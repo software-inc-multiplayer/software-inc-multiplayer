@@ -1,27 +1,23 @@
-﻿using UnityEngine;
+﻿using Multiplayer.Extensions;
+using UnityEngine;
 using UnityEngine.UI;
-using Multiplayer.Extensions;
 
 namespace Multiplayer.Debugging
 {
     public class ErrorHandling
     {
-        public static void Handle(Error error, bool DebugMode)
+        public static void Handle(Error error)
         {
-            if (DebugMode)
-            {
-                GUIWindow errorWindow = WindowManager.SpawnWindow();
-                var title = WindowManager.SpawnLabel();
-                title.text = "Error!";
-                errorWindow.TitleText = title;
-                var panel = errorWindow.MainPanel;
-                Text errorInfo = WindowManager.SpawnLabel();
-                errorInfo.text = $"We found an error:\n\n<color=red><b>{error.ToString()}</b></color>\n\n";
-                errorWindow.MinSize = new Vector2(Screen.width / 2.5f, Screen.height / 2.5f);
-                errorWindow.Show();
-                PopupManager.NotificationSound.Issue.Play();
-                WindowManager.AddElementToWindow(errorInfo.gameObject, errorWindow, new Rect(0, 15, 450, 50), Rect.zero);
-            }
+            GUIWindow errorWindow = WindowManager.SpawnWindow();
+            errorWindow.Title = "Error!";
+            var panel = errorWindow.MainPanel;
+            Text errorInfo = WindowManager.SpawnLabel();
+            errorInfo.supportRichText = true;
+            errorInfo.text = $"We found an error:\n\n<color=red><b>{error.ToString()}</b></color>\n\n";
+            errorWindow.MinSize = new Vector2(Screen.width / 2.5f, Screen.height / 2.5f);
+            errorWindow.Show();
+            PopupManager.NotificationSound.Issue.Play();
+            WindowManager.AddElementToElement(errorInfo.gameObject, panel.gameObject, new Rect(0, 15, 450, 50), Rect.zero);
             if (error.Message == "This is a test error. Please ignore.") return;
         }
         public class Error
