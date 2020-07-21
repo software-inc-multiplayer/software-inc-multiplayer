@@ -37,12 +37,15 @@ namespace Multiplayer.Extensions
 
         private void DebugSetter(bool arg0)
         {
-            
+            ThisMod.SaveSetting("debug", arg0.ToString());
         }
 
         public override void Initialize(ModController.DLLMod parentMod)
         {
             ThisMod = parentMod;
+            ThisMod.Settings.TryGetValue("debug", out string e);
+            if (bool.Parse(e)) DebugMode = true;
+            else DebugMode = false;
             AppDomain.CurrentDomain.FirstChanceException += ErrorCatcher;
             AppDomain.CurrentDomain.AssemblyResolve += (x, y) => Assembly.LoadFrom(Path.Combine(parentMod.FolderPath(), "References\\" + y.Name.Substring(0, y.Name.IndexOf(",")) + ".dll"));
             base.Initialize(parentMod);
