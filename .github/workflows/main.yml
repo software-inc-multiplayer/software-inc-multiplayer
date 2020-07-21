@@ -22,5 +22,5 @@ jobs:
         uses: actions/upload-artifact@v1.0.0
         with:
           name: swinc.multiplayer-${{github.run_id}}
-          path: swinc.multiplayer\Core\bin\Release
+          path: swinc.multiplayer\Multiplayer.Core\bin\Release
 
