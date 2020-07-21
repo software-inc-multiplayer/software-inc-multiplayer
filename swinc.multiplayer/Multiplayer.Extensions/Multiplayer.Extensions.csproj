@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}</ProjectGuid>
+    <ProjectGuid>{816FE3F3-50EF-44A7-A54A-F2EE0346E9F8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Multiplayer.Debugging</RootNamespace>
-    <AssemblyName>Multiplayer.Debugging</AssemblyName>
+    <RootNamespace>Multiplayer.Extensions</RootNamespace>
+    <AssemblyName>Multiplayer.Extensions</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -230,15 +230,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ErrorHandling.cs" />
-    <Compile Include="Logging.cs" />
+    <Compile Include="AudioHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Multiplayer.Extensions\Multiplayer.Extensions.csproj">
-      <Project>{816fe3f3-50ef-44a7-a54a-f2ee0346e9f8}</Project>
-      <Name>Multiplayer.Extensions</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

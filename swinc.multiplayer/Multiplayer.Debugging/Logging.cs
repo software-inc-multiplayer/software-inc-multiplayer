@@ -29,16 +29,16 @@ namespace Multiplayer.Debugging
                 switch (logType)
                 {
                     case LogType.Debug:
-                        DevConsole.Console.Log(e);
+                        DevConsole.Console.Log("[Multiplayer] " + e);
                         break;
                     case LogType.Info:
-                        DevConsole.Console.LogInfo(e);
+                        DevConsole.Console.LogInfo("[Multiplayer] " + e);
                         break;
                     case LogType.Error:
-                        DevConsole.Console.LogError(e);
+                        DevConsole.Console.LogError("[Multiplayer] " + e);
                         break;
                     case LogType.Warn:
-                        DevConsole.Console.LogWarning(e);
+                        DevConsole.Console.LogWarning("[Multiplayer] " + e);
                         break;
                 }
             }
@@ -50,16 +50,16 @@ namespace Multiplayer.Debugging
                 switch (f.LogType)
                 {
                     case LogType.Debug:
-                        DevConsole.Console.Log(f.Object);
+                        DevConsole.Console.Log("[Multiplayer] " + f.Object);
                         break;
                     case LogType.Info:
-                        DevConsole.Console.LogInfo(f.Object);
+                        DevConsole.Console.LogInfo("[Multiplayer] " + f.Object);
                         break;
                     case LogType.Error:
-                        DevConsole.Console.LogError(f.Object);
+                        DevConsole.Console.LogError("[Multiplayer] " + f.Object);
                         break;
                     case LogType.Warn:
-                        DevConsole.Console.LogWarning(f.Object);
+                        DevConsole.Console.LogWarning("[Multiplayer] " + f.Object);
                         break;
                 }
             }
@@ -68,28 +68,28 @@ namespace Multiplayer.Debugging
         {
             foreach(object e in obj)
             {
-                DevConsole.Console.Log(e);
+                DevConsole.Console.Log("[Multiplayer] " + e);
             }
         }
         public static void Info(params object[] obj)
         {
             foreach(object e in obj)
             {
-                DevConsole.Console.LogInfo(e);
+                DevConsole.Console.LogInfo("[Multiplayer] " + e);
             }
         }
         public static void Warn(params object[] obj)
         {
             foreach(object e in obj)
             {
-                DevConsole.Console.LogWarning(e);
+                DevConsole.Console.LogWarning("[Multiplayer] " + e);
             }
         }
         public static void Error(params object[] obj)
         {
             foreach(object e in obj)
             {
-                DevConsole.Console.LogError(e);
+                DevConsole.Console.LogError("[Multiplayer] " + e);
             }
         }
     }
