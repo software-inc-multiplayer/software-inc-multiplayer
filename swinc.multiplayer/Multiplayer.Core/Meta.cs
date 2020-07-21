@@ -57,4 +57,16 @@ namespace Multiplayer.Extensions
             ErrorHandling.Handle(error, DebugMode);
         }
     }
+    public class Behaviour : ModBehaviour
+    {
+        public override void OnActivate()
+        {
+            
+        }
+
+        public override void OnDeactivate()
+        {
+            
+        }
+    }
 }
