@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{13F254D3-469C-4D57-BB72-7D8E881A8C64}</ProjectGuid>
+    <ProjectGuid>{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Multiplayer.Core</RootNamespace>
-    <AssemblyName>Core</AssemblyName>
+    <RootNamespace>Multiplayer.Debugging</RootNamespace>
+    <AssemblyName>Multiplayer.Debugging</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -57,6 +57,9 @@
     </Reference>
     <Reference Include="Mono.Security">
       <HintPath>..\References\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SSAA">
       <HintPath>..\References\SSAA.dll</HintPath>
@@ -227,7 +230,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Meta.cs" />
+    <Compile Include="ErrorHandling.cs" />
+    <Compile Include="Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
