@@ -28,4 +28,9 @@ jobs:
         with:
           name: Multiplayer.Debugging
           path: swinc.multiplayer\Multiplayer.Debugging\bin\Release
+      - name: Upload Multiplayer.Extensions
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: Multiplayer.Extensions
+          path: swinc.multiplayer\Multiplayer.Extensions\bin\Release
 
