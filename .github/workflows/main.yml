@@ -25,12 +25,12 @@ jobs:
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2
       - name: Restore NuGet Packages
-        run: nuget restore swinc.multiplayer.sln
+        run: nuget restore .\swinc.multiplayer\swinc.multiplayer.sln
       - name: Build
-        run: msbuild swinc.multiplayer.sln /p:Configuration=Release
+        run: msbuild .\swinc.multiplayer\swinc.multiplayer.sln /p:Configuration=Release
       - name: Upload Artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           name: Release
-          path: bin\Release
+          path: swinc.multiplayer\Core\bin\Release
 
