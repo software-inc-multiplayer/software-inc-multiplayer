@@ -21,6 +21,6 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: Release
+          name: swinc.multiplayer-{{github.run_id}}
           path: swinc.multiplayer\Core\bin\Release
 
