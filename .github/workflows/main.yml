@@ -18,9 +18,14 @@ jobs:
         run: nuget restore .\swinc.multiplayer\swinc.multiplayer.sln
       - name: Build
         run: msbuild .\swinc.multiplayer\swinc.multiplayer.sln /p:Configuration=Release
-      - name: Upload Artifact
+      - name: Upload Multiplayer.Core
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: swinc.multiplayer-${{github.run_id}}
-          path: swinc.multiplayer\Core\bin\Release
+          name: Multiplayer.Core
+          path: swinc.multiplayer\Multiplayer.Core\bin\Release
+      - name: Upload Multiplayer.Debugging
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: Multiplayer.Debugging
+          path: swinc.multiplayer\Multiplayer.Debugging\bin\Release
 
