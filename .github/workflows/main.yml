@@ -13,7 +13,6 @@ jobs:
     - name: Super-Linter
       uses: github/super-linter@v3.3.2
       with:
-        VALIDATE_ALL_CODEBASE: false
         VALIDATE_MD: true
   build-artifacts:
     runs-on: windows-latest
