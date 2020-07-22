@@ -248,7 +248,7 @@
       <Name>Multiplayer.Debugging</Name>
     </ProjectReference>
     <ProjectReference Include="..\Multiplayer.Networking\Multiplayer.Networking.csproj">
-      <Project>{7A1C9B1D-33BA-4C30-A592-5717FB9E4F13}</Project>
+      <Project>{19cd273f-a601-45ed-ab6d-6e61f47a074c}</Project>
       <Name>Multiplayer.Networking</Name>
     </ProjectReference>
   </ItemGroup>

@@ -1,9 +1,9 @@
-﻿using EasyTcp3;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
@@ -12,10 +12,16 @@ namespace Multiplayer.Networking
 {
 	public static class Helpers
 	{
+		public static void Log(string from, string message)
+		{
+			DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + " " + from + ": " + message);
+		}
+
 		public class User
 		{
 			public string Username { get; set; }
 			public UserRole Role { get; set; }
+			public object TcpClient { get; set; }
 
 			public string ToJson()
 			{
@@ -30,7 +36,6 @@ namespace Multiplayer.Networking
 
 		public class ChatMessage
 		{
-			public string Sender { get; set; }
 			public string Receiver { get; set; }
 			public string Chatmessage { get; set; }
 			public MessageData AsMessage()
@@ -66,11 +71,22 @@ namespace Multiplayer.Networking
 			{
 				return new MessageData() { Data = obj, DataType = typeof(T).FullName };
 			}
+
+			public static MessageData FromJson(string json)
+			{
+				return JsonConvert.DeserializeObject<MessageData>(json);
+			}
+
+			public string ToJson()
+			{
+				return JsonConvert.SerializeObject(this);
+			}
 		}
 
 		public enum SysMessageType
 		{
-			Login
+			Login,
+			Chat
 		}
 
 		public enum UserRole
