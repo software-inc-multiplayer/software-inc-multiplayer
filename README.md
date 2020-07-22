@@ -1,3 +1,3 @@
-![# Software Inc Multiplayer](https://raw.githubusercontent.com/cal3432/software-inc-multiplayer/master/banner.png)
+# Software Inc Multiplayer
 
-A multiplayer mod for Software Inc.
+A multiplayer mod for Software Inc that is in development.
