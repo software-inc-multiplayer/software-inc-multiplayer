@@ -20,7 +20,7 @@ namespace Multiplayer.Networking
         public ushort MaxPlayers = 0;
         private string Password = "";
         static EasyTcpServer server;
-
+        public static SrvClass instance;
         void Log(string message)
         {
             DevConsole.Console.Log("Sever: " + message);

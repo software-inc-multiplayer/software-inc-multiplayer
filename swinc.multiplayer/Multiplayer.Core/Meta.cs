@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using Multiplayer.Debugging;
+using Multiplayer.Networking;
 
 namespace Multiplayer.Core
 {
@@ -47,7 +48,14 @@ namespace Multiplayer.Core
     {
         public override void OnActivate()
         {
-            
+            if (!Meta.ThisMod.Settings.TryGetValue("port", out string port)) {
+                port = 52512.ToString();
+            }
+            if(!ushort.TryParse(port, out ushort porte))
+            {
+                porte = 52512;
+            }
+            SrvClass.instance.Start(porte);
         }
 
         public override void OnDeactivate()

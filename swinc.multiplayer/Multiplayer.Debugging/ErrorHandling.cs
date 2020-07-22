@@ -9,13 +9,14 @@ namespace Multiplayer.Debugging
         public static void Handle(Error error)
         {
             GUIWindow errorWindow = WindowManager.SpawnWindow();
+            errorWindow.Show();
             errorWindow.Title = "Error!";
             var panel = errorWindow.MainPanel;
             Text errorInfo = WindowManager.SpawnLabel();
             errorInfo.supportRichText = true;
             errorInfo.text = $"We found an error:\n\n<color=red><b>{error.ToString()}</b></color>\n\n";
             errorWindow.MinSize = new Vector2(Screen.width / 2.5f, Screen.height / 2.5f);
-            errorWindow.Show();
+            
             PopupManager.NotificationSound.Issue.Play();
             WindowManager.AddElementToElement(errorInfo.gameObject, panel.gameObject, new Rect(0, 15, 450, 50), Rect.zero);
             if (error.Message == "This is a test error. Please ignore.") return;
