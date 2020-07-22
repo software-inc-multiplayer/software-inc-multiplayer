@@ -33,4 +33,9 @@ jobs:
         with:
           name: Multiplayer.Extensions
           path: swinc.multiplayer\Multiplayer.Extensions\bin\Release
+      - name: Upload Multiplayer.Networking
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: Multiplayer.Networking
+          path: swinc.multiplayer\Multiplayer.Networking\bin\Release
 
