@@ -33,7 +33,6 @@ namespace Multiplayer.Core
         public override void Initialize(ModController.DLLMod parentMod)
         {
             AppDomain.CurrentDomain.UnhandledException += ErrorCatcher;
-            AppDomain.CurrentDomain.AssemblyResolve += (x, y) => Assembly.LoadFrom(Path.Combine(parentMod.FolderPath(), "References\\Priorities\\" + y.Name.Substring(0, y.Name.IndexOf(",")) + ".dll"));
             AppDomain.CurrentDomain.AssemblyResolve += (x, y) => Assembly.LoadFrom(Path.Combine(parentMod.FolderPath(), "References\\" + y.Name.Substring(0, y.Name.IndexOf(",")) + ".dll"));
             base.Initialize(parentMod);
         }
