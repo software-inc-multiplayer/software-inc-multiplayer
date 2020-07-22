@@ -27,7 +27,7 @@ namespace Multiplayer.Core
 
         private void ErrorTest()
         {
-            ErrorCatcher(null, new UnhandledExceptionEventArgs(new Exception("This is a test error. Please ignore."), false));
+            Logging.Error("Test");
         }
 
         public override void Initialize(ModController.DLLMod parentMod)
@@ -40,24 +40,14 @@ namespace Multiplayer.Core
         {
             Exception t = (Exception)e.ExceptionObject;
             Logging.Error(t.ToString());
-            ErrorHandling.Error error = new ErrorHandling.Error(t.GetHashCode().ToString(), t.Message, t.StackTrace, t.Source, t.TargetSite.ToString());
-            ErrorHandling.Handle(error);
         }
     }
     public class Behaviour : ModBehaviour
     {
         public override void OnActivate()
         {
-            if (!Meta.ThisMod.Settings.TryGetValue("port", out string port)) {
-                port = 52512.ToString();
-            }
-            if(!ushort.TryParse(port, out ushort porte))
-            {
-                porte = 52512;
-            }
-            SrvClass.instance.Start(porte);
+            
         }
-
         public override void OnDeactivate()
         {
             
