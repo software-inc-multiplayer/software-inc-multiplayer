@@ -12,12 +12,12 @@ namespace Multiplayer.Core
     {
         public override void OnActivate()
         {
-            ServerClass.Start();
+            new ServerClass().Start();
         }
 
         public override void OnDeactivate()
         {
-            ServerClass.Stop();
+            ServerClass.Instance.Stop();
         }
     }
 }
