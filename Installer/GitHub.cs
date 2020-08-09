@@ -1,13 +1,10 @@
 ﻿using Octokit;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO.Compression;
 using System.IO;
-using System.ComponentModel;
+using System.IO.Compression;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Installer
 {
@@ -28,19 +25,19 @@ namespace Installer
         public static async Task GetReleases()
         {
             var client = new GitHubClient(new ProductHeaderValue(new Random().Next().ToString()));
-            IReadOnlyList<Release> releases = await client.Repository.Release.GetAll("cal3432","software-inc-multiplayer");
-            Release latest = await client.Repository.Release.GetLatest("cal3432","software-inc-multiplayer");
-            foreach(Release release in releases)
-            {        
-                foreach(ReleaseAsset asset in release.Assets)
+            IReadOnlyList<Release> releases = await client.Repository.Release.GetAll("cal3432", "software-inc-multiplayer");
+            foreach (Release release in releases)
+            {
+                if (release.Name.ToLower().Contains("installer")) continue;
+                foreach (ReleaseAsset asset in release.Assets)
                 {
-                    if (asset.Name != "installer-binaries.zip") return;
+                    if (asset.Name != "installer-binaries.zip") continue;
                     ReleaseTag temp = new ReleaseTag();
                     temp.DownloadURL = asset.BrowserDownloadUrl;
                     temp.PreRelease = release.Prerelease;
                     temp.Tag = release.TagName;
                     temp.DownloadCount = asset.DownloadCount;
-                    allowedReleases.Add(temp.Tag, temp);
+                    allowedReleases.Add(release.TagName, temp);
                 }
             }
         }
@@ -49,7 +46,7 @@ namespace Installer
             if (!Directory.Exists(LocalLowPath + release.Tag))
             {
                 client.Headers.Add("user-agent", "Anything");
-                if(!Directory.Exists(LocalLowPath))
+                if (!Directory.Exists(LocalLowPath))
                 {
                     Directory.CreateDirectory(LocalLowPath);
                 }
@@ -59,7 +56,7 @@ namespace Installer
                 DirectoryCopy(LocalLowPath + release.Tag + "/manage", Properties.Settings.Default.installDir + "/Software Inc_Data/Managed", true);
                 File.Delete(LocalLowPath + "download.zip");
                 Directory.Delete(LocalLowPath + release.Tag, true);
-            }           
+            }
         }
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
         {
@@ -85,7 +82,7 @@ namespace Installer
             foreach (FileInfo file in files)
             {
                 string temppath = Path.Combine(destDirName, file.Name);
-                if(File.Exists(temppath))
+                if (File.Exists(temppath))
                 {
                     File.Delete(temppath);
                 }

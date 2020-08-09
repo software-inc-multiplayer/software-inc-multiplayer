@@ -83,8 +83,6 @@
             // releasesList
             // 
             this.releasesList.FormattingEnabled = true;
-            this.releasesList.Items.AddRange(new object[] {
-            "latest"});
             this.releasesList.Location = new System.Drawing.Point(309, 190);
             this.releasesList.Name = "releasesList";
             this.releasesList.Size = new System.Drawing.Size(121, 21);
@@ -99,7 +97,7 @@
             this.InstallButton.TabIndex = 6;
             this.InstallButton.Text = "Install!";
             this.InstallButton.UseVisualStyleBackColor = true;
-            this.InstallButton.Click += new System.EventHandler(this.InstallButton_ClickAsync);
+            this.InstallButton.Click += new System.EventHandler(this.InstallButton_Click);
             // 
             // label3
             // 

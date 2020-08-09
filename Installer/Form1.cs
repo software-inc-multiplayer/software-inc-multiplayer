@@ -16,10 +16,6 @@ namespace Installer
         public MainWindow()
         {
             InitializeComponent();
-            Init();
-        }
-        private async void Init()
-        {
             if (String.IsNullOrWhiteSpace(Properties.Settings.Default.installDir))
             {
                 installationDirTag.Text = "Game installation not set.";
@@ -28,13 +24,16 @@ namespace Installer
             {
                 installationDirTag.Text = Properties.Settings.Default.installDir;
             }
+            IniteAsync();
+        }
+        public async void IniteAsync()
+        {
             await GitHub.GetReleases();
             foreach (KeyValuePair<string, ReleaseTag> pair in GitHub.allowedReleases)
             {
                 releasesList.Items.Add(pair.Key);
             }
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog f = new FolderBrowserDialog();   
@@ -64,7 +63,7 @@ namespace Installer
             selectedRelease = release;
         }
 
-        private async void InstallButton_ClickAsync(object sender, EventArgs e)
+        private async void InstallButton_Click(object sender, EventArgs e)
         {
             if(installationDirTag.Text == "Game installation not set.")
             {
