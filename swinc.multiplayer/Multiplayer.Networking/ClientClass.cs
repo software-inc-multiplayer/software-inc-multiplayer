@@ -32,8 +32,10 @@ namespace Multiplayer.Networking
             // send a message
             client.Send("Hello!");
             // send a message with metadata
-            Dictionary<object, object> md = new Dictionary<object, object>();
-            md.Add("foo", "bar");
+            Dictionary<object, object> md = new Dictionary<object, object>
+            {
+                { "foo", "bar" }
+            };
             client.Send(md, "Hello, client!  Here's some metadata!");
 
             // send async!

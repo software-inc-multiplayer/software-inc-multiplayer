@@ -28,7 +28,12 @@ namespace Multiplayer.Networking
             server.MessageReceived += MessageReceived;
             server.SyncRequestReceived = SyncRequestReceived;
             server.Start();
-
+            Logging.Info($"[Server] Server started.");
+        }
+        public static void Stop()
+        {
+            server.Dispose();
+            Logging.Info($"[Server] Server disposed.");
         }
 
         static void ClientConnected(object sender, ClientConnectedEventArgs args)

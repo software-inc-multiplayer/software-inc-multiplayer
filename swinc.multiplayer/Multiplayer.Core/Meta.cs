@@ -42,15 +42,4 @@ namespace Multiplayer.Core
             Logging.Error(t.ToString());
         }
     }
-    public class Behaviour : ModBehaviour
-    {
-        public override void OnActivate()
-        {
-            
-        }
-        public override void OnDeactivate()
-        {
-            
-        }
-    }
 }
