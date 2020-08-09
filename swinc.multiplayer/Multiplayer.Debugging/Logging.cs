@@ -29,16 +29,16 @@ namespace Multiplayer.Debugging
                 switch (logType)
                 {
                     case LogType.Debug:
-                        DevConsole.Console.Log($"[Multiplayer] {e}");
+                        DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                         break;
                     case LogType.Info:
-                        DevConsole.Console.LogInfo($"[Multiplayer] {e}");
+                        DevConsole.Console.LogInfo(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                         break;
                     case LogType.Error:
-                        DevConsole.Console.LogError($"[Multiplayer] {e}");
+                        DevConsole.Console.LogError(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                         break;
                     case LogType.Warn:
-                        DevConsole.Console.LogWarning($"[Multiplayer] {e}");
+                        DevConsole.Console.LogWarning(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                         break;
                 }
             }
@@ -50,16 +50,16 @@ namespace Multiplayer.Debugging
                 switch (f.LogType)
                 {
                     case LogType.Debug:
-                        DevConsole.Console.Log($"[Multiplayer] {f.Object}");
+                        DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {f.Object}");
                         break;
                     case LogType.Info:
-                        DevConsole.Console.LogInfo($"[Multiplayer] {f.Object}");
+                        DevConsole.Console.LogInfo(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {f.Object}");
                         break;
                     case LogType.Error:
-                        DevConsole.Console.LogError($"[Multiplayer] {f.Object}");
+                        DevConsole.Console.LogError(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {f.Object}");
                         break;
                     case LogType.Warn:
-                        DevConsole.Console.LogWarning($"[Multiplayer] {f.Object}");
+                        DevConsole.Console.LogWarning(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {f.Object}");
                         break;
                 }
             }
@@ -68,28 +68,28 @@ namespace Multiplayer.Debugging
         {
             foreach(object e in obj)
             {
-                DevConsole.Console.Log($"[Multiplayer] {e}");
+                DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
             }
         }
         public static void Info(params object[] obj)
         {
             foreach(object e in obj)
             {             
-                DevConsole.Console.LogInfo($"[Multiplayer] {e}");
+                DevConsole.Console.LogInfo(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
             }
         }
         public static void Warn(params object[] obj)
         {
             foreach(object e in obj)
             {
-                DevConsole.Console.LogWarning($"[Multiplayer] {e}");
+                DevConsole.Console.LogWarning(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
             }
         }
         public static void Error(params object[] obj)
         {
             foreach(object e in obj)
             {
-                DevConsole.Console.LogError($"[Multiplayer] {e}");
+                DevConsole.Console.LogError(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
             }
         }
     }

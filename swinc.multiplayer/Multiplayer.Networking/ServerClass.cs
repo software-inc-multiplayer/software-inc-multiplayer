@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Multiplayer.Debugging;
 using WatsonTcp;
 
 namespace Multiplayer.Networking
@@ -32,17 +33,17 @@ namespace Multiplayer.Networking
 
         static void ClientConnected(object sender, ClientConnectedEventArgs args)
         {
-            Helpers.Log("server", "Client connected: " + args.IpPort);
+            Logging.Info("[Server] Client connected: " + args.IpPort);
         }
 
         static void ClientDisconnected(object sender, ClientDisconnectedEventArgs args)
         {
-            Helpers.Log("server", "Client disconnected: " + args.IpPort + ": " + args.Reason.ToString());
+            Logging.Info("[Server] Client disconnected: " + args.IpPort + ": " + args.Reason.ToString());
         }
 
         static void MessageReceived(object sender, MessageReceivedFromClientEventArgs args)
         {
-            Helpers.Log("server", "Message received from " + args.IpPort + ": " + Encoding.UTF8.GetString(args.Data));
+            Logging.Info("[Server] Message received from " + args.IpPort + ": " + Encoding.UTF8.GetString(args.Data));
         }
 
         static SyncResponse SyncRequestReceived(SyncRequest req)

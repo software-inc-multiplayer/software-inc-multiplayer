@@ -65,5 +65,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerClass.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Multiplayer.Debugging\Multiplayer.Debugging.csproj">
+      <Project>{3ba2b696-5228-429f-8fff-fbf6ca7a5303}</Project>
+      <Name>Multiplayer.Debugging</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

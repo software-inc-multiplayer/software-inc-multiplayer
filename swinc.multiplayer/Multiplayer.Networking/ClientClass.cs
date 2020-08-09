@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Multiplayer.Debugging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Steamworks;
@@ -26,7 +27,7 @@ namespace Multiplayer.Networking
             client.Start();
 
             // check connectivity
-            Helpers.Log("client", "Am I connected?  " + client.Connected);
+            Logging.Info("[Client] Am I Connected? " + client.Connected);
 
             // send a message
             client.Send("Hello!");
@@ -42,11 +43,11 @@ namespace Multiplayer.Networking
             try
             {
                 SyncResponse resp = client.SendAndWait(5000, "Hey, say hello back within 5 seconds!");
-                Helpers.Log("client", "My friend says: " + Encoding.UTF8.GetString(resp.Data));
+                Logging.Info("[Client] My friend says: " + Encoding.UTF8.GetString(resp.Data));
             }
             catch (TimeoutException)
             {
-                Helpers.Log("client", "Too slow...");
+                Logging.Info("[Client] Too slow...");
             }
             //Helpers.SystemMessage sysmsg = new Helpers.SystemMessage(Helpers.SysMessageType.Login, "User", Helpers.UserRole.Host);
             //client.Send(sysmsg.AsMessage().ToJson());
@@ -54,17 +55,17 @@ namespace Multiplayer.Networking
 
         static void MessageReceived(object sender, MessageReceivedFromServerEventArgs args)
         {
-            Helpers.Log("client", "Message from server: " + Encoding.UTF8.GetString(args.Data));
+            Logging.Info("[Client] Message from server: " + Encoding.UTF8.GetString(args.Data));
         }
 
         static void ServerConnected(object sender, EventArgs args)
         {
-            Helpers.Log("client", "Server connected");
+            Logging.Info("[Client] Server connected");
         }
 
         static void ServerDisconnected(object sender, EventArgs args)
         {
-            Helpers.Log("client", "Server disconnected");
+            Logging.Error("[Client] Server disconnected");
         }
 
         static SyncResponse SyncRequestReceived(SyncRequest req)

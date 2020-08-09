@@ -12,6 +12,7 @@ namespace Multiplayer.Networking
 {
 	public static class Helpers
 	{
+		[Obsolete("Use Multiplayer.Debugging.Logging instead.")]
 		public static void Log(string from, string message)
 		{
 			DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + " " + from + ": " + message);
