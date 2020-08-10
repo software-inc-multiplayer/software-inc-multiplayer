@@ -11,13 +11,19 @@ using WatsonTcp;
 
 namespace Multiplayer.Networking
 {
-    public static class ClientClass
+    public class ClientClass : IDisposable
     {
-
-        static bool isLoggedin = false;
+        public static ClientClass Instance;
+        bool isLoggedin = false;
         static WatsonTcpClient client;
+		private bool disposedValue;
 
-        public static async void Connect(string ip, ushort port = 52512)
+        public ClientClass()
+		{
+            Instance = this;
+		}
+
+		public async void Connect(string ip, ushort port = 52512)
         {
             client = new WatsonTcpClient(ip, port);
             client.ServerConnected += ServerConnected;
@@ -55,24 +61,42 @@ namespace Multiplayer.Networking
             //client.Send(sysmsg.AsMessage().ToJson());
         }
 
-        static void MessageReceived(object sender, MessageReceivedFromServerEventArgs args)
+        void MessageReceived(object sender, MessageReceivedFromServerEventArgs args)
         {
             Logging.Info("[Client] Message from server: " + Encoding.UTF8.GetString(args.Data));
         }
 
-        static void ServerConnected(object sender, EventArgs args)
+        void ServerConnected(object sender, EventArgs args)
         {
             Logging.Info("[Client] Server connected");
         }
 
-        static void ServerDisconnected(object sender, EventArgs args)
+        void ServerDisconnected(object sender, EventArgs args)
         {
             Logging.Error("[Client] Server disconnected");
         }
 
-        static SyncResponse SyncRequestReceived(SyncRequest req)
+        SyncResponse SyncRequestReceived(SyncRequest req)
         {
             return new SyncResponse(req, "Hello back at you!");
         }
-    }
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+                    client.Dispose();
+				}
+				disposedValue = true;
+			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+	}
 }

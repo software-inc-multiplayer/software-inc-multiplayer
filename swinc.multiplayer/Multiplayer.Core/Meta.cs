@@ -22,7 +22,8 @@ namespace Multiplayer.Core
         {          
             Button e = WindowManager.SpawnButton();
             e.onClick.AddListener(ErrorTest);
-            WindowManager.AddElementToElement(e.gameObject, parent.gameObject, new Rect(0, 15, 64, 64), Rect.zero);
+            e.gameObject.GetComponentInChildren<Text>().text = "Test Error";
+            WindowManager.AddElementToElement(e.gameObject, parent.gameObject, new Rect(0, 15, 192, 64), Rect.zero);
         }
 
         private void ErrorTest()

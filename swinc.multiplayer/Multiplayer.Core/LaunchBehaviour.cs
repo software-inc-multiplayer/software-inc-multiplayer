@@ -5,19 +5,27 @@ using System.Text;
 using Multiplayer.Networking;
 using Multiplayer.Debugging;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Multiplayer.Core
 {
     public class LaunchBehaviour : ModBehaviour
     {
+        public static List<GameObject> ActiveObjects = new List<GameObject>() { };
+
         public override void OnActivate()
         {
-            ServerClass.Start();
+            new ServerClass().Start();
         }
 
         public override void OnDeactivate()
         {
-            ServerClass.Stop();
+            foreach(GameObject e in ActiveObjects)
+            {
+                e.SetActive(false);
+                ActiveObjects.Remove(e);
+            }
+            ServerClass.Instance.Stop();
         }
     }
 }

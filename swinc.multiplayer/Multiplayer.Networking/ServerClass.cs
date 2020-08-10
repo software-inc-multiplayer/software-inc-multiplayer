@@ -12,14 +12,21 @@ using WatsonTcp;
 namespace Multiplayer.Networking
 {
 
-    public static class ServerClass
+    public class ServerClass : IDisposable
     {
-        private static ushort Port = 52512;
-        public static ushort MaxPlayers = 0;
-        private static string Password = "";
-        static WatsonTcpServer server;
+        public static ServerClass Instance;
+        private ushort Port = 52512;
+        public ushort MaxPlayers = 10;
+        private string Password = "";
+        WatsonTcpServer server;
+		private bool disposedValue;
 
-        public static void Start(ushort port = 52512)
+        public ServerClass()
+        {
+            Instance = this;
+        }
+
+        public void Start(ushort port = 52512)
         {
             Port = port;
             server = new WatsonTcpServer(null, Port);
@@ -30,30 +37,48 @@ namespace Multiplayer.Networking
             server.Start();
             Logging.Info($"[Server] Server started.");
         }
-        public static void Stop()
+        public void Stop()
         {
             server.Dispose();
             Logging.Info($"[Server] Server disposed.");
         }
 
-        static void ClientConnected(object sender, ClientConnectedEventArgs args)
+        void ClientConnected(object sender, ClientConnectedEventArgs args)
         {
             Logging.Info("[Server] Client connected: " + args.IpPort);
         }
 
-        static void ClientDisconnected(object sender, ClientDisconnectedEventArgs args)
+        void ClientDisconnected(object sender, ClientDisconnectedEventArgs args)
         {
             Logging.Info("[Server] Client disconnected: " + args.IpPort + ": " + args.Reason.ToString());
         }
 
-        static void MessageReceived(object sender, MessageReceivedFromClientEventArgs args)
+        void MessageReceived(object sender, MessageReceivedFromClientEventArgs args)
         {
             Logging.Info("[Server] Message received from " + args.IpPort + ": " + Encoding.UTF8.GetString(args.Data));
         }
 
-        static SyncResponse SyncRequestReceived(SyncRequest req)
+        SyncResponse SyncRequestReceived(SyncRequest req)
         {
             return new SyncResponse(req, "Hello back at you!");
         }
-    }
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+                    server.Dispose();
+				}
+				disposedValue = true;
+			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+	}
 }
