@@ -20,8 +20,7 @@ namespace Multiplayer.Core
         {
             RectTransform mainMenuPanel = WindowManager.FindElementPath("MainPanel/Panel");
             Button mainMenuButton = WindowManager.SpawnButton();
-            mainMenuButton.GetComponentInChildren<Text>().text = "Multiplayer";
-            mainMenuButton.GetComponentInChildren<Text>().fontSize = 40;
+            mainMenuButton.gameObject.GetComponentInChildren<Text>().text = "MainMenu_MP_Button".LocDef("Multiplayer");
             mainMenuButton.onClick.AddListener(MainMenuButtonClick);
             mainMenuButton.gameObject.name = "MainMenu_MP_Button";
             LaunchBehaviour.ActiveObjects.Add(mainMenuButton.gameObject);
