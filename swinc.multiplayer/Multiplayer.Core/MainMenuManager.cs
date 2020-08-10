@@ -18,7 +18,7 @@ namespace Multiplayer.Core
         }
         private void CreateButton()
         {
-            RectTransform mainMenuPanel = WindowManager.FindElementPath("SPanel / Panel");
+            RectTransform mainMenuPanel = WindowManager.FindElementPath("MainPanel/Panel");
             Button mainMenuButton = WindowManager.SpawnButton();
             mainMenuButton.GetComponentInChildren<Text>().text = "Multiplayer";
             mainMenuButton.GetComponentInChildren<Text>().fontSize = 40;
