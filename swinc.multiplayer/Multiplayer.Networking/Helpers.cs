@@ -12,14 +12,12 @@ namespace Multiplayer.Networking
 {
 	public static class Helpers
 	{
-		[Obsolete("Use Multiplayer.Debugging.Logging instead.")]
-		public static void Log(string from, string message)
-		{
-			DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + " " + from + ": " + message);
-		}
-
 		public class User
 		{
+			/// <summary>
+			/// The ID of the User inside the server
+			/// </summary>
+			public ushort ID { get; set; }
 			/// <summary>
 			/// The (Steam) username of the User
 			/// </summary>
@@ -29,9 +27,9 @@ namespace Multiplayer.Networking
 			/// </summary>
 			public UserRole Role { get; set; }
 			/// <summary>
-			/// The TCP Client of the user
+			/// The Ip & Port of the user
 			/// </summary>
-			public object TcpClient { get; set; }
+			public string IpPort { get; set; }
 			/// <summary>
 			/// The UserCompany of the User, will be set with the User() function
 			/// </summary>
@@ -89,71 +87,73 @@ namespace Multiplayer.Networking
 			}
 		}
 
-		public class ChatMessage
+		/// <summary>
+		/// Do not use this, but use one of the objects that are based on the message
+		/// </summary>
+		public class Message
+		{
+			public string Data = "";
+			public Dictionary<object, object> Meta = new Dictionary<object, object>();
+		}
+
+		public class LoginMessage : Message
 		{
 			/// <summary>
-			/// The receiver of the chatmessage
+			/// [CLIENT ONLY] The loginmessage a user sends when trying to login to the server
 			/// </summary>
-			public string Receiver { get; set; }
-			/// <summary>
-			/// The message itself
-			/// </summary>
-			public string Chatmessage { get; set; }
-
-			public MessageData AsMessage()
+			/// <param name="username">The username of the user (TODO: Steam username)</param>
+			/// <param name="password">The server password, if empty it won't have a password</param>
+			public LoginMessage(string username, string password)
 			{
-				return MessageData.FromObject(this);
+				Data = "login";
+				Meta.Add("username", username);
+				Meta.Add("password", password);
 			}
 		}
 
-		public class SystemMessage
+		public class ChatMessage : Message
 		{
 			/// <summary>
-			/// The type of the system message (Login/Chat)
+			/// [CLIENT ONLY] Sends a chatmessage to a receiver, if receiver is empty it will send it to all clients
 			/// </summary>
-			public SysMessageType MessageType { get; set; }
-			/// <summary>
-			/// the data of the system message. The content depends on the type
-			/// </summary>
-			public List<object> Data { get; set; }
-
-			public SystemMessage(SysMessageType messageType, params object[] data)
+			/// <param name="receiver">The receiver of the chat message, if its empty it will send it to all clients</param>
+			/// <param name="message">The chat message of the client</param>
+			public ChatMessage(string receiver, string message)
 			{
-				MessageType = messageType;
-				Data = new List<object>();
-				Data.AddRange(data);
-			}
-
-			public MessageData AsMessage()
-			{
-				return MessageData.FromObject(this);
+				Data = "chat";
+				Meta.Add("receiver", receiver);
+				Meta.Add("message", message);
 			}
 		}
 
-		public class MessageData
+		public class ServerMessage : Message
 		{
 			/// <summary>
-			/// The type of the data as string
+			/// [SERVER ONLY] Sends a message from the server to a receiver client
 			/// </summary>
-			public string DataType { get; set; }
+			/// <param name="receiver">The receiver of the message, if its empty it will send it to every client</param>
+			/// <param name="message">The system message the server sends</param>
+			public ServerMessage(string receiver, string message)
+			{
+				Data = "server";
+				Meta.Add("receiver", receiver);
+				Meta.Add("message", message);
+			}
+		}
+
+		public class DataMessage : Message
+		{
 			/// <summary>
-			/// The data itself as object
+			/// Sends a Datamessage with a Company object within it
 			/// </summary>
-			public object Data { get; set; }
-
-			public static MessageData FromObject<T>(T obj)
+			/// <param name="receiver">The receiver of the datamessage if its empty its for every client, if its "server" its for the server</param>
+			/// <param name="company">The company object that needs to be sent</param>
+			public DataMessage(string receiver, Company company)
 			{
-				return new MessageData() { Data = obj, DataType = typeof(T).FullName };
-			}
-
-			public static MessageData FromJson(string json)
-			{
-				return JsonConvert.DeserializeObject<MessageData>(json);
-			}
-
-			public string ToJson()
-			{
-				return JsonConvert.SerializeObject(this);
+				Data = "data";
+				Meta.Add("receiver", receiver);
+				Meta.Add("type", "company");
+				Meta.Add("data", JsonConvert.SerializeObject(company));
 			}
 		}
 
