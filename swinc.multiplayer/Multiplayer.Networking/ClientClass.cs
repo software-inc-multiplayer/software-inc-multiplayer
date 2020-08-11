@@ -16,14 +16,14 @@ namespace Multiplayer.Networking
         public static ClientClass Instance;
         bool isLoggedin = false;
         static WatsonTcpClient client;
-		private bool disposedValue;
+        private bool disposedValue;
 
         public ClientClass()
-		{
+        {
             Instance = this;
-		}
+        }
 
-		public async void Connect(string ip, ushort port = 52512)
+        public void Connect(string ip, ushort port = 52512, string password = "", Helpers.UserRole userRole = Helpers.UserRole.Client)
         {
             client = new WatsonTcpClient(ip, port);
             client.ServerConnected += ServerConnected;
@@ -31,39 +31,51 @@ namespace Multiplayer.Networking
             client.MessageReceived += MessageReceived;
             client.SyncRequestReceived = SyncRequestReceived;
             client.Start();
+            if (client.Connected)
+                Login(password);
+            else
+                Logging.Warn("[Client] Couldn't connect to the server!");
+        }
 
-            // check connectivity
-            Logging.Info("[Client] Am I Connected? " + client.Connected);
-
-            // send a message
-            client.Send("Hello!");
-            // send a message with metadata
-            Dictionary<object, object> md = new Dictionary<object, object>
-            {
-                { "foo", "bar" }
-            };
-            client.Send(md, "Hello, client!  Here's some metadata!");
-
-            // send async!
-            await client.SendAsync("Hello, client!  I'm async!");
-
-            // send and wait for a response
+        public async void Login(string password = "")
+        {
+            string username = "";
             try
             {
-                SyncResponse resp = client.SendAndWait(5000, "Hey, say hello back within 5 seconds!");
-                Logging.Info("[Client] My friend says: " + Encoding.UTF8.GetString(resp.Data));
+                username = SteamFriends.GetPersonaName();
             }
-            catch (TimeoutException)
+            catch (Exception ex)
             {
-                Logging.Info("[Client] Too slow...");
+                Logging.Warn("[Client] Couldn't fetch Steam Username, will use username from server! => " + ex.Message);
             }
-            //Helpers.SystemMessage sysmsg = new Helpers.SystemMessage(Helpers.SysMessageType.Login, "User", Helpers.UserRole.Host);
-            //client.Send(sysmsg.AsMessage().ToJson());
+            Helpers.LoginMessage lm = new Helpers.LoginMessage(username, password);
+            await client.SendAsync(lm.Meta, lm.Data);
         }
 
         void MessageReceived(object sender, MessageReceivedFromServerEventArgs args)
         {
-            Logging.Info("[Client] Message from server: " + Encoding.UTF8.GetString(args.Data));
+            string datastr = Encoding.UTF8.GetString(args.Data);
+            if (datastr == "login_response")
+                LoginResponseReceived(args);
+            else
+                Logging.Warn("Unknown ServerMessage => " + datastr);
+        }
+
+        void LoginResponseReceived(MessageReceivedFromServerEventArgs args)
+        {
+            Logging.Info("[Client] Getting login response from server");
+            string message = (string)args.Metadata["message"];
+            if (message == "ok")
+            {
+                isLoggedin = true;
+                Logging.Info("[Client] You're now logged in to the server!");
+            }
+            else if (message == "max_players")
+                Logging.Warn("[Client] You can't login to the server because max player count reached");
+            else if (message == "wrong_password")
+                Logging.Warn("[Client] You can't login because you did enter the wrong password!");
+            else
+                Logging.Warn("[Client] Server says: " + message);
         }
 
         void ServerConnected(object sender, EventArgs args)
@@ -81,22 +93,22 @@ namespace Multiplayer.Networking
             return new SyncResponse(req, "Hello back at you!");
         }
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposedValue)
-			{
-				if (disposing)
-				{
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
                     client.Dispose();
-				}
-				disposedValue = true;
-			}
-		}
+                }
+                disposedValue = true;
+            }
+        }
 
-		public void Dispose()
-		{
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
-		}
-	}
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+    }
 }
