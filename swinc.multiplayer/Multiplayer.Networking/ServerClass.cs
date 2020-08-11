@@ -55,7 +55,6 @@ namespace Multiplayer.Networking
                 uid = u.ID;
             return uid;
         }
-
         public string GetUsername(string ipport)
         {
             Helpers.User u = clients.Find(x => x.IpPort == ipport);
@@ -66,7 +65,6 @@ namespace Multiplayer.Networking
         {
             return clients.Find(x => x.Username == username);
         }
-
         void ClientConnected(object sender, ClientConnectedEventArgs args)
         {
             Logging.Info("[Server] Client connected: " + args.IpPort + "\nWaiting for client login...");
