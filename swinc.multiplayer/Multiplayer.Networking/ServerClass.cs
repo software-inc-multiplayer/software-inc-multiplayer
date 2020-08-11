@@ -56,6 +56,17 @@ namespace Multiplayer.Networking
             return uid;
         }
 
+        public string GetUsername(string ipport)
+        {
+            Helpers.User u = clients.Find(x => x.IpPort == ipport);
+            return u.Username;
+        }
+
+        public Helpers.User GetUser(string username)
+        {
+            return clients.Find(x => x.Username == username);
+        }
+
         void ClientConnected(object sender, ClientConnectedEventArgs args)
         {
             Logging.Info("[Server] Client connected: " + args.IpPort + "\nWaiting for client login...");
@@ -84,6 +95,33 @@ namespace Multiplayer.Networking
             string datastr = Encoding.UTF8.GetString(args.Data);
             if (datastr == "login")
                 LoginMessageReceived(args);
+            else if (datastr == "chat")
+                ChatMessageReceived(args);
+        }
+
+        async void ChatMessageReceived(MessageReceivedFromClientEventArgs args)
+        {
+            Helpers.User receiver = GetUser((string)args.Metadata["receiver"]);
+            Helpers.User sender = clients.Find(x => x.IpPort == args.IpPort);
+            string message = (string)args.Metadata["message"];
+
+            if (receiver == null && (string)args.Metadata["receiver"] != "")
+                Logging.Warn("[Server] Couldn't find user " + args.Metadata["receiver"] + " on the server and therefor couldn't send the chat message!");
+
+            Helpers.ChatMessage cm = new Helpers.ChatMessage(sender.Username, message);
+
+            if ((string)args.Metadata["receiver"] == "")
+            {
+                foreach (Helpers.User u in clients)
+                    await server.SendAsync(u.IpPort, cm.Meta, cm.Data);
+
+                Logging.Info($"[Server] Sent chat message from '{sender.Username}' to all clients on the server");
+            }
+            else
+            {
+                await server.SendAsync(receiver.IpPort, cm.Meta, cm.Data);
+                Logging.Info($"[Server] Sent chat message from '{sender.Username}' to '{receiver.Username}'");
+            }
         }
 
         void LoginMessageReceived(MessageReceivedFromClientEventArgs args)

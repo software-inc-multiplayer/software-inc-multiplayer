@@ -23,7 +23,7 @@ namespace Multiplayer.Networking
             Instance = this;
         }
 
-        public void Connect(string ip, ushort port = 52512, string password = "", Helpers.UserRole userRole = Helpers.UserRole.Client)
+        public async void Connect(string ip, ushort port = 52512, string password = "", Helpers.UserRole userRole = Helpers.UserRole.Client)
         {
             client = new WatsonTcpClient(ip, port);
             client.ServerConnected += ServerConnected;
@@ -52,13 +52,34 @@ namespace Multiplayer.Networking
             await client.SendAsync(lm.Meta, lm.Data);
         }
 
+        public async void SendChatMessage(string receiver, string message)
+        {
+            if (!isLoggedin)
+            {
+                Logging.Warn("[Client] You can't send a chat message if you're not logged in!");
+                return;
+            }
+
+            Helpers.ChatMessage cm = new Helpers.ChatMessage(receiver, message);
+            await client.SendAsync(cm.Meta, cm.Data);
+        }
+
         void MessageReceived(object sender, MessageReceivedFromServerEventArgs args)
         {
             string datastr = Encoding.UTF8.GetString(args.Data);
             if (datastr == "login_response")
                 LoginResponseReceived(args);
+            else if (datastr == "chat")
+                ChatMessageReceived(args);
             else
                 Logging.Warn("Unknown ServerMessage => " + datastr);
+        }
+
+        void ChatMessageReceived(MessageReceivedFromServerEventArgs args)
+        {
+            string sender = (string)args.Metadata["receiver"];
+            string message = (string)args.Metadata["message"];
+            Logging.Info($"[Client] You did receive a message from '{sender}': {message}");
         }
 
         void LoginResponseReceived(MessageReceivedFromServerEventArgs args)
@@ -69,6 +90,14 @@ namespace Multiplayer.Networking
             {
                 isLoggedin = true;
                 Logging.Info("[Client] You're now logged in to the server!");
+
+
+
+                //DEBUG: Sending a message from this client to A) all other players on the server and B) to Player_1
+                SendChatMessage("", "Hello world!");
+                SendChatMessage("Player_1", "Hello Player_1!");
+                //DEBUG END
+
             }
             else if (message == "max_players")
                 Logging.Warn("[Client] You can't login to the server because max player count reached");
