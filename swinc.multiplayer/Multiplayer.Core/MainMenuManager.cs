@@ -42,9 +42,15 @@ namespace Multiplayer.Core
             if (scene.name != "MainMenu") return;
             CreateButton();
         }
-
+        private bool isWindowUp = false;
         private void MainMenuButtonClick()
         {
+            if (isWindowUp)
+            {
+                PopupManager.NotificationSound.Warning.Play();
+                return;
+            }
+            isWindowUp = true;
             GUIWindow window = WindowManager.SpawnWindow();
 
             Button OptionsButton = WindowManager.SpawnButton();
@@ -114,6 +120,10 @@ namespace Multiplayer.Core
             });
             WindowManager.AddElementToElement(SHeader.gameObject, window.MainPanel, new Rect(0, 38, 192, 32), Rect.zero);
             WindowManager.AddElementToElement(SConnectIP.gameObject, window.MainPanel, new Rect(0, 55, 192, 42), Rect.zero);
+            window.OnClose += () =>
+            {
+                isWindowUp = false;
+            };
         }
 
         public override void OnDeactivate()
