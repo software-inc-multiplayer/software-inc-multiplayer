@@ -23,6 +23,10 @@ namespace Multiplayer.Networking
         private bool disposedValue;
         public List<Helpers.User> clients = new List<Helpers.User>();
 
+        public static ushort GetServerPort()
+        {
+            return Instance.Port;
+        }
         public ServerClass()
         {
             Instance = this;

@@ -1,5 +1,10 @@
 ﻿using Multiplayer.Debugging;
+using Multiplayer.Extensions;
+using Multiplayer.Networking;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -40,7 +45,75 @@ namespace Multiplayer.Core
 
         private void MainMenuButtonClick()
         {
-            WindowManager.SpawnDialog("CS_Dialog".LocDef("Coming soon."), false, DialogWindow.DialogType.Information);          
+            GUIWindow window = WindowManager.SpawnWindow();
+
+            Button OptionsButton = WindowManager.SpawnButton();
+            OptionsButton.gameObject.GetComponentInChildren<Text>().text = "MPOptionsWindow_OptionsButton".LocDef("Options");
+
+
+            Button ServerIButton = WindowManager.SpawnButton();
+            ServerIButton.gameObject.GetComponentInChildren<Text>().text = "MPOptionsWindow_ServerIButton".LocDef("Server Info");
+          
+            window.NonLocTitle = "Manage Multiplayer";
+            window.Title = "MPOptionsWindowTitle".LocDef("Manage Multiplayer");
+            window.MinSize = new Vector2(128f + 1f + 128f, Screen.height / 2f);
+            window.ShowCentered = true;            
+            window.Show();
+            window.SizeButton.SetActive(false);
+            WindowManager.AddElementToElement(OptionsButton.gameObject, window.MainPanel, new Rect(0, 0, 128, 32), Rect.zero);
+            WindowManager.AddElementToElement(ServerIButton.gameObject, window.MainPanel, new Rect(129, 0, 128, 32), Rect.zero);
+
+            List<GameObject> OptionsPanel = new List<GameObject>() { };
+
+            #region Options Panel
+
+            #endregion
+
+            List<GameObject> ServerIPanel = new List<GameObject>() { };
+
+            #region Server Info Panel
+            Text SHeader = WindowManager.SpawnLabel();
+            SHeader.text = "MPOptionsWindow_SHeader".LocDef("Your server:");
+            SHeader.fontSize = 16;
+            
+            Text SConnectIP = WindowManager.SpawnLabel();
+            SConnectIP.text = "MPOptionsWindow_SConnectIP".LocDef("Server IP:") + $" <color=blue>{IPUtils.GetIP()}:{ServerClass.GetServerPort()}</color>";
+            
+
+            ServerIPanel.Add(SConnectIP.gameObject);
+            ServerIPanel.Add(SHeader.gameObject);            
+            #endregion
+
+            OptionsButton.onClick.AddListener(() => {
+                ServerIPanel.ForEach((GameObject obj) =>
+                {
+                    obj.SetActive(false);
+                });
+                OptionsPanel.ForEach((GameObject obj) =>
+                {
+                    obj.SetActive(true);
+                });
+            });
+            ServerIButton.onClick.AddListener(() => {
+                OptionsPanel.ForEach((GameObject obj) =>
+                {
+                    obj.SetActive(false);
+                });
+                ServerIPanel.ForEach((GameObject obj) =>
+                {
+                    obj.SetActive(true);
+                });
+            });
+            ServerIPanel.ForEach((GameObject obj) =>
+             {
+                 obj.SetActive(false);
+             });
+            OptionsPanel.ForEach((GameObject obj) =>
+            {
+                obj.SetActive(true);
+            });
+            WindowManager.AddElementToElement(SHeader.gameObject, window.MainPanel, new Rect(0, 38, 192, 32), Rect.zero);
+            WindowManager.AddElementToElement(SConnectIP.gameObject, window.MainPanel, new Rect(0, 55, 192, 42), Rect.zero);
         }
 
         public override void OnDeactivate()
