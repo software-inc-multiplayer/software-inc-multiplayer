@@ -20,10 +20,15 @@ namespace Multiplayer.Core
 
         public override void OnDeactivate()
         {
-            foreach(GameObject e in ActiveObjects)
+            List<GameObject> copy = new List<GameObject>() { };
+            foreach (GameObject e in ActiveObjects)
             {
                 e.SetActive(false);
-                ActiveObjects.Remove(e);
+                copy.Add(e);
+            }
+            foreach(GameObject copye in copy)
+            {
+                ActiveObjects.Remove(copye);
             }
             ServerClass.Instance.Stop();
         }

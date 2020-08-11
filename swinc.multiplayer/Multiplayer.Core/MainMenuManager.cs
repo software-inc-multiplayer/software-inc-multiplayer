@@ -1,4 +1,5 @@
 ﻿using Multiplayer.Debugging;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -19,14 +20,16 @@ namespace Multiplayer.Core
         private void CreateButton()
         {
             RectTransform mainMenuPanel = WindowManager.FindElementPath("MainPanel/Panel");
-            Button mainMenuButton = WindowManager.SpawnButton();
-            mainMenuButton.GetComponentInChildren<Text>().text = "Multiplayer";
-            mainMenuButton.GetComponentInChildren<Text>().fontSize = 40;
-            mainMenuButton.onClick.AddListener(MainMenuButtonClick);
-            mainMenuButton.gameObject.name = "MainMenu_MP_Button";
-            LaunchBehaviour.ActiveObjects.Add(mainMenuButton.gameObject);
-            WindowManager.AddElementToElement(mainMenuButton.gameObject, mainMenuPanel.gameObject, new Rect(0, 0, 400, 250), Rect.zero);
-
+            RectTransform toCopy = WindowManager.FindElementPath("MainPanel/Panel/Button 5");
+            Button butt = Instantiate(toCopy).GetComponent<Button>();
+            butt.onClick.RemoveAllListeners();
+            butt.onClick = new Button.ButtonClickedEvent();
+            butt.onClick.AddListener(MainMenuButtonClick);
+            butt.GetComponentInChildren<Text>().text = "Multiplayer";
+            Sprite texture = butt.image.sprite;           
+            LaunchBehaviour.ActiveObjects.Add(butt.gameObject);
+            WindowManager.AddElementToElement(butt.gameObject, mainMenuPanel.gameObject, new Rect(0, 0, texture.rect.width, texture.rect.height), Rect.zero);
+            butt.transform.SetSiblingIndex(1);
             Logging.Debug("Added menu button.");
         }
         private void SceneChanged(Scene scene, LoadSceneMode mode)
@@ -37,7 +40,7 @@ namespace Multiplayer.Core
 
         private void MainMenuButtonClick()
         {
-            WindowManager.SpawnDialog("CS_Dialog".LocDef("Coming soon."), false, DialogWindow.DialogType.Information);
+            WindowManager.SpawnDialog("CS_Dialog".LocDef("Coming soon."), false, DialogWindow.DialogType.Information);          
         }
 
         public override void OnDeactivate()
