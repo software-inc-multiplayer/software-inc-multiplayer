@@ -231,7 +231,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioHandler.cs" />
+    <Compile Include="Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

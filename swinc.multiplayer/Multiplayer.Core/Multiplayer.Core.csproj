@@ -253,6 +253,10 @@
       <Project>{3ba2b696-5228-429f-8fff-fbf6ca7a5303}</Project>
       <Name>Multiplayer.Debugging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Multiplayer.Extensions\Multiplayer.Extensions.csproj">
+      <Project>{816fe3f3-50ef-44a7-a54a-f2ee0346e9f8}</Project>
+      <Name>Multiplayer.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Multiplayer.Networking\Multiplayer.Networking.csproj">
       <Project>{19cd273f-a601-45ed-ab6d-6e61f47a074c}</Project>
       <Name>Multiplayer.Networking</Name>
