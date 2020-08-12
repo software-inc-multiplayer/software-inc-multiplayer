@@ -40,7 +40,11 @@ namespace Multiplayer.Core
         }
         private void SceneChanged(Scene scene, LoadSceneMode mode)
         {
-            if (scene.name != "MainMenu") return;
+            if (scene.name != "MainMenu")
+            {
+                isWindowUp = false;
+                return;
+            }
             CreateButton();
         }
         private bool isWindowUp = false;

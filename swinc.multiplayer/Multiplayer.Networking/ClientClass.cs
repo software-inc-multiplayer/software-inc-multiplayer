@@ -43,6 +43,7 @@ namespace Multiplayer.Networking
             try
             {
                 username = SteamFriends.GetPersonaName();
+                Logging.Info("[Client] Fetching Username from Steam: " + username);
             }
             catch (Exception ex)
             {
@@ -71,8 +72,18 @@ namespace Multiplayer.Networking
                 LoginResponseReceived(args);
             else if (datastr == "chat")
                 ChatMessageReceived(args);
+            else if (datastr == "gameworld")
+                GameWorldMessageReceived(args);
             else
                 Logging.Warn("Unknown ServerMessage => " + datastr);
+        }
+
+        void GameWorldMessageReceived(MessageReceivedFromServerEventArgs args)
+        {
+            Logging.Info($"[Client] Did recieve a GameWorldMessage!");
+            GameWorld.World gameworldcontent = JsonConvert.DeserializeObject<GameWorld.World>((string)args.Metadata["data"]);
+            bool addscontent = (bool)args.Metadata["add"];
+            GameWorld.Client.Instance.UpdateWorld(gameworldcontent, addscontent);
         }
 
         void ChatMessageReceived(MessageReceivedFromServerEventArgs args)
