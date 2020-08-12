@@ -164,9 +164,10 @@ namespace Multiplayer.Networking
 			/// Actual content: Companies
 			/// </summary>
 			/// <param name="world">The gameworld that you want to be sent to the client</param>
-			public GameWorldMessage(GameWorld.World world)
+			public GameWorldMessage(GameWorld.World world, bool isAddition)
 			{
 				Data = "gameworld";
+				Meta.Add("add", isAddition);
 				Meta.Add("data", JsonConvert.SerializeObject(world));
 			}
 		}

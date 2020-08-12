@@ -242,6 +242,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugConsole.cs" />
     <Compile Include="LaunchBehaviour.cs" />
     <Compile Include="MainMenuManager.cs" />
     <Compile Include="Meta.cs" />
