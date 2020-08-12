@@ -1,6 +1,7 @@
 ﻿using Multiplayer.Debugging;
 using Multiplayer.Extensions;
 using Multiplayer.Networking;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -69,13 +70,13 @@ namespace Multiplayer.Core
             WindowManager.AddElementToElement(OptionsButton.gameObject, window.MainPanel, new Rect(0, 0, 128, 32), Rect.zero);
             WindowManager.AddElementToElement(ServerIButton.gameObject, window.MainPanel, new Rect(129, 0, 128, 32), Rect.zero);
 
-            GameObject OptionsPanel = new GameObject();
+            List<GameObject> OptionsPanel = new List<GameObject>() { };
 
             #region Options Panel
 
             #endregion
 
-            GameObject ServerIPanel = new GameObject();
+            List<GameObject> ServerIPanel = new List<GameObject>() { };
 
             #region Server Info Panel
             Text SHeader = WindowManager.SpawnLabel();
@@ -83,29 +84,34 @@ namespace Multiplayer.Core
             SHeader.fontSize = 16;
             
             Text SConnectIP = WindowManager.SpawnLabel();
-            SConnectIP.text = "MPOptionsWindow_SConnectIP".LocDef("Server IP:") + $" <color=blue>{IPUtils.GetIP()}:{ServerClass.GetServerPort()}</color>";
 
+            string serverPort;
+            if(!PlayerPrefs.HasKey("cachedIP"))
+            {
+                serverPort = ServerClass.GetDefaultPort().ToString();
+            } else
+            {
+                serverPort = (string)JsonConvert.DeserializeObject(PlayerPrefs.GetString("cachedIP"));
+            }
 
-            SConnectIP.gameObject.transform.SetParent(ServerIPanel.transform);
-            SHeader.gameObject.transform.SetParent(ServerIPanel.transform);
+            SConnectIP.text = "MPOptionsWindow_SConnectIP".LocDef("Server IP:") + $" <color=blue>{IPUtils.GetIP()}:{serverPort}</color>";
+
+            ServerIPanel.AddBulk(SConnectIP.gameObject, SHeader.gameObject);
             #endregion
 
             OptionsButton.onClick.AddListener(() => {
-                ServerIPanel.SetActive(false);
-                OptionsPanel.SetActive(true);
+                ServerIPanel.ForEach((GameObject e) => e.SetActive(false));
+                OptionsPanel.ForEach((GameObject e) => e.SetActive(true));
             });
             ServerIButton.onClick.AddListener(() => {
-                OptionsPanel.SetActive(false);
-                ServerIPanel.SetActive(true);
+                OptionsPanel.ForEach((GameObject e) => e.SetActive(false));
+                ServerIPanel.ForEach((GameObject e) => e.SetActive(true));
             });
-            ServerIPanel.SetActive(false);
-            OptionsPanel.SetActive(true);
+            ServerIPanel.ForEach((GameObject e) => e.SetActive(false));
+            OptionsPanel.ForEach((GameObject e) => e.SetActive(true));
             WindowManager.AddElementToElement(SHeader.gameObject, window.MainPanel, new Rect(0, 38, 192, 32), Rect.zero);
             WindowManager.AddElementToElement(SConnectIP.gameObject, window.MainPanel, new Rect(0, 55, 192, 42), Rect.zero);
-            window.OnClose += () =>
-            {
-                isWindowUp = false;
-            };
+            window.GetComponentsInChildren<Button>().SingleOrDefault(x => x.name == "CloseButton").onClick.AddListener(() => isWindowUp = false);
         }
 
         public override void OnDeactivate()

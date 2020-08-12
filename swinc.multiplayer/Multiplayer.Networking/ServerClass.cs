@@ -26,15 +26,6 @@ namespace Multiplayer.Networking
         public ServerData serverdata;
 
         /// <summary>
-        /// Get the port of the server. Used for the ServerInfo part of the MMM window.
-        /// </summary>
-        /// <returns>Port</returns>
-        public static ushort GetServerPort()
-		{
-            return Instance.Port;
-		}
-
-        /// <summary>
         /// Create a new serverclass.
         /// </summary>
         public ServerClass()
@@ -119,6 +110,11 @@ namespace Multiplayer.Networking
         public Helpers.User GetUser(string username)
         {
             return clients.Find(x => x.Username == username);
+        }
+
+        public static ushort GetDefaultPort()
+        {
+            return 52512;
         }
 
         public async void SendGameWorld(Helpers.GameWorldMessage gameworldmessage, params Helpers.User[] users)

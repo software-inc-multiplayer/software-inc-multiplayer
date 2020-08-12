@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,13 @@ namespace Multiplayer.Extensions
                 tex.LoadImage(fileData);
             }
             return tex;
+        }
+        public static void AddBulk<T>(this List<T> list, params T[] bulkToAdd)
+        {
+            foreach(T a in bulkToAdd)
+            {
+                list.Add(a);
+            }
         }
     }
 }
