@@ -2,7 +2,7 @@
 name: Bug report
 about: Found a bug? Use this template!
 title: ''
-labels: bug
+labels: Bug
 assignees: cal3432, daredloco
 
 ---
