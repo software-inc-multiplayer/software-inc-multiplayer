@@ -25,16 +25,30 @@ namespace Multiplayer.Networking
         public bool hasAI = false;
         public ServerData serverdata;
 
+        /// <summary>
+        /// Get the port of the server. Used for the ServerInfo part of the MMM window.
+        /// </summary>
+        /// <returns>Port</returns>
         public static ushort GetServerPort()
 		{
             return Instance.Port;
 		}
 
+        /// <summary>
+        /// Create a new serverclass.
+        /// </summary>
         public ServerClass()
         {
             Instance = this;
         }
 
+        /// <summary>
+        /// Start the server.
+        /// </summary>
+        /// <param name="port">The port to listen on.</param>
+        /// <param name="name">The name of the server</param>
+        /// <param name="password">The password if specified</param>
+        /// <param name="maxplayers">The maximumn amount of players, default 10</param>
         public void Start(ushort port = 52512, string name = "My Server", string password = "", ushort maxplayers = 10)
         {
             Password = password;
@@ -51,12 +65,20 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Load/Create ServerData");
             serverdata = new ServerData(name);
         }
+        /// <summary>
+        /// Dispose the server.
+        /// </summary>
         public void Stop()
         {
             server.Dispose();
             Logging.Info($"[Server] Server disposed.");
         }
 
+        /// <summary>
+        /// Get a user's id by username.
+        /// </summary>
+        /// <param name="username">The user's username</param>
+        /// <returns>ushort</returns>
         public ushort GetUserID(string username)
         {
             ushort uid = ushort.MaxValue;
@@ -65,13 +87,35 @@ namespace Multiplayer.Networking
                 uid = u.ID;
             return uid;
         }
-
+        /// <summary>
+        /// Get a username by IP address.
+        /// </summary>
+        /// <param name="ipport">The ip address of the user.</param>
+        /// <returns>Username</returns>
         public string GetUsername(string ipport)
         {
             Helpers.User u = clients.Find(x => x.IpPort == ipport);
             return u.Username;
         }
-
+        /// <summary>
+        /// Get a username by user ID.
+        /// </summary>
+        /// <param name="id">The user's ID</param>
+        /// <returns>Username</returns>
+        public string GetUsername(ushort id)
+        {
+            Helpers.User u = clients.Find(x => x.ID == id);
+            if(u != null)
+            {
+                return u.Username;
+            }
+            return "";
+        }
+        /// <summary>
+        /// Get a user by their username
+        /// </summary>
+        /// <param name="username">The username of the user.</param>
+        /// <returns></returns>
         public Helpers.User GetUser(string username)
         {
             return clients.Find(x => x.Username == username);
@@ -94,12 +138,16 @@ namespace Multiplayer.Networking
                 }
             }
         }
-
+        /// <summary>
+        /// The event that fires when a client connects.
+        /// </summary>
         void ClientConnected(object sender, ClientConnectedEventArgs args)
         {
             Logging.Info("[Server] Client connected: " + args.IpPort + "\nWaiting for client login...");
         }
-
+        /// <summary>
+        /// The event that fires when a client disconnects.
+        /// </summary>
         void ClientDisconnected(object sender, ClientDisconnectedEventArgs args)
         {
             Logging.Info("[Server] Client disconnected: " + args.IpPort + ": " + args.Reason.ToString());
@@ -116,7 +164,9 @@ namespace Multiplayer.Networking
             }
             clients.Remove(usr);
         }
-
+        /// <summary>
+        /// The event that fires when a message is recieved.
+        /// </summary>
         void MessageReceived(object sender, MessageReceivedFromClientEventArgs args)
         {
             Logging.Info("[Server] Message received from " + args.IpPort + ": " + Encoding.UTF8.GetString(args.Data));
@@ -126,7 +176,9 @@ namespace Multiplayer.Networking
             else if (datastr == "chat")
                 ChatMessageReceived(args);
         }
-
+        /// <summary>
+        /// The event that fires when a chat message is recieved.
+        /// </summary>
         async void ChatMessageReceived(MessageReceivedFromClientEventArgs args)
         {
             Helpers.User receiver = GetUser((string)args.Metadata["receiver"]);
@@ -151,7 +203,9 @@ namespace Multiplayer.Networking
                 Logging.Info($"[Server] Sent chat message from '{sender.Username}' to '{receiver.Username}'");
             }
         }
-
+        /// <summary>
+        /// The event that fires when a login message is recieved.
+        /// </summary>
         void LoginMessageReceived(MessageReceivedFromClientEventArgs args)
         {
             string un = (string)args.Metadata["username"];
@@ -192,12 +246,13 @@ namespace Multiplayer.Networking
             server.Send(args.IpPort, loginmsg.Meta, "login_response");
 
         }
-
+        /// <summary>
+        /// The event that fires when a Sync is requested.
+        /// </summary>
         SyncResponse SyncRequestReceived(SyncRequest req)
         {
             return new SyncResponse(req, "Hello back at you!");
         }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -209,7 +264,9 @@ namespace Multiplayer.Networking
                 disposedValue = true;
             }
         }
-
+        /// <summary>
+        /// Dispose the server.
+        /// </summary>
         public void Dispose()
         {
             Dispose(disposing: true);
