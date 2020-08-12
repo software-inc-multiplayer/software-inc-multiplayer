@@ -12,27 +12,30 @@ using System.Configuration;
 
 namespace Multiplayer.Networking
 {
-
     public class ServerClass : IDisposable
     {
         public static ServerClass Instance;
-        private ushort Port = 52512;
+        public string ServerName = "My Server";
+        internal ushort Port = 52512;
         public ushort MaxPlayers = 10;
-        private string Password = "";
+        internal string Password = "";
         WatsonTcpServer server;
         private bool disposedValue;
         public List<Helpers.User> clients = new List<Helpers.User>();
+        public bool hasAI = false;
+        public ServerData serverdata;
 
         public static ushort GetServerPort()
-        {
+		{
             return Instance.Port;
-        }
+		}
+
         public ServerClass()
         {
             Instance = this;
         }
 
-        public void Start(ushort port = 52512, string password = "", ushort maxplayers = 10)
+        public void Start(ushort port = 52512, string name = "My Server", string password = "", ushort maxplayers = 10)
         {
             Password = password;
             MaxPlayers = maxplayers;
@@ -44,6 +47,9 @@ namespace Multiplayer.Networking
             server.SyncRequestReceived = SyncRequestReceived;
             server.Start();
             Logging.Info($"[Server] Server started.");
+
+            Logging.Info("[Server] Load/Create ServerData");
+            serverdata = new ServerData(name);
         }
         public void Stop()
         {
@@ -59,6 +65,7 @@ namespace Multiplayer.Networking
                 uid = u.ID;
             return uid;
         }
+
         public string GetUsername(string ipport)
         {
             Helpers.User u = clients.Find(x => x.IpPort == ipport);
@@ -69,6 +76,25 @@ namespace Multiplayer.Networking
         {
             return clients.Find(x => x.Username == username);
         }
+
+        public async void SendGameWorld(Helpers.GameWorldMessage gameworldmessage, params Helpers.User[] users)
+        {
+            if (users.Length < 1)
+            {
+                Logging.Info($"[Server] Sending GameWorld to all connected users");
+                foreach (Helpers.User u in clients)
+                    await server.SendAsync(u.IpPort, gameworldmessage.Meta, gameworldmessage.Data);
+            }
+            else
+            {
+                foreach (Helpers.User u in users)
+                {
+                    Logging.Info($"[Server] Sending GameWorld to user '{u.Username}'");
+                    await server.SendAsync(u.IpPort, gameworldmessage.Meta, gameworldmessage.Data);
+                }
+            }
+        }
+
         void ClientConnected(object sender, ClientConnectedEventArgs args)
         {
             Logging.Info("[Server] Client connected: " + args.IpPort + "\nWaiting for client login...");

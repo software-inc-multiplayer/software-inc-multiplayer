@@ -116,7 +116,7 @@ namespace Multiplayer.Networking
 			/// <summary>
 			/// [CLIENT ONLY] Sends a chatmessage to a receiver, if receiver is empty it will send it to all clients
 			/// </summary>
-			/// <param name="receiver">The receiver of the chat message, if its empty it will send it to all clients</param>
+			/// <param name="receiver">The receiver of the chat message, if its empty it will send it to all clients. If this message is coming from the server, receiver will be the sender</param>
 			/// <param name="message">The chat message of the client</param>
 			public ChatMessage(string receiver, string message)
 			{
@@ -154,6 +154,20 @@ namespace Multiplayer.Networking
 				Meta.Add("receiver", receiver);
 				Meta.Add("type", "company");
 				Meta.Add("data", JsonConvert.SerializeObject(company));
+			}
+		}
+
+		public class GameWorldMessage : Message
+		{
+			/// <summary>
+			/// [SERVER ONLY] A message sent if the gameworld gets updated. Contains lists of companies etc
+			/// Actual content: Companies
+			/// </summary>
+			/// <param name="world">The gameworld that you want to be sent to the client</param>
+			public GameWorldMessage(GameWorld.World world)
+			{
+				Data = "gameworld";
+				Meta.Add("data", JsonConvert.SerializeObject(world));
 			}
 		}
 
