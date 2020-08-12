@@ -69,13 +69,13 @@ namespace Multiplayer.Core
             WindowManager.AddElementToElement(OptionsButton.gameObject, window.MainPanel, new Rect(0, 0, 128, 32), Rect.zero);
             WindowManager.AddElementToElement(ServerIButton.gameObject, window.MainPanel, new Rect(129, 0, 128, 32), Rect.zero);
 
-            List<GameObject> OptionsPanel = new List<GameObject>() { };
+            GameObject OptionsPanel = new GameObject();
 
             #region Options Panel
 
             #endregion
 
-            List<GameObject> ServerIPanel = new List<GameObject>() { };
+            GameObject ServerIPanel = new GameObject();
 
             #region Server Info Panel
             Text SHeader = WindowManager.SpawnLabel();
@@ -84,40 +84,22 @@ namespace Multiplayer.Core
             
             Text SConnectIP = WindowManager.SpawnLabel();
             SConnectIP.text = "MPOptionsWindow_SConnectIP".LocDef("Server IP:") + $" <color=blue>{IPUtils.GetIP()}:{ServerClass.GetServerPort()}</color>";
-            
 
-            ServerIPanel.Add(SConnectIP.gameObject);
-            ServerIPanel.Add(SHeader.gameObject);            
+
+            SConnectIP.gameObject.transform.SetParent(ServerIPanel.transform);
+            SHeader.gameObject.transform.SetParent(ServerIPanel.transform);
             #endregion
 
             OptionsButton.onClick.AddListener(() => {
-                ServerIPanel.ForEach((GameObject obj) =>
-                {
-                    obj.SetActive(false);
-                });
-                OptionsPanel.ForEach((GameObject obj) =>
-                {
-                    obj.SetActive(true);
-                });
+                ServerIPanel.SetActive(false);
+                OptionsPanel.SetActive(true);
             });
             ServerIButton.onClick.AddListener(() => {
-                OptionsPanel.ForEach((GameObject obj) =>
-                {
-                    obj.SetActive(false);
-                });
-                ServerIPanel.ForEach((GameObject obj) =>
-                {
-                    obj.SetActive(true);
-                });
+                OptionsPanel.SetActive(false);
+                ServerIPanel.SetActive(true);
             });
-            ServerIPanel.ForEach((GameObject obj) =>
-             {
-                 obj.SetActive(false);
-             });
-            OptionsPanel.ForEach((GameObject obj) =>
-            {
-                obj.SetActive(true);
-            });
+            ServerIPanel.SetActive(false);
+            OptionsPanel.SetActive(true);
             WindowManager.AddElementToElement(SHeader.gameObject, window.MainPanel, new Rect(0, 38, 192, 32), Rect.zero);
             WindowManager.AddElementToElement(SConnectIP.gameObject, window.MainPanel, new Rect(0, 55, 192, 42), Rect.zero);
             window.OnClose += () =>
