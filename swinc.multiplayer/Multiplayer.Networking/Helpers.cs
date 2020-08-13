@@ -1,5 +1,6 @@
 ﻿using Multiplayer.Debugging;
 using Newtonsoft.Json;
+using RoWa;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -43,7 +44,7 @@ namespace Multiplayer.Networking
 			/// <summary>
 			/// The ID of the User inside the server
 			/// </summary>
-			public ushort ID { get; set; }
+			public int ID { get; set; }
 			/// <summary>
 			/// The (Steam) username of the User
 			/// </summary>
@@ -53,9 +54,9 @@ namespace Multiplayer.Networking
 			/// </summary>
 			public UserRole Role { get; set; }
 			/// <summary>
-			/// The Ip & Port of the user
+			/// The Unique User ID
 			/// </summary>
-			public string IpPort { get; set; }
+			public string UniqueID { get; set; }
 			/// <summary>
 			/// The UserCompany of the User, will be set with the User() function
 			/// </summary>
@@ -119,11 +120,17 @@ namespace Multiplayer.Networking
 		public class TcpMessage
 		{
 			public string Header = "";
-			public Dictionary<object, object> Data = new Dictionary<object, object>();
+			public XML.XMLDictionary Data = new XML.XMLDictionary();
 
 			public virtual string ToJson()
 			{
-				return JsonConvert.SerializeObject(this);
+				return XML.To(this);
+				//return JsonConvert.SerializeObject(this);
+			}
+
+			public virtual T FromJson<T>(string json)
+			{
+				return XML.From<T>(json);
 			}
 
 			public virtual byte[] ToArray()
@@ -137,6 +144,10 @@ namespace Multiplayer.Networking
 		/// </summary>
 		public class TcpLogin : TcpMessage
 		{
+			public TcpLogin()
+			{
+			}
+
 			/// <summary>
 			/// [Client Only] Login message used to send a login request from the client to the server.
 			/// Uses Helpers.GetUniqueID() as uniqueid to identify the user.
@@ -157,6 +168,10 @@ namespace Multiplayer.Networking
 		/// </summary>
 		public class TcpGameWorld : TcpMessage
 		{
+			public TcpGameWorld()
+			{
+			}
+
 			/// <summary>
 			/// [Client/Server] GameWorld message used to update the GameWorld. Can be used by the Server and the Client!
 			/// </summary>
@@ -175,6 +190,8 @@ namespace Multiplayer.Networking
 		/// </summary>
 		public class TcpResponse : TcpMessage
 		{
+			public TcpResponse() { }
+
 			/// <summary>
 			/// [Server Only] A response from the server (For example a response to a TcpLogin message from the client)
 			/// </summary>
@@ -185,6 +202,47 @@ namespace Multiplayer.Networking
 				Header = "response";
 				Data.Add("type", type);
 				Data.Add("data", response);
+			}
+		}
+
+		public class TcpChat : TcpMessage
+		{
+			public TcpChat() { }
+			public TcpChat(User receiver, string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", receiver.ID);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(string receivername, string message)
+			{
+				Logging.Warn("[Helpers] TcpChat(receivername, message) is non functional!");
+			}
+
+			public TcpChat(string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", null);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(int receiverid, string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", receiverid);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(int receiverid, string message, int senderid)
+			{
+				Header = "chat";
+				Data.Add("sender", senderid);
+				Data.Add("receiver", receiverid);
+				Data.Add("message", message);
 			}
 		}
 

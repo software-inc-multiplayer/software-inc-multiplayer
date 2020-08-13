@@ -1,4 +1,5 @@
 ﻿using Multiplayer.Debugging;
+using RoWa;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace Multiplayer.Networking
 	{
         static Telepathy.Client client = new Telepathy.Client();
         static bool isRunning = false;
+        static string Username = "Player";
+        static string ServerPassword = "test";
 
         public static void Connect(string ip, ushort port)
         {
@@ -21,8 +24,9 @@ namespace Multiplayer.Networking
             Read();
         }
 
-        public static async void Read()
+        static async void Read()
 		{
+            Logging.Info("[Client] Starts reading");
             await Task.Run(() => {
                 while (isRunning)
                 {
@@ -45,11 +49,30 @@ namespace Multiplayer.Networking
                     }
                 }
             });
+            Logging.Info("[Client] Ends reading");
         }
 
-        public static void Receive(byte[] data)
+        static void Receive(byte[] data)
 		{
-            Logging.Info("[Client] Data from Server: " + Encoding.UTF8.GetString(data));
+            string datastr = Encoding.UTF8.GetString(data);
+            Logging.Info("[Client] Data from Server: " + datastr);
+            Helpers.TcpResponse tcpresponse = XML.From<Helpers.TcpResponse>(datastr);
+            if (tcpresponse != null && tcpresponse.Header == "response")
+                OnServerResponse(tcpresponse);
+        }
+
+        static void OnServerResponse(Helpers.TcpResponse response)
+		{
+            object type = response.Data.GetValue("type");
+            if(type == null)
+			{
+                Logging.Warn("[Client] Type is null!");
+                return;
+			}
+            if((string)type == "login_request")
+			{
+                Send(new Helpers.TcpLogin(Username, ServerPassword));
+			}
 		}
 
 		#region Messages
@@ -63,6 +86,12 @@ namespace Multiplayer.Networking
 		{
             Logging.Info("[Client] Sending gameworld update");
             client.Send(changes.ToArray());
+		}
+
+        public static void Send(Helpers.TcpChat chatmsg)
+		{
+            Logging.Info("[Client] Sending chat message");
+            client.Send(chatmsg.ToArray());
 		}
 		#endregion
 
