@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Multiplayer.Debugging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -12,6 +13,7 @@ namespace Multiplayer.Networking
 {
 	public static class Helpers
 	{
+
 		public class User
 		{
 			/// <summary>
@@ -87,6 +89,43 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		public class TcpMessage
+		{
+			public string Header = "";
+			public Dictionary<object, object> Data = new Dictionary<object, object>();
+
+			public virtual string ToJson()
+			{
+				return JsonConvert.SerializeObject(this);
+			}
+
+			public virtual byte[] ToArray()
+			{
+				return Encoding.UTF8.GetBytes(ToJson());
+			}
+		}
+
+		public class TcpLogin : TcpMessage
+		{
+			public TcpLogin(string username, string password)
+			{
+				Header = "login";
+				Data.Add("username", username);
+				Data.Add("password", password);
+			}
+		}
+
+		public class TcpResponse : TcpMessage
+		{
+			public TcpResponse(string type, string response)
+			{
+				Header = "response";
+				Data.Add("type", type);
+				Data.Add("data", response);
+			}
+		}
+
+		[Obsolete]
 		/// <summary>
 		/// Do not use this, but use one of the objects that are based on the message
 		/// </summary>
@@ -96,6 +135,7 @@ namespace Multiplayer.Networking
 			public Dictionary<object, object> Meta = new Dictionary<object, object>();
 		}
 
+		[Obsolete]
 		public class LoginMessage : Message
 		{
 			/// <summary>
@@ -111,6 +151,7 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Obsolete]
 		public class ChatMessage : Message
 		{
 			/// <summary>
@@ -126,6 +167,7 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Obsolete]
 		public class ServerMessage : Message
 		{
 			/// <summary>
@@ -141,6 +183,7 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Obsolete]
 		public class DataMessage : Message
 		{
 			/// <summary>
@@ -157,6 +200,7 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Obsolete]
 		public class GameWorldMessage : Message
 		{
 			/// <summary>

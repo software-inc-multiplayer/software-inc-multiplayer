@@ -92,7 +92,7 @@ namespace Multiplayer.Core
             string serverPort;
             if(!PlayerPrefs.HasKey("cachedIP"))
             {
-                serverPort = ServerClass.GetDefaultPort().ToString();
+                serverPort = Networking.Server.Port.ToString(); //ServerClass.GetDefaultPort().ToString();
             } else
             {
                 serverPort = (string)JsonConvert.DeserializeObject(PlayerPrefs.GetString("cachedIP"));

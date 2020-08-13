@@ -1,7 +1,9 @@
 ﻿using Multiplayer.Debugging;
 using Multiplayer.Networking;
+using Multiplayer.Networking.GameWorld;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +13,6 @@ namespace Multiplayer.Core
 {
 	class DebugConsole : ModBehaviour
 	{
-		public static ServerClass server = new ServerClass();
-		public static ClientClass client = new ClientClass();
 		bool inmain = false;
 
 		public override void OnActivate()
@@ -21,7 +21,7 @@ namespace Multiplayer.Core
 			Logging.Info("[DebugConsole] Adding console commands");
 			DevConsole.Command startservercmd = new DevConsole.Command("MULTIPLAYER_START", OnStartServer);
 			DevConsole.Console.AddCommand(startservercmd);
-			DevConsole.Command<string> connectclientcmd = new DevConsole.Command<string>("MULTIPLAYER_CONNECT", OnClientConnect);
+			DevConsole.Command<string, ushort> connectclientcmd = new DevConsole.Command<string, ushort>("MULTIPLAYER_CONNECT", OnClientConnect);
 			DevConsole.Console.AddCommand(connectclientcmd);
 			DevConsole.Command<string> sendchatcmd = new DevConsole.Command<string>("MULTIPLAYER_CHAT", OnSendChat);
 			DevConsole.Console.AddCommand(sendchatcmd);
@@ -39,19 +39,14 @@ namespace Multiplayer.Core
 			}
 		}
 
-		private void OnClientConnect(string arg0)
+		private void OnClientConnect(string ip, ushort port)
 		{
 			if(!inmain)
 			{
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-
-			if (ServerClass.Instance != null)
-				ServerClass.Instance.Dispose();
-			if (ClientClass.Instance != null)
-				ClientClass.Instance.Dispose();
-			client.Connect(arg0);
+			Networking.Client.Connect(ip, port);
 		}
 
 		private void OnSendChat(string arg0)
@@ -61,7 +56,7 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-			client.SendChatMessage("", arg0);
+			Logging.Warn("[DebugConsole] The Chat function is not included in this version!");
 		}
 
 		private void OnStartServer()
@@ -71,8 +66,9 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-			server.Start();
-			client.Connect("127.0.0.1");
+			Networking.Server.Start(53223);
+			Networking.Client.Connect("127.0.0.1", 53223);
+			//Networking.Client.Send(new Helpers.TcpLogin("daRedLoCo", "test")); This function is not working and gives an exception!
 		}
 
 		public override void OnDeactivate()

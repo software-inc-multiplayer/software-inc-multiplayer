@@ -15,8 +15,6 @@ namespace Multiplayer.Networking
     [Serializable]
     public class ServerData
     {
-        [NonSerialized]
-        private ServerClass _server;
         public string ServerID;
         public List<Helpers.User> Clients = new List<Helpers.User>();
         public string ServerName;
@@ -37,7 +35,6 @@ namespace Multiplayer.Networking
             if (string.IsNullOrEmpty(fname) || !File.Exists(Path.Combine(serverpath, fname + ".json")))
             {
                 Logging.Info("[ServerHandler] ServerData does not exist, will create new one");
-                _server = ServerClass.Instance;
                 Gameworld = new GameWorld.Server();
                 ServerID = DateTime.Now.Ticks + "";
                 UpdateData();
@@ -62,10 +59,10 @@ namespace Multiplayer.Networking
         public void UpdateData()
         {
             Logging.Info("[ServerHandler] Updating ServerData from Server Instance");
-            Clients = _server.clients;
-            ServerName = _server.ServerName;
-            Password = _server.Password;
-            MaxPlayers = _server.MaxPlayers;
+            Clients = Server.Users;
+            ServerName = Server.ServerName;
+            Password = Server.Password;
+            MaxPlayers = Server.MaxPlayers;
         }
 
         /// <summary>
@@ -74,12 +71,10 @@ namespace Multiplayer.Networking
         public void UpdateServer()
         {
             Logging.Info("[ServerHandler] Updating Server Instance from ServerData");
-            ServerClass server = new ServerClass();
-            server.clients = Clients;
-            server.ServerName = ServerName;
-            server.Password = Password;
-            server.MaxPlayers = MaxPlayers;
-            _server = ServerClass.Instance;
+            Server.Users = Clients;
+            Server.ServerName = ServerName;
+            Server.Password = Password;
+            Server.MaxPlayers = MaxPlayers;
         }
 
         /// <summary>

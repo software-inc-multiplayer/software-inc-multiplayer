@@ -30,26 +30,28 @@ namespace Multiplayer.Networking
 			public World oldworld; //When the world is updated save the old world to see what did change and only send the changed stuff
 			private bool disposedValue;
 
+			[Obsolete("Needs to get updated to the new Server class")]
 			public Server()
 			{
 				Instance = this;
 				TimeOfDay.OnDayPassed += UpdateClients;
 
 				//Create World
-				ServerClass server = ServerClass.Instance;
-				if (server.hasAI)
-				{
-					Logging.Info("[GameWorld] Populate Gameworld with AI companies");
-					Logging.Warn("[GameWorld] AI companies not included in this version!");
+				//ServerClass server = ServerClass.Instance;
+				//if (server.hasAI)
+				//{
+				//	Logging.Info("[GameWorld] Populate Gameworld with AI companies");
+				//	Logging.Warn("[GameWorld] AI companies not included in this version!");
 
-				}
-				else
-				{
-					Logging.Info("[GameWorld] Removing all AI companies");
-					MarketSimulation.Active.Companies.Clear(); //Remove all AI companies (DEACTIVATE IN CONSOLE MODE!)
-				}
+				//}
+				//else
+				//{
+				//	Logging.Info("[GameWorld] Removing all AI companies");
+				//	MarketSimulation.Active.Companies.Clear(); //Remove all AI companies (DEACTIVATE IN CONSOLE MODE!)
+				//}
 			}
 
+			[Obsolete("Needs to get updated to the new Server class")]
 			private void UpdateClients(object sender, EventArgs e)
 			{
 				//TODO Update the clients so the gameworld is the same as on the server
@@ -62,7 +64,7 @@ namespace Multiplayer.Networking
 				{
 					Logging.Info("[GameWorld] Sending GameWorld because oldworld is null!");
 					Helpers.GameWorldMessage gwm = new Helpers.GameWorldMessage(world, true);
-					ServerClass.Instance.SendGameWorld(gwm);
+					//ServerClass.Instance.SendGameWorld(gwm);
 				}
 
 				oldworld = world; //Set oldworld to world to see if anything did change
@@ -74,12 +76,13 @@ namespace Multiplayer.Networking
 				SendGameWorldChanges(user);
 			}
 
+			[Obsolete("Needs to get updated to the new Server class")]
 			void SendGameWorldChanges(params Helpers.User[] users)
 			{
-				Helpers.GameWorldMessage add = new Helpers.GameWorldMessage(CompareWorlds(true), true);
-				ServerClass.Instance.SendGameWorld(add, users);
-				Helpers.GameWorldMessage remove = new Helpers.GameWorldMessage(CompareWorlds(false), false);
-				ServerClass.Instance.SendGameWorld(remove, users);
+				//Helpers.GameWorldMessage add = new Helpers.GameWorldMessage(CompareWorlds(true), true);
+				////ServerClass.Instance.SendGameWorld(add, users);
+				//Helpers.GameWorldMessage remove = new Helpers.GameWorldMessage(CompareWorlds(false), false);
+				////ServerClass.Instance.SendGameWorld(remove, users);
 			}
 
 			/// <summary>
