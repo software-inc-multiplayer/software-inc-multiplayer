@@ -68,7 +68,6 @@ namespace Multiplayer.Core
 			}
 			Networking.Server.Start(53223);
 			Networking.Client.Connect("127.0.0.1", 53223);
-			//Networking.Client.Send(new Helpers.TcpLogin("daRedLoCo", "test")); This function is not working and gives an exception!
 		}
 
 		public override void OnDeactivate()

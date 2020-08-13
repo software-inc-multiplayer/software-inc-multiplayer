@@ -1,9 +1,11 @@
 ﻿using Multiplayer.Debugging;
+using RoWa;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using UnityEngine;
 
 namespace Multiplayer.Networking
@@ -12,7 +14,7 @@ namespace Multiplayer.Networking
     {
         public static List<Helpers.User> Users = new List<Helpers.User>();
         public static string ServerName = "My Server";
-        public static string Password = "";
+        public static string Password = "test";
         public static ushort MaxPlayers = 10;
         public static ushort Port;
         static Telepathy.Server server = new Telepathy.Server();
@@ -76,7 +78,7 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] " + msg.connectionId + " Connected");
 
             //Send a ServerResponse to the user to login
-            server.Send(msg.connectionId,new Helpers.TcpResponse("login_request", "").ToArray());
+            Send(msg.connectionId,new Helpers.TcpResponse("login_request", ""));
         }
 
         /// <summary>
@@ -101,19 +103,32 @@ namespace Multiplayer.Networking
 		#region Messages
         public static void Send(int clientid, Helpers.TcpResponse response)
 		{
-
             Logging.Info("[Server] Sending response to client " + clientid);
+            server.Send(clientid, response.ToArray());
         }
 
         public static void Send(int clientid, Helpers.TcpGameWorld changes)
         {
-
+            Logging.Info("[Server] Sending GameWorldChanges to client " + clientid);
+            server.Send(clientid, changes.ToArray());
         }
 
         public static void Send(Helpers.TcpGameWorld changes)
         {
-
+            Logging.Info("[Server] Sending GameWorldChanges to all clients");
+            foreach(Helpers.User user in Users)
+			{
+                server.Send(user.ID, changes.ToArray());
+			}
         }
+
+        public static void Send(int clientid, Helpers.TcpChat message)
+		{
+            int receiver = (int)message.Data.GetValue("receiver");
+            string msg = (string)message.Data.GetValue("message");
+            Logging.Info("[Server] Redirecting Chat message from " + clientid + " to " + receiver);
+            server.Send(receiver, new Helpers.TcpChat(receiver, msg, clientid).ToArray());
+		}
         #endregion
 
         /// <summary>
@@ -122,8 +137,48 @@ namespace Multiplayer.Networking
         /// <param name="msg">The Telepathy.Message sent by the server.getNextMessage() function</param>
         static void Receive(Telepathy.Message msg)
         {
-            Logging.Info($"[Server] From Connection {msg.connectionId}:" + Encoding.UTF8.GetString(msg.data));
+            string datastr = Encoding.UTF8.GetString(msg.data);
+            Logging.Info($"[Server] From Connection {msg.connectionId}: " + datastr);
+            Helpers.TcpLogin tcplogin = XML.From<Helpers.TcpLogin>(datastr);
+            if (tcplogin != null && tcplogin.Header == "login")
+                OnUserLogin(msg.connectionId, tcplogin);
         }
+
+        /// <summary>
+        /// Gets called when the Header of Receive is "login"
+        /// </summary>
+        /// <param name="connectionid">The connection id of the Telepathy.Message</param>
+        /// <param name="login">The Helpers.TcpLogin</param>
+        static void OnUserLogin(int connectionid, Helpers.TcpLogin login)
+        {
+            Logging.Info($"[Server] User {login.Data.GetValue("username")} ({connectionid}) tries to login to the server");
+            if (Users.Count >= MaxPlayers)
+            {
+                Logging.Info($"[Server] User {connectionid} tries login but max users reached");
+                Send(connectionid, new Helpers.TcpResponse("login_response", "max_players"));
+            }
+            else if (Password != (string)login.Data.GetValue("password"))
+			{
+                Logging.Info($"[Server] User {connectionid} tries login with password {(string)login.Data.GetValue("password")} but pass is {Password}");
+                Send(connectionid, new Helpers.TcpResponse("login_response", "wrong_password"));
+            }
+            else if (Users.Count < MaxPlayers && Password == (string)login.Data.GetValue("password"))
+			{
+                Send(connectionid, new Helpers.TcpResponse("login_response", "ok"));
+                Users.Add(new Helpers.User()
+                {
+                    ID = connectionid,
+                    Role = Users.Count < 1 ? Helpers.UserRole.Host : Helpers.UserRole.Client,
+                    UniqueID = (string)login.Data.GetValue("uniqueid"),
+                    Username = (string)login.Data.GetValue("username")
+                });
+                Logging.Info($"[Server] User logged in!");
+                return;
+            }
+            else
+                Logging.Warn($"[Server] Invalid TcpLogin data!");
+            Logging.Warn("[Server] User didn't login, check client for details");
+		}
 
         /// <summary>
         /// Stops the Server
@@ -136,5 +191,3 @@ namespace Multiplayer.Networking
 		}
     }
 }
-
-//INStalLer CraSHES IF NO INTERNET CONNECTiON

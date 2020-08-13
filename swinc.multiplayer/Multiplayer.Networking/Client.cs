@@ -21,7 +21,7 @@ namespace Multiplayer.Networking
             Read();
         }
 
-        public static async void Read()
+        static async void Read()
 		{
             await Task.Run(() => {
                 while (isRunning)
@@ -47,7 +47,7 @@ namespace Multiplayer.Networking
             });
         }
 
-        public static void Receive(byte[] data)
+        static void Receive(byte[] data)
 		{
             Logging.Info("[Client] Data from Server: " + Encoding.UTF8.GetString(data));
 		}
@@ -63,6 +63,12 @@ namespace Multiplayer.Networking
 		{
             Logging.Info("[Client] Sending gameworld update");
             client.Send(changes.ToArray());
+		}
+
+        public static void Send(Helpers.TcpChat chatmsg)
+		{
+            Logging.Info("[Client] Sending chat message");
+            client.Send(chatmsg.ToArray());
 		}
 		#endregion
 

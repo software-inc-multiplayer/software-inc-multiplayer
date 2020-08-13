@@ -92,25 +92,29 @@ namespace RoWa
         /// <returns>The Object of type T from the XML string</returns>
         public static T From<T>(string xml)
 		{
-            using (MemoryStream ms = new MemoryStream(1024))
-            {
-                ms.Write(Encoding.UTF8.GetBytes(xml), 0, Encoding.UTF8.GetBytes(xml).Length);
-                ms.Seek(0, SeekOrigin.Begin);
-
-                //fix for encoding:
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
-                using (StreamReader stream = new StreamReader(ms, Encoding.GetEncoding("UTF-8"))) //using fires stream.close
+			try
+			{
+                using (MemoryStream ms = new MemoryStream(1024))
                 {
-                    ms.Position = 0;
-                    object o;
-                    try
+                    ms.Write(Encoding.UTF8.GetBytes(xml), 0, Encoding.UTF8.GetBytes(xml).Length);
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    //fix for encoding:
+                    XmlSerializer serializer = new XmlSerializer(typeof(T));
+                    using (StreamReader stream = new StreamReader(ms, Encoding.GetEncoding("UTF-8"))) //using fires stream.close
                     {
+                        ms.Position = 0;
+                        object o;
                         o = serializer.Deserialize(stream);
+                        return (T)o;
                     }
-                    catch (System.Exception ex) { Logging.Error(ex.Message); o = null; }
-                    return (T)o;
                 }
             }
+            catch(Exception ex)
+			{
+                Logging.Warn("[XML] " + ex.Message);
+                return default(T);
+			}          
         }
 	}
 }

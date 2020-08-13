@@ -44,7 +44,7 @@ namespace Multiplayer.Networking
 			/// <summary>
 			/// The ID of the User inside the server
 			/// </summary>
-			public ushort ID { get; set; }
+			public int ID { get; set; }
 			/// <summary>
 			/// The (Steam) username of the User
 			/// </summary>
@@ -54,9 +54,9 @@ namespace Multiplayer.Networking
 			/// </summary>
 			public UserRole Role { get; set; }
 			/// <summary>
-			/// The Ip & Port of the user
+			/// The Unique User ID
 			/// </summary>
-			public string IpPort { get; set; }
+			public string UniqueID { get; set; }
 			/// <summary>
 			/// The UserCompany of the User, will be set with the User() function
 			/// </summary>
@@ -202,6 +202,47 @@ namespace Multiplayer.Networking
 				Header = "response";
 				Data.Add("type", type);
 				Data.Add("data", response);
+			}
+		}
+
+		public class TcpChat : TcpMessage
+		{
+			public TcpChat() { }
+			public TcpChat(User receiver, string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", receiver.ID);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(string receivername, string message)
+			{
+				Logging.Warn("[Helpers] TcpChat(receivername, message) is non functional!");
+			}
+
+			public TcpChat(string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", null);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(int receiverid, string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", receiverid);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(int receiverid, string message, int senderid)
+			{
+				Header = "chat";
+				Data.Add("sender", senderid);
+				Data.Add("receiver", receiverid);
+				Data.Add("message", message);
 			}
 		}
 
