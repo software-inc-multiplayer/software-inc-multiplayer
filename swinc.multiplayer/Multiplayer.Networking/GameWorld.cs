@@ -30,31 +30,27 @@ namespace Multiplayer.Networking
 			public World oldworld; //When the world is updated save the old world to see what did change and only send the changed stuff
 			private bool disposedValue;
 
-			[Obsolete("Needs to get updated to the new Server class")]
 			public Server()
 			{
 				Instance = this;
 				TimeOfDay.OnDayPassed += UpdateClients;
 
 				//Create World
-				//ServerClass server = ServerClass.Instance;
-				//if (server.hasAI)
-				//{
-				//	Logging.Info("[GameWorld] Populate Gameworld with AI companies");
-				//	Logging.Warn("[GameWorld] AI companies not included in this version!");
+				if (Networking.Server.hasAI)
+				{
+					Logging.Info("[GameWorld] Populate Gameworld with AI companies");
+					Logging.Warn("[GameWorld] AI companies not included in this version!");
 
-				//}
-				//else
-				//{
-				//	Logging.Info("[GameWorld] Removing all AI companies");
-				//	MarketSimulation.Active.Companies.Clear(); //Remove all AI companies (DEACTIVATE IN CONSOLE MODE!)
-				//}
+				}
+				else
+				{
+					Logging.Info("[GameWorld] Removing all AI companies");
+					MarketSimulation.Active.Companies.Clear(); //Remove all AI companies (DEACTIVATE IN CONSOLE MODE!)
+				}
 			}
 
-			[Obsolete("Needs to get updated to the new Server class")]
 			private void UpdateClients(object sender, EventArgs e)
 			{
-				//TODO Update the clients so the gameworld is the same as on the server
 				if (oldworld != null)
 				{
 					Logging.Info("[GameWorld] Updating GameWorld");
@@ -63,8 +59,8 @@ namespace Multiplayer.Networking
 				else
 				{
 					Logging.Info("[GameWorld] Sending GameWorld because oldworld is null!");
-					Helpers.GameWorldMessage gwm = new Helpers.GameWorldMessage(world, true);
-					//ServerClass.Instance.SendGameWorld(gwm);
+					Helpers.TcpGameWorld gwm = new Helpers.TcpGameWorld(world, true);
+					Networking.Server.Send(gwm);
 				}
 
 				oldworld = world; //Set oldworld to world to see if anything did change
@@ -76,13 +72,22 @@ namespace Multiplayer.Networking
 				SendGameWorldChanges(user);
 			}
 
-			[Obsolete("Needs to get updated to the new Server class")]
 			void SendGameWorldChanges(params Helpers.User[] users)
 			{
-				//Helpers.GameWorldMessage add = new Helpers.GameWorldMessage(CompareWorlds(true), true);
-				////ServerClass.Instance.SendGameWorld(add, users);
-				//Helpers.GameWorldMessage remove = new Helpers.GameWorldMessage(CompareWorlds(false), false);
-				////ServerClass.Instance.SendGameWorld(remove, users);
+				Helpers.TcpGameWorld add = new Helpers.TcpGameWorld(CompareWorlds(true), true);
+				Helpers.TcpGameWorld remove = new Helpers.TcpGameWorld(CompareWorlds(false), false);
+
+				if(users.Length < 1)
+				{
+					//If users aren't set, it will send it to all users connected to the server
+					users = Networking.Server.Users.ToArray();
+				}
+
+				foreach(Helpers.User user in users)
+				{
+					Networking.Server.Send(user.ID, add);
+					Networking.Server.Send(user.ID, remove);
+				}
 			}
 
 			/// <summary>
@@ -187,12 +192,14 @@ namespace Multiplayer.Networking
 				if (adds)
 				{
 					Logging.Info("[GameWorld] Will add new content to the GameWorld");
-					Logging.Info("[Debug] " + JsonConvert.SerializeObject(servercontent));
+					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
+					Networking.Client.Send(gwc);
 				}
 				else
 				{
 					Logging.Info("[GameWorld] Will remove content from the GameWorld");
-					Logging.Info("[Debug] " + JsonConvert.SerializeObject(servercontent));
+					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
+					Networking.Client.Send(gwc);
 				}
 			}
 

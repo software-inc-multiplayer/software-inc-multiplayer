@@ -246,6 +246,46 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		public class TcpRequest : TcpMessage
+		{
+			public TcpRequest() { }
+
+			public TcpRequest(string request)
+			{
+				Header = "request";
+				Data.Add("request", request);
+			}
+		}
+
+		public class TcpData : TcpMessage
+		{
+			public TcpData() { }
+
+			public TcpData(Dictionary<object,object> dict)
+			{
+				Header = "data";
+				Data = new XML.XMLDictionary(dict);
+			}
+
+			public TcpData(params string[] keyvalues)
+			{
+				Header = "data";
+				foreach(string keyvalue in keyvalues)
+				{
+					string k = keyvalue.Split('|')[0];
+					string v = keyvalue.Split('|')[1];
+					Data = new XML.XMLDictionary();
+					Data.Add(k, v);
+				}
+			}
+
+			public TcpData(string key, string value)
+			{
+				Header = "data";
+				Data.Add(key, value);
+			}
+		}
+
 		[Obsolete]
 		/// <summary>
 		/// Do not use this, but use one of the objects that are based on the message

@@ -17,6 +17,7 @@ namespace Multiplayer.Networking
         public static string Password = "";
         public static ushort MaxPlayers = 10;
         public static ushort Port;
+        public static bool hasAI = false;
         static Telepathy.Server server = new Telepathy.Server();
         static bool isRunning = false;
 
@@ -202,6 +203,17 @@ namespace Multiplayer.Networking
                 server.Send((int)chat.Data.GetValue("receiver"), chat.ToArray());
 			}
 		}
+
+        static void OnRequestGameWorld(int connectionid, Helpers.TcpRequest request)
+		{
+            //TODO: Add a request from the client and send the gameworld to the client
+		}
+
+        static void OnRequestUserList(int connectionid, Helpers.TcpRequest request)
+		{
+            //TODO: Add a request from the client and send a list of the users online
+		}
+
         /// <summary>
         /// Stops the Server
         /// </summary>
