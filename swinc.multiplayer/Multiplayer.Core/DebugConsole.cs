@@ -27,6 +27,28 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(sendchatcmd);
 			DevConsole.Command closeserver = new DevConsole.Command("MULTIPLAYER_STOP", OnServerStop);
 			DevConsole.Console.AddCommand(closeserver);
+			DevConsole.Command getuserlist = new DevConsole.Command("MULTIPLAYER_USERS", OnRequestUserList);
+			DevConsole.Console.AddCommand(getuserlist);
+			DevConsole.Command getgameworld = new DevConsole.Command("MULTIPLAYER_GAMEWORLD", OnRequestGameWorld);
+			DevConsole.Console.AddCommand(getgameworld);
+
+
+		}
+
+		private void OnRequestGameWorld()
+		{
+			if (!Networking.Client.Connected)
+				Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
+
+			Networking.Client.Send(new Helpers.TcpRequest("gameworld"));
+		}
+
+		private void OnRequestUserList()
+		{
+			if (!Networking.Client.Connected)
+				Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
+
+			Networking.Client.Send(new Helpers.TcpRequest("userlist"));
 		}
 
 		private void OnServerStop()

@@ -123,6 +123,18 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Sending chat message");
             client.Send(chatmsg.ToArray());
 		}
+
+        public static void Send(Helpers.TcpRequest request)
+		{
+            Logging.Info("[Client] Sending request");
+            client.Send(request.ToArray());
+		}
+
+        public static void Send(Helpers.TcpResponse response)
+		{
+            Logging.Info("[Client] Sending response");
+            client.Send(response.ToArray());
+		}
 		#endregion
 
 		public static void Disconnect()

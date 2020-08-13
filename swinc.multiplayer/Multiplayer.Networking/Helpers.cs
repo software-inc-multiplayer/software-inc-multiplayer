@@ -197,7 +197,7 @@ namespace Multiplayer.Networking
 			/// </summary>
 			/// <param name="type">The type of the response, for a TcpLogin response it would be "login" for example</param>
 			/// <param name="response">The response as a string, if the password for the login is wrong it would be "wrong_password"</param>
-			public TcpResponse(string type, string response)
+			public TcpResponse(string type, object response)
 			{
 				Header = "response";
 				Data.Add("type", type);
