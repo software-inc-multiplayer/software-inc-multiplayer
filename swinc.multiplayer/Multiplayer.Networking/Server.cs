@@ -207,6 +207,11 @@ namespace Multiplayer.Networking
         /// </summary>
         public static void Stop()
 		{
+            if(!isRunning)
+			{
+                Logging.Warn("[Server] Can't stop a Server that isn't running...");
+                return;
+			}
             Logging.Info("[Server] Stop listening");
             isRunning = false;
             server.Stop();

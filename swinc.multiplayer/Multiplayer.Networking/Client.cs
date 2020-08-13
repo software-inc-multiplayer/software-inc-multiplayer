@@ -11,25 +11,36 @@ namespace Multiplayer.Networking
 {
 	public static class Client
 	{
-        public static bool Connected { get { return isRunning; } }
+        public static bool Connected { get { return client.Connected; } }
         static Telepathy.Client client = new Telepathy.Client();
-		private static bool isRunning = false;
         static string Username = "Player";
-        static string ServerPassword = "test";
+        static string ServerPassword = "";
 
         public static void Connect(string ip, ushort port)
         {
             // create and connect the client
             client.Connect(ip, port);
-            isRunning = true;
-            Read();
+            Logging.Info("[Client] Trying to connect!");
+            while(client.Connecting)
+			{
+
+			}
+            if(client.Connected)
+            {
+                Logging.Info("[Client] Connected to the Server!");
+                Read();
+            }
+			else
+			{
+                Logging.Warn("[Client] Couldn't connect to the Server");
+			}
         }
 
         static async void Read()
 		{
             Logging.Info("[Client] Starts reading");
             await Task.Run(() => {
-                while (isRunning)
+                while (Connected)
                 {
                     // grab all new messages. do this in your Update loop.
                     Telepathy.Message msg;
@@ -113,7 +124,11 @@ namespace Multiplayer.Networking
 
 		public static void Disconnect()
 		{
-            isRunning = false;
+            if (!Connected)
+            {
+                Logging.Warn("[Client] You can't disconnect a client that isn't connected...");
+                return;
+			}
             client.Disconnect();
 		}
 	}
