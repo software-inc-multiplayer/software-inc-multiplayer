@@ -14,7 +14,7 @@ namespace Multiplayer.Networking
     {
         public static List<Helpers.User> Users = new List<Helpers.User>();
         public static string ServerName = "My Server";
-        public static string Password = "test";
+        public static string Password = "";
         public static ushort MaxPlayers = 10;
         public static ushort Port;
         static Telepathy.Server server = new Telepathy.Server();

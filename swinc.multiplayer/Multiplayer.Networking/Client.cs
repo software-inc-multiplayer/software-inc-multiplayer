@@ -16,24 +16,27 @@ namespace Multiplayer.Networking
         static string Username = "Player";
         static string ServerPassword = "";
 
-        public static void Connect(string ip, ushort port)
+        public static async void Connect(string ip, ushort port)
         {
             // create and connect the client
             client.Connect(ip, port);
             Logging.Info("[Client] Trying to connect!");
-            while(client.Connecting)
-			{
+            await Task.Run(() => {
+                while (client.Connecting)
+                {
 
-			}
-            if(client.Connected)
-            {
-                Logging.Info("[Client] Connected to the Server!");
-                Read();
-            }
-			else
-			{
-                Logging.Warn("[Client] Couldn't connect to the Server");
-			}
+                }
+                if (client.Connected)
+                {
+                    Logging.Info("[Client] Connected to the Server!");
+                    Read();
+                }
+                else
+                {
+                    Logging.Warn("[Client] Couldn't connect to the Server");
+                }
+            });
+            
         }
 
         static async void Read()
