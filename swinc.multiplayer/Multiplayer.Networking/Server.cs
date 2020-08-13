@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using System.Xml.Serialization;
 using UnityEngine;
 
 namespace Multiplayer.Networking
@@ -19,6 +20,7 @@ namespace Multiplayer.Networking
         public static ushort Port;
         public static bool hasAI = false;
         static Telepathy.Server server = new Telepathy.Server();
+        static ServerData serverdata = new ServerData();
         static bool isRunning = false;
 
         /// <summary>
@@ -230,8 +232,9 @@ namespace Multiplayer.Networking
         static void OnRequestUserList(int connectionid)
 		{
             Logging.Info("[Server] Sending Userlist to user " + connectionid);
-            Helpers.TcpResponse response = new Helpers.TcpResponse("userlist", Users);
-            server.Send(connectionid, response.ToArray());
+            Logging.Warn("[Server] Can't send Userlist because there is an exception, this problem is known!");
+            //Helpers.TcpResponse response = new Helpers.TcpResponse("userlist", new XML.XMLDictionary(new XML.XMLDictionaryPair("users", Users.ToArray())));
+            //server.Send(connectionid, response.ToArray());
 		}
 
         /// <summary>

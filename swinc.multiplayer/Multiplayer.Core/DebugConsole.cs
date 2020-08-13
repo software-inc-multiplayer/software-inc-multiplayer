@@ -31,8 +31,6 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(getuserlist);
 			DevConsole.Command getgameworld = new DevConsole.Command("MULTIPLAYER_GAMEWORLD", OnRequestGameWorld);
 			DevConsole.Console.AddCommand(getgameworld);
-
-
 		}
 
 		private void OnRequestGameWorld()

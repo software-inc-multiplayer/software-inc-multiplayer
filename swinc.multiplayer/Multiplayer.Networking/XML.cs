@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using Multiplayer.Debugging;
+using UnityEngine;
 
 namespace RoWa
 {
     public static class XML
-	{
+    {
         /// <summary>
         /// A Dictionary that can be saved to an XML file/string
         /// </summary>
@@ -22,6 +24,10 @@ namespace RoWa
 			{
                 foreach(KeyValuePair<object, object> kvp in dict)
                     Pairs.Add(new XMLDictionaryPair(kvp.Key, kvp.Value));
+			}
+            public XMLDictionary(params XMLDictionaryPair[] pairs)
+			{
+                Pairs.AddRange(pairs);
 			}
 
             public bool Contains(object key)
