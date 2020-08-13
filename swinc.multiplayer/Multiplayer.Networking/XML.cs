@@ -34,8 +34,26 @@ namespace RoWa
 
             public object GetValue(object key)
 			{
-                return Pairs.Find(x => x.Key == key);
+                XMLDictionaryPair p = Pairs.Find(x => x.Key == key);
+                if(p == null)
+				{
+                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs!");
+                    return null;
+				}
+                object value = p.Value;
+                return value;
 			}
+
+            public object GetValue(string key)
+			{
+                XMLDictionaryPair p = Pairs.Find(x => (string)x.Key == key);
+                if (p == null)
+                {
+                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs!");
+                    return null;
+                }
+                return p.Value;
+            }
 
             public void Add(XMLDictionaryPair pair)
 			{
