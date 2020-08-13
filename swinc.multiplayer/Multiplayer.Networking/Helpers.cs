@@ -1,5 +1,6 @@
 ﻿using Multiplayer.Debugging;
 using Newtonsoft.Json;
+using RoWa;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -119,11 +120,17 @@ namespace Multiplayer.Networking
 		public class TcpMessage
 		{
 			public string Header = "";
-			public Dictionary<object, object> Data = new Dictionary<object, object>();
+			public XML.XMLDictionary Data = new XML.XMLDictionary();
 
 			public virtual string ToJson()
 			{
-				return JsonConvert.SerializeObject(this);
+				return XML.To(this);
+				//return JsonConvert.SerializeObject(this);
+			}
+
+			public virtual T FromJson<T>(string json)
+			{
+				return XML.From<T>(json);
 			}
 
 			public virtual byte[] ToArray()
@@ -137,6 +144,10 @@ namespace Multiplayer.Networking
 		/// </summary>
 		public class TcpLogin : TcpMessage
 		{
+			public TcpLogin()
+			{
+			}
+
 			/// <summary>
 			/// [Client Only] Login message used to send a login request from the client to the server.
 			/// Uses Helpers.GetUniqueID() as uniqueid to identify the user.
@@ -157,6 +168,10 @@ namespace Multiplayer.Networking
 		/// </summary>
 		public class TcpGameWorld : TcpMessage
 		{
+			public TcpGameWorld()
+			{
+			}
+
 			/// <summary>
 			/// [Client/Server] GameWorld message used to update the GameWorld. Can be used by the Server and the Client!
 			/// </summary>
@@ -175,6 +190,8 @@ namespace Multiplayer.Networking
 		/// </summary>
 		public class TcpResponse : TcpMessage
 		{
+			public TcpResponse() { }
+
 			/// <summary>
 			/// [Server Only] A response from the server (For example a response to a TcpLogin message from the client)
 			/// </summary>
