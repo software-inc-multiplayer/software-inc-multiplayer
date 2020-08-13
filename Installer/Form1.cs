@@ -53,6 +53,10 @@ namespace Installer
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (releasesList.SelectedItem == null) {
+                releasesList.SelectedIndex = 0;
+                return; 
+            }
             string releasee = (string) releasesList.SelectedItem;
             bool exists = GitHub.allowedReleases.TryGetValue(releasee, out ReleaseTag release);
             if (!exists) return;
