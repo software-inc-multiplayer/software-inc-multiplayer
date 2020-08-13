@@ -51,12 +51,12 @@ namespace Multiplayer.Core
 
 		private void OnSendChat(string arg0)
 		{
-			if (!inmain)
+			if (!inmain || !Networking.Client.Connected)
 			{
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-			Logging.Warn("[DebugConsole] The Chat function is not included in this version!");
+			Networking.Client.Send(new Helpers.TcpChat(arg0));
 		}
 
 		private void OnStartServer()

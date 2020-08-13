@@ -37,7 +37,7 @@ namespace RoWa
                 XMLDictionaryPair p = Pairs.Find(x => x.Key == key);
                 if(p == null)
 				{
-                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs!");
+                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs! <= Can be ignored if mod doesn't crash afterwards");
                     return null;
 				}
                 object value = p.Value;
