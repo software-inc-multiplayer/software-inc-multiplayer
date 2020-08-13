@@ -4,7 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Markdig;
+using System.Windows.Forms;
+using System.Drawing;
 
 namespace Installer
 {
@@ -13,9 +17,14 @@ namespace Installer
         public string DownloadURL { get; set; }
         public ReleaseTag() { }
         public string Tag { get; set; }
+        public string Changelog { get; set; }
         public bool PreRelease { get; set; }
         public bool Latest { get; set; }
         public int DownloadCount { get; set; }
+        public void GetRichText(RichTextBox box)
+        {
+            box.Text = Changelog;
+        }
     }
     public class GitHub
     {
@@ -37,6 +46,7 @@ namespace Installer
                     temp.PreRelease = release.Prerelease;
                     temp.Tag = release.TagName;
                     temp.DownloadCount = asset.DownloadCount;
+                    temp.Changelog = "<link rel=\"stylesheet\" media=\"screen\" href=\"https://fontlibrary.org/face/anke\" type=\"text/css\"/><style>* {font-family: 'Anke';}</style>" + Markdown.ToHtml(release.Body);
                     allowedReleases.Add(release.TagName, temp);
                 }
             }
