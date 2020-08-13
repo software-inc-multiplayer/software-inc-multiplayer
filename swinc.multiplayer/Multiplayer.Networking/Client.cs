@@ -52,12 +52,21 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Data from Server: " + Encoding.UTF8.GetString(data));
 		}
 
-        public static void Send(Helpers.TcpLogin login)
+		#region Messages
+		public static void Send(Helpers.TcpLogin login)
 		{
+            Logging.Info("[Client] Sending login message");
             client.Send(login.ToArray());
 		}
 
-        public static void Disconnect()
+        public static void Send(Helpers.TcpGameWorld changes)
+		{
+            Logging.Info("[Client] Sending gameworld update");
+            client.Send(changes.ToArray());
+		}
+		#endregion
+
+		public static void Disconnect()
 		{
             isRunning = false;
             client.Disconnect();

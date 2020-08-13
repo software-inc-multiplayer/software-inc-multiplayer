@@ -3,16 +3,39 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using Tyd;
 
 namespace Multiplayer.Networking
 {
 	public static class Helpers
 	{
+
+		/// <summary>
+		/// returns the unique user id, if it doesn't exist it will create one and return it
+		/// </summary>
+		/// <returns>The unique User ID</returns>
+		public static string GetUniqueID()
+		{
+			string uid;
+			string path = Path.Combine(ModController.ModFolder, "Multiplayer", "user.id");
+			Directory.CreateDirectory(path); //Create path if not exists
+			if(File.Exists(path))
+			{
+				uid = File.ReadAllText(path);
+			}
+			else
+			{
+				uid = Guid.NewGuid().ToString();
+				File.WriteAllText(path, uid);
+			}
+			return uid;
+		}
 
 		public class User
 		{
@@ -88,7 +111,10 @@ namespace Multiplayer.Networking
 				return null;
 			}
 		}
-
+		
+		/// <summary>
+		/// Base message to send over the network. DO NOT USE!
+		/// </summary>
 		public class TcpMessage
 		{
 			public string Header = "";
@@ -105,18 +131,54 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		/// <summary>
+		/// [Client Only] Login message used to send a login request from the client to the server
+		/// </summary>
 		public class TcpLogin : TcpMessage
 		{
+			/// <summary>
+			/// [Client Only] Login message used to send a login request from the client to the server.
+			/// Uses Helpers.GetUniqueID() as uniqueid to identify the user.
+			/// </summary>
+			/// <param name="username">The username which will be saved with the server</param>
+			/// <param name="password">The servers password</param>
 			public TcpLogin(string username, string password)
 			{
 				Header = "login";
 				Data.Add("username", username);
 				Data.Add("password", password);
+				Data.Add("uniqueid", Helpers.GetUniqueID());
 			}
 		}
 
+		/// <summary>
+		/// [Client/Server] GameWorld message used to update the GameWorld. Can be used by the Server and the Client!
+		/// </summary>
+		public class TcpGameWorld : TcpMessage
+		{
+			/// <summary>
+			/// [Client/Server] GameWorld message used to update the GameWorld. Can be used by the Server and the Client!
+			/// </summary>
+			/// <param name="worldchanges">GameWorld.Server.CompareWorlds() for Server or a new GameWorld.World with the changes for the client</param>
+			/// <param name="isAddition">If the content from worldchanges should be added or removed from the GameWorld</param>
+			public TcpGameWorld(GameWorld.World worldchanges, bool isAddition)
+			{
+				Header = "gameworld";
+				Data.Add("addition", isAddition);
+				Data.Add("changes", worldchanges);
+			}
+		}
+
+		/// <summary>
+		/// [Server Only] A response from the server (For example a response to a TcpLogin message from the client)
+		/// </summary>
 		public class TcpResponse : TcpMessage
 		{
+			/// <summary>
+			/// [Server Only] A response from the server (For example a response to a TcpLogin message from the client)
+			/// </summary>
+			/// <param name="type">The type of the response, for a TcpLogin response it would be "login" for example</param>
+			/// <param name="response">The response as a string, if the password for the login is wrong it would be "wrong_password"</param>
 			public TcpResponse(string type, string response)
 			{
 				Header = "response";
