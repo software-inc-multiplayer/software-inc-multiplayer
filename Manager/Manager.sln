@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Manager", "./Main/Manager.csproj", "{AAD61238-92B9-4B59-BF1B-6B1555D0DB13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Manager", "Main\Manager.csproj", "{AAD61238-92B9-4B59-BF1B-6B1555D0DB13}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Manager.Installer", "./Manager.Installer/Manager.Installer.vdproj", "{4E9BA604-553F-44CC-A527-2C724BCB9144}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Software Inc Multiplayer Mod Installer", "Software Inc Multiplayer Mod Installer\Software Inc Multiplayer Mod Installer.vdproj", "{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +29,14 @@ Global
 		{AAD61238-92B9-4B59-BF1B-6B1555D0DB13}.Release|x64.Build.0 = Release|x64
 		{AAD61238-92B9-4B59-BF1B-6B1555D0DB13}.Release|x86.ActiveCfg = Release|x86
 		{AAD61238-92B9-4B59-BF1B-6B1555D0DB13}.Release|x86.Build.0 = Release|x86
-		{4E9BA604-553F-44CC-A527-2C724BCB9144}.Debug|Any CPU.ActiveCfg = Debug
-		{4E9BA604-553F-44CC-A527-2C724BCB9144}.Debug|x64.ActiveCfg = Release
-		{4E9BA604-553F-44CC-A527-2C724BCB9144}.Debug|x86.ActiveCfg = Debug
-		{4E9BA604-553F-44CC-A527-2C724BCB9144}.Release|Any CPU.ActiveCfg = Release
-		{4E9BA604-553F-44CC-A527-2C724BCB9144}.Release|x64.ActiveCfg = Release
-		{4E9BA604-553F-44CC-A527-2C724BCB9144}.Release|x86.ActiveCfg = Release
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Debug|Any CPU.ActiveCfg = Debug
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Debug|x64.ActiveCfg = Debug
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Debug|x86.ActiveCfg = Debug
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Release|Any CPU.ActiveCfg = Release
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Release|x64.ActiveCfg = Release
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Release|x64.Build.0 = Release
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Release|x86.ActiveCfg = Debug
+		{5A21140D-6EDC-41C2-B90F-CFD57720BDBB}.Release|x86.Build.0 = Debug
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
