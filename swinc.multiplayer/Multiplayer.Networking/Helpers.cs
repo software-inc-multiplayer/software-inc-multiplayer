@@ -1,23 +1,50 @@
-﻿using Newtonsoft.Json;
+﻿using Multiplayer.Debugging;
+using Newtonsoft.Json;
+using RoWa;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using Tyd;
 
 namespace Multiplayer.Networking
 {
 	public static class Helpers
 	{
+
+		/// <summary>
+		/// returns the unique user id, if it doesn't exist it will create one and return it
+		/// </summary>
+		/// <returns>The unique User ID</returns>
+		public static string GetUniqueID()
+		{
+			string uid;
+			string path = Path.Combine(ModController.ModFolder, "Multiplayer");
+			Directory.CreateDirectory(path); //Create path if not exists
+			path = Path.Combine(path, "user.id");
+			if(File.Exists(path))
+			{
+				uid = File.ReadAllText(path);
+			}
+			else
+			{
+				uid = Guid.NewGuid().ToString();
+				File.WriteAllText(path, uid);
+			}
+			return uid;
+		}
+
 		public class User
 		{
 			/// <summary>
 			/// The ID of the User inside the server
 			/// </summary>
-			public ushort ID { get; set; }
+			public int ID { get; set; }
 			/// <summary>
 			/// The (Steam) username of the User
 			/// </summary>
@@ -27,9 +54,9 @@ namespace Multiplayer.Networking
 			/// </summary>
 			public UserRole Role { get; set; }
 			/// <summary>
-			/// The Ip & Port of the user
+			/// The Unique User ID
 			/// </summary>
-			public string IpPort { get; set; }
+			public string UniqueID { get; set; }
 			/// <summary>
 			/// The UserCompany of the User, will be set with the User() function
 			/// </summary>
@@ -86,7 +113,140 @@ namespace Multiplayer.Networking
 				return null;
 			}
 		}
+		
+		/// <summary>
+		/// Base message to send over the network. DO NOT USE!
+		/// </summary>
+		public class TcpMessage
+		{
+			public string Header = "";
+			public XML.XMLDictionary Data = new XML.XMLDictionary();
 
+			public virtual string ToJson()
+			{
+				return XML.To(this);
+				//return JsonConvert.SerializeObject(this);
+			}
+
+			public virtual T FromJson<T>(string json)
+			{
+				return XML.From<T>(json);
+			}
+
+			public virtual byte[] ToArray()
+			{
+				return Encoding.UTF8.GetBytes(ToJson());
+			}
+		}
+
+		/// <summary>
+		/// [Client Only] Login message used to send a login request from the client to the server
+		/// </summary>
+		public class TcpLogin : TcpMessage
+		{
+			public TcpLogin()
+			{
+			}
+
+			/// <summary>
+			/// [Client Only] Login message used to send a login request from the client to the server.
+			/// Uses Helpers.GetUniqueID() as uniqueid to identify the user.
+			/// </summary>
+			/// <param name="username">The username which will be saved with the server</param>
+			/// <param name="password">The servers password</param>
+			public TcpLogin(string username, string password)
+			{
+				Header = "login";
+				Data.Add("username", username);
+				Data.Add("password", password);
+				Data.Add("uniqueid", Helpers.GetUniqueID());
+			}
+		}
+
+		/// <summary>
+		/// [Client/Server] GameWorld message used to update the GameWorld. Can be used by the Server and the Client!
+		/// </summary>
+		public class TcpGameWorld : TcpMessage
+		{
+			public TcpGameWorld()
+			{
+			}
+
+			/// <summary>
+			/// [Client/Server] GameWorld message used to update the GameWorld. Can be used by the Server and the Client!
+			/// </summary>
+			/// <param name="worldchanges">GameWorld.Server.CompareWorlds() for Server or a new GameWorld.World with the changes for the client</param>
+			/// <param name="isAddition">If the content from worldchanges should be added or removed from the GameWorld</param>
+			public TcpGameWorld(GameWorld.World worldchanges, bool isAddition)
+			{
+				Header = "gameworld";
+				Data.Add("addition", isAddition);
+				Data.Add("changes", worldchanges);
+			}
+		}
+
+		/// <summary>
+		/// [Server Only] A response from the server (For example a response to a TcpLogin message from the client)
+		/// </summary>
+		public class TcpResponse : TcpMessage
+		{
+			public TcpResponse() { }
+
+			/// <summary>
+			/// [Server Only] A response from the server (For example a response to a TcpLogin message from the client)
+			/// </summary>
+			/// <param name="type">The type of the response, for a TcpLogin response it would be "login" for example</param>
+			/// <param name="response">The response as a string, if the password for the login is wrong it would be "wrong_password"</param>
+			public TcpResponse(string type, string response)
+			{
+				Header = "response";
+				Data.Add("type", type);
+				Data.Add("data", response);
+			}
+		}
+
+		public class TcpChat : TcpMessage
+		{
+			public TcpChat() { }
+			public TcpChat(User receiver, string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", receiver.ID);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(string receivername, string message)
+			{
+				Logging.Warn("[Helpers] TcpChat(receivername, message) is non functional!");
+			}
+
+			public TcpChat(string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", null);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(int receiverid, string message, User sender = null)
+			{
+				Header = "chat";
+				Data.Add("sender", sender);
+				Data.Add("receiver", receiverid);
+				Data.Add("message", message);
+			}
+
+			public TcpChat(int receiverid, string message, int senderid)
+			{
+				Header = "chat";
+				Data.Add("sender", senderid);
+				Data.Add("receiver", receiverid);
+				Data.Add("message", message);
+			}
+		}
+
+		[Obsolete]
 		/// <summary>
 		/// Do not use this, but use one of the objects that are based on the message
 		/// </summary>
@@ -96,6 +256,7 @@ namespace Multiplayer.Networking
 			public Dictionary<object, object> Meta = new Dictionary<object, object>();
 		}
 
+		[Obsolete]
 		public class LoginMessage : Message
 		{
 			/// <summary>
@@ -111,12 +272,13 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Obsolete]
 		public class ChatMessage : Message
 		{
 			/// <summary>
 			/// [CLIENT ONLY] Sends a chatmessage to a receiver, if receiver is empty it will send it to all clients
 			/// </summary>
-			/// <param name="receiver">The receiver of the chat message, if its empty it will send it to all clients</param>
+			/// <param name="receiver">The receiver of the chat message, if its empty it will send it to all clients. If this message is coming from the server, receiver will be the sender</param>
 			/// <param name="message">The chat message of the client</param>
 			public ChatMessage(string receiver, string message)
 			{
@@ -126,6 +288,7 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Obsolete]
 		public class ServerMessage : Message
 		{
 			/// <summary>
@@ -141,6 +304,7 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Obsolete]
 		public class DataMessage : Message
 		{
 			/// <summary>
@@ -154,6 +318,22 @@ namespace Multiplayer.Networking
 				Meta.Add("receiver", receiver);
 				Meta.Add("type", "company");
 				Meta.Add("data", JsonConvert.SerializeObject(company));
+			}
+		}
+
+		[Obsolete]
+		public class GameWorldMessage : Message
+		{
+			/// <summary>
+			/// [SERVER ONLY] A message sent if the gameworld gets updated. Contains lists of companies etc
+			/// Actual content: Companies
+			/// </summary>
+			/// <param name="world">The gameworld that you want to be sent to the client</param>
+			public GameWorldMessage(GameWorld.World world, bool isAddition)
+			{
+				Data = "gameworld";
+				Meta.Add("add", isAddition);
+				Meta.Add("data", JsonConvert.SerializeObject(world));
 			}
 		}
 
