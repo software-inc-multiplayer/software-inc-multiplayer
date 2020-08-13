@@ -139,9 +139,16 @@ namespace Multiplayer.Networking
         {
             string datastr = Encoding.UTF8.GetString(msg.data);
             Logging.Info($"[Server] From Connection {msg.connectionId}: " + datastr);
+
+            //Handle TCPLogin
             Helpers.TcpLogin tcplogin = XML.From<Helpers.TcpLogin>(datastr);
             if (tcplogin != null && tcplogin.Header == "login")
                 OnUserLogin(msg.connectionId, tcplogin);
+
+            //Handle TCPChat
+            Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
+            if (tcpchat != null && tcpchat.Header == "chat")
+                OnUserChat(msg.connectionId, tcpchat);
         }
 
         /// <summary>
@@ -180,6 +187,21 @@ namespace Multiplayer.Networking
             Logging.Warn("[Server] User didn't login, check client for details");
 		}
 
+        static void OnUserChat(int connectionid, Helpers.TcpChat chat)
+		{
+            if(chat.Data.GetValue("receiver") == null)
+			{
+                //Send to all connected users
+                Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
+                foreach (Helpers.User u in Users)
+                    server.Send(u.ID, chat.ToArray());
+			}else
+			{
+                //Send to a receiver
+                Logging.Info($"[Server] User {connectionid} sends a chat to {(int)chat.Data.GetValue("receiver")}");
+                server.Send((int)chat.Data.GetValue("receiver"), chat.ToArray());
+			}
+		}
         /// <summary>
         /// Stops the Server
         /// </summary>

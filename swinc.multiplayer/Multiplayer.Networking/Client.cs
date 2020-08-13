@@ -11,8 +11,9 @@ namespace Multiplayer.Networking
 {
 	public static class Client
 	{
+        public static bool Connected { get { return isRunning; } }
         static Telepathy.Client client = new Telepathy.Client();
-        static bool isRunning = false;
+		private static bool isRunning = false;
         static string Username = "Player";
         static string ServerPassword = "test";
 
@@ -56,9 +57,16 @@ namespace Multiplayer.Networking
 		{
             string datastr = Encoding.UTF8.GetString(data);
             Logging.Info("[Client] Data from Server: " + datastr);
+
+            //Handle TcpResponse
             Helpers.TcpResponse tcpresponse = XML.From<Helpers.TcpResponse>(datastr);
             if (tcpresponse != null && tcpresponse.Header == "response")
                 OnServerResponse(tcpresponse);
+
+            //Handle TcpChat
+            Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
+            if (tcpchat != null && tcpchat.Header == "chat")
+                OnChatReceived(tcpchat);
         }
 
         static void OnServerResponse(Helpers.TcpResponse response)
@@ -73,6 +81,14 @@ namespace Multiplayer.Networking
 			{
                 Send(new Helpers.TcpLogin(Username, ServerPassword));
 			}
+		}
+
+        static void OnChatReceived(Helpers.TcpChat chat)
+		{
+            Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
+            if (sender == null)
+                sender = new Helpers.User() { Username = "Server" };
+            Logging.Info("[Client] Chat received from " + sender.Username + ": " + (string)chat.Data.GetValue("message"));
 		}
 
 		#region Messages
