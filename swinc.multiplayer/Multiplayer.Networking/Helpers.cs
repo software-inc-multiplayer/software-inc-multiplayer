@@ -23,8 +23,9 @@ namespace Multiplayer.Networking
 		public static string GetUniqueID()
 		{
 			string uid;
-			string path = Path.Combine(ModController.ModFolder, "Multiplayer", "user.id");
+			string path = Path.Combine(ModController.ModFolder, "Multiplayer");
 			Directory.CreateDirectory(path); //Create path if not exists
+			path = Path.Combine(path, "user.id");
 			if(File.Exists(path))
 			{
 				uid = File.ReadAllText(path);
