@@ -72,21 +72,22 @@ namespace Multiplayer.Networking
 
         static void Receive(byte[] data)
 		{
-            //string datastr = Encoding.UTF8.GetString(data);
-            //Logging.Info("[Client] Data from Server: " + datastr);
             Logging.Info("[Client] Data from Server: " + data.Length + " bytes");
 
             //Handle TcpResponse
-            //Helpers.TcpResponse tcpresponse = XML.From<Helpers.TcpResponse>(datastr);
             Helpers.TcpResponse tcpresponse = Helpers.TcpResponse.Deserialize(data);
             if (tcpresponse != null && tcpresponse.Header == "response")
                 OnServerResponse(tcpresponse);
 
             //Handle TcpChat
-            //Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
             Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnChatReceived(tcpchat);
+
+            //Handle GameWorld
+            Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
+            if (tcpworld != null && tcpchat.Header == "gameworld")
+                OnGameWorldReceived(tcpworld);
         }
 
         static void OnServerResponse(Helpers.TcpResponse response)
@@ -109,6 +110,14 @@ namespace Multiplayer.Networking
             if (sender == null)
                 sender = new Helpers.User() { Username = "Server" };
             Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
+		}
+
+        static void OnGameWorldReceived(Helpers.TcpGameWorld world)
+		{
+            Logging.Info($"[Client] Updating GameWorld");
+            GameWorld.World changes = world.Data.GetValue("changes") as GameWorld.World;
+            bool addition = (bool)world.Data.GetValue("addition");
+            GameWorld.Client.Instance.UpdateWorld(changes, addition);
 		}
 
 		#region Messages

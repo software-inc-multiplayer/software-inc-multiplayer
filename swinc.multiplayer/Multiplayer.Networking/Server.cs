@@ -133,8 +133,7 @@ namespace Multiplayer.Networking
             int receiver = (int)message.Data.GetValue("receiver");
             string msg = (string)message.Data.GetValue("message");
             Logging.Info("[Server] Redirecting Chat message from " + clientid + " to " + receiver);
-            //server.Send(receiver, new Helpers.TcpChat(receiver, msg, clientid).ToArray());
-            server.Send(receiver, new Helpers.TcpChat(receiver, msg, clientid).Serialize());
+            server.Send(receiver, new Helpers.TcpChat(msg, GetUser(clientid)).Serialize());
 		}
         #endregion
 
