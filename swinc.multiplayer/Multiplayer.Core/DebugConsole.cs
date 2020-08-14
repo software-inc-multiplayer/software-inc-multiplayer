@@ -67,8 +67,6 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-			Networking.Client.Disconnect();
-			Networking.Server.Stop();
 			Networking.Client.Connect(ip, port);
 		}
 
