@@ -1,12 +1,5 @@
 ﻿using Multiplayer.Debugging;
 using Multiplayer.Networking;
-using Multiplayer.Networking.GameWorld;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
 namespace Multiplayer.Core
@@ -74,6 +67,7 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
+			Networking.Client.Disconnect();
 			Networking.Server.Stop();
 			Networking.Client.Connect(ip, port);
 		}

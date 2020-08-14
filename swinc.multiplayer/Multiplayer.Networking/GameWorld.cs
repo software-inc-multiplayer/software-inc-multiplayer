@@ -1,12 +1,6 @@
 ﻿using Multiplayer.Debugging;
-using Multiplayer.Networking;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Multiplayer.Networking
 {
@@ -100,6 +94,12 @@ namespace Multiplayer.Networking
 			{
 				World tmpworld = new World();
 
+				if(oldworld == null)
+				{
+					Logging.Warn("[GameWorld] oldworld is null but CompareWorlds() is called!");
+					return world;
+				}
+
 				//Compare dateTime (Do this with Added & Removed ones. Will probably change it in the future to sync the gametime
 				if (world.dateTime != oldworld.dateTime)
 				{
@@ -170,6 +170,7 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		[Serializable]
 		public class Client : IDisposable
 		{
 			public static Client Instance;

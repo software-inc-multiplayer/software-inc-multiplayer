@@ -1,13 +1,6 @@
 ﻿using Multiplayer.Debugging;
-using RoWa;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using UnityEngine;
 
 namespace Multiplayer.Networking
 {
@@ -107,19 +100,22 @@ namespace Multiplayer.Networking
         public static void Send(int clientid, Helpers.TcpRequest request)
 		{
             Logging.Info("[Server] Sending request to client " + clientid);
-            server.Send(clientid, request.ToArray());
+            //server.Send(clientid, request.ToArray());
+            server.Send(clientid, request.Serialize());
 		}
 
         public static void Send(int clientid, Helpers.TcpResponse response)
 		{
             Logging.Info("[Server] Sending response to client " + clientid);
-            server.Send(clientid, response.ToArray());
+            //server.Send(clientid, response.ToArray());
+            server.Send(clientid, response.Serialize());
         }
 
         public static void Send(int clientid, Helpers.TcpGameWorld changes)
         {
             Logging.Info("[Server] Sending GameWorldChanges to client " + clientid);
-            server.Send(clientid, changes.ToArray());
+            //server.Send(clientid, changes.ToArray());
+            server.Send(clientid, changes.Serialize());
         }
 
         public static void Send(Helpers.TcpGameWorld changes)
@@ -127,7 +123,8 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Sending GameWorldChanges to all clients");
             foreach(Helpers.User user in Users)
 			{
-                server.Send(user.ID, changes.ToArray());
+                //server.Send(user.ID, changes.ToArray());
+                server.Send(user.ID, changes.Serialize());
 			}
         }
 
@@ -136,7 +133,8 @@ namespace Multiplayer.Networking
             int receiver = (int)message.Data.GetValue("receiver");
             string msg = (string)message.Data.GetValue("message");
             Logging.Info("[Server] Redirecting Chat message from " + clientid + " to " + receiver);
-            server.Send(receiver, new Helpers.TcpChat(receiver, msg, clientid).ToArray());
+            //server.Send(receiver, new Helpers.TcpChat(receiver, msg, clientid).ToArray());
+            server.Send(receiver, new Helpers.TcpChat(receiver, msg, clientid).Serialize());
 		}
         #endregion
 
@@ -146,21 +144,25 @@ namespace Multiplayer.Networking
         /// <param name="msg">The Telepathy.Message sent by the server.getNextMessage() function</param>
         static void Receive(Telepathy.Message msg)
         {
-            string datastr = Encoding.UTF8.GetString(msg.data);
-            Logging.Info($"[Server] From Connection {msg.connectionId}: " + datastr);
+            //string datastr = Encoding.UTF8.GetString(msg.data);
+            //Logging.Info($"[Server] From Connection {msg.connectionId}: " + datastr);
+            Logging.Info($"[Server] Data from Connection {msg.connectionId}: {msg.data.Length} bytes");
 
             //Handle TCPLogin
-            Helpers.TcpLogin tcplogin = XML.From<Helpers.TcpLogin>(datastr);
+            //Helpers.TcpLogin tcplogin = XML.From<Helpers.TcpLogin>(datastr);
+            Helpers.TcpLogin tcplogin = Helpers.TcpLogin.Deserialize(msg.data);
             if (tcplogin != null && tcplogin.Header == "login")
                 OnUserLogin(msg.connectionId, tcplogin);
 
             //Handle TCPChat
-            Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
+            //Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
+            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(msg.data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnUserChat(msg.connectionId, tcpchat);
 
             //Handle TCPRequests
-            Helpers.TcpRequest tcprequest = XML.From<Helpers.TcpRequest>(datastr);
+            //Helpers.TcpRequest tcprequest = XML.From<Helpers.TcpRequest>(datastr);
+            Helpers.TcpRequest tcprequest = Helpers.TcpRequest.Deserialize(msg.data);
             if (tcprequest != null && tcprequest.Header == "request")
 			{
                 string req = (string)tcprequest.Data.GetValue("request");
@@ -199,7 +201,7 @@ namespace Multiplayer.Networking
                     UniqueID = (string)login.Data.GetValue("uniqueid"),
                     Username = (string)login.Data.GetValue("username")
                 });
-                Logging.Info($"[Server] User logged in!");
+                Logging.Info($"[Server] User {(string)login.Data.GetValue("username")} logged in!");
                 return;
             }
             else
@@ -214,12 +216,13 @@ namespace Multiplayer.Networking
                 //Send to all connected users
                 Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
                 foreach (Helpers.User u in Users)
-                    server.Send(u.ID, chat.ToArray());
+                    if(u.ID != connectionid)
+                        server.Send(u.ID, chat.Serialize());
 			}else
 			{
                 //Send to a receiver
                 Logging.Info($"[Server] User {connectionid} sends a chat to {(int)chat.Data.GetValue("receiver")}");
-                server.Send((int)chat.Data.GetValue("receiver"), chat.ToArray());
+                server.Send((int)chat.Data.GetValue("receiver"), chat.Serialize());
 			}
 		}
 

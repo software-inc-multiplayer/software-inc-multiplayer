@@ -6,12 +6,13 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using Multiplayer.Debugging;
-using UnityEngine;
 
 namespace RoWa
 {
     public static class XML
     {
+        [Serializable]
+        [Obsolete]
         /// <summary>
         /// A Dictionary that can be saved to an XML file/string
         /// </summary>
@@ -72,6 +73,7 @@ namespace RoWa
 			}
 		}
 
+        [Serializable]
         /// <summary>
         /// A keyvaluepair of a XMLDictionary
         /// </summary>
@@ -85,6 +87,7 @@ namespace RoWa
             public XMLDictionaryPair(object key, object value) { Key = key; Value = value; }
 		}
 
+        [Obsolete]
         /// <summary>
         /// Transforms the object of type T into a XML string
         /// </summary>
@@ -108,6 +111,7 @@ namespace RoWa
             }
         }
 
+        [Obsolete]
         /// <summary>
         /// Transforms the XML string to an object of type T
         /// </summary>
