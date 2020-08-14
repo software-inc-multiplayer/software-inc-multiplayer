@@ -191,7 +191,7 @@ namespace Multiplayer.Networking
 				Header = "login";
 				Data.Add("username", username);
 				Data.Add("password", password);
-				Data.Add("uniqueid", Helpers.GetUniqueID());
+				Data.Add("uniqueid", GetUniqueID());
 			}
 
 			public override byte[] Serialize()

@@ -15,7 +15,6 @@ namespace Multiplayer.Core
 
         public override void OnActivate()
         {
-            // new ServerClass().Start();
         }
 
         public override void OnDeactivate()
@@ -30,7 +29,6 @@ namespace Multiplayer.Core
             {
                 ActiveObjects.Remove(copye);
             }
-            // ServerClass.Instance.Stop();
         }
     }
 }
