@@ -98,6 +98,9 @@ namespace Multiplayer.Core
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_CONNECT");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_CHAT");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_STOP");
+			DevConsole.Console.RemoveCommand("MULTIPLAYER_USERS");
+			DevConsole.Console.RemoveCommand("MULTIPLAYER_GAMEWORLD");
+
 			SceneManager.sceneLoaded -= OnSceneLoaded;
 		}
 	}
