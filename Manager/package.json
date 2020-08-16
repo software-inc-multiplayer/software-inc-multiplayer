@@ -1,0 +1,77 @@
+{
+  "name": "multiplayer-mod-manager",
+  "version": "0.1.0",
+  "description": "A manager for the multiplayer mod for software inc.",
+  "main": "index.js",
+  "scripts": {
+    "compile": "electron-builder --windows nsis:ia32",
+    "start": "electron .",
+    "test": "echo No test specified"
+  },
+  "build": {
+    "directories": {
+      "buildResources": "./brs/",
+      "output": "./out/"
+    },
+    "files": [
+      "**/*",
+      "!**/brs/**",
+      "!**/out/**",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "appId": "com.mpmm.github",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "nsis": {
+      "shortcutName": "SIMM Manager"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cal3432/software-inc-multiplayer.git"
+  },
+  "keywords": [
+    "Installer",
+    "Manager",
+    "Launcher",
+    "Helper",
+    "Informative"
+  ],
+  "author": "CyaCal (Calum Henderson)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cal3432/software-inc-multiplayer/issues"
+  },
+  "homepage": "https://github.com/cal3432/software-inc-multiplayer#readme",
+  "devDependencies": {
+    "electron": "^9.2.0"
+  },
+  "dependencies": {
+    "@octokit/rest": "^18.0.3",
+    "@terascope/fetch-github-release": "^0.7.2",
+    "csharp-webclient": "^1.0.1",
+    "electron-debug": "^3.1.0",
+    "electron-localshortcut": "^3.2.1",
+    "electron-settings": "^4.0.2",
+    "extract-zip": "^2.0.1",
+    "get-redirect-url": "0.0.3",
+    "got": "^11.5.2",
+    "jquery": "^3.5.1",
+    "ncp": "^2.0.0",
+    "open": "^7.1.0",
+    "platform-folders": "^0.5.1",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
+  }
+}
