@@ -24,7 +24,6 @@ namespace Multiplayer.Core
             }
         }
         public static List<GameObject> ActiveObjects = new List<GameObject>() { };
-
         public override void OnActivate()
         {
             bool firstTimeLaunch = !SettingsHandler.Has("firstTimeLaunch");
