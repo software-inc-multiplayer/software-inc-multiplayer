@@ -12,6 +12,6 @@
 <h2>Contents</h2>
 
 - <a href="#install">Install</a>
-- <a href="#how-it-works">Install</a>
-- <a href="#install">Install</a>
-- <a href="#install">Install</a>
+- <a href="#how-it-works">How it works</a>
+- <a href="#bug-reports-and-feature-requests">Submitting a bug report/feature request.</a>
+- <a href="#contributing">Contributing</a>
