@@ -11,7 +11,18 @@
 
 <h2>Contents</h2>
 
-- <a href="#install">Install</a>
+- <a href="#installing">Install</a>
 - <a href="#how-it-works">How it works</a>
 - <a href="#bug-reports-and-feature-requests">Submitting a bug report/feature request.</a>
 - <a href="#contributing">Contributing</a>
+
+<h2>Installing</h2>
+
+<a href="https://github.com/cal3432/software-inc-multiplayer/releases/tag/2.0.0-launcher"> Download the latest manager here.</a>
+
+The manager is a desktop app you can use to install different versions of the mod, at a fast speed with no hassle. If you are having trouble using the installer, <a href="">follow this guide on how to manually install.</a>
+
+<h2>How it works</h2>
+
+The multiplayer mod is based on the Peer To Peer system currently, with dedicated servers coming soon.
+
