@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for the multiplayer mod.
 title: ''
-labels: enhancement
+labels: Idea
 assignees: ''
 
 ---
