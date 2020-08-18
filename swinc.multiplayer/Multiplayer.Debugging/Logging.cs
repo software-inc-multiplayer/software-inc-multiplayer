@@ -8,6 +8,7 @@ namespace Multiplayer.Debugging
 {
     public class Logging
     {
+        public static Logging instance;
         public enum LogType
         {
             Info = 0,

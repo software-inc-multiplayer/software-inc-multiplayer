@@ -26,5 +26,9 @@ namespace Multiplayer.Extensions
                 list.Add(a);
             }
         }
+        public static void AddToElement(this GameObject toAdd, GameObject parent, Rect rect, Rect bounding)
+        {
+            WindowManager.AddElementToElement(toAdd, parent, rect, bounding);
+        }
     }
 }
