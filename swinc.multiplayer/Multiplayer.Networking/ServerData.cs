@@ -23,8 +23,8 @@ namespace Multiplayer.Networking
         /// <param name="fname">The filename to the saved Server, if empty it will load from the ServerClass.Instance</param>
         public ServerData(string fname = "")
         {
-            serverpath = Path.Combine(ModController.ModFolder, "Multiplayer", "Servers"); //Use this for SINC
-            //serverpath = Path.Combine(new FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).DirectoryName, "Multiplayer", "Servers"); //Use this for Console
+            Server.OnSavingServer += SaveData;
+            serverpath = Path.Combine(ModController.ModFolder, "Multiplayer", "Servers");
             Directory.CreateDirectory(serverpath); //Create path if not exists
             if (string.IsNullOrEmpty(fname) || !File.Exists(Path.Combine(serverpath, fname + ".json")))
             {
@@ -74,7 +74,7 @@ namespace Multiplayer.Networking
         /// <summary>
         /// Saves the ServerData to a File inside the "./Multiplayer/Servers/" directory
         /// </summary>
-        public void SaveData()
+        public void SaveData(object sender, EventArgs args)
         {
             string fname = ServerName;
             string floca = Path.Combine(serverpath, fname + ".json");

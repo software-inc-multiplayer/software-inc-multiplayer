@@ -1,4 +1,5 @@
 ﻿using Multiplayer.Debugging;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,8 +14,11 @@ namespace Multiplayer.Networking
         public static ushort Port;
         public static bool hasAI = false;
         static Telepathy.Server server = new Telepathy.Server();
-        static ServerData serverdata = new ServerData();
+        static ServerData serverdata = new ServerData("test");
         static bool isRunning = false;
+
+        //gets fired if the server wants to save data.
+        public static EventHandler OnSavingServer;
 
         /// <summary>
         /// Starts the server, use Server.Stop() to stop it.
@@ -31,6 +35,7 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Start listening on Port " + port);
             server.Start(port);
             isRunning = true;
+            serverdata.UpdateServer();
             Read();
         }
 
@@ -114,7 +119,6 @@ namespace Multiplayer.Networking
         public static void Send(int clientid, Helpers.TcpGameWorld changes)
         {
             Logging.Info("[Server] Sending GameWorldChanges to client " + clientid);
-            //server.Send(clientid, changes.ToArray());
             server.Send(clientid, changes.Serialize());
         }
 
@@ -123,7 +127,6 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Sending GameWorldChanges to all clients");
             foreach(Helpers.User user in Users)
 			{
-                //server.Send(user.ID, changes.ToArray());
                 server.Send(user.ID, changes.Serialize());
 			}
         }
@@ -252,6 +255,14 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Stop listening");
             isRunning = false;
             server.Stop();
+		}
+
+        /// <summary>
+        /// Saves the server by firing the OnSavingServer event
+        /// </summary>
+        public static void Save()
+		{
+            OnSavingServer?.Invoke(null, null);
 		}
 
         /// <summary>

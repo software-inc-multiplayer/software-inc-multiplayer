@@ -34,6 +34,9 @@ namespace Multiplayer.Networking
                 {
                     Logging.Info("[Client] Connected to the Server!");
                     Read();
+
+                    //Send request to get GameWorld
+                    Send(new Helpers.TcpRequest("gameworld"));
                 }
                 else
                 {
