@@ -24,17 +24,17 @@ namespace Multiplayer.Core
             }
         }
         public static List<GameObject> ActiveObjects = new List<GameObject>() { };
-
         public override void OnActivate()
         {
-            // bool firstTimeLaunch = !SettingsHandler.Has("firstTimeLaunch");
-            if (true)
+            bool firstTimeLaunch = !SettingsHandler.Has("firstTimeLaunch");
+            if (firstTimeLaunch)
+            //if (true)
             {
                 GUIWindow firstTimeWindow = WindowManager.SpawnWindow();
                 firstTimeWindow.Show();
-                firstTimeWindow.TitleText.text = "FirstTimeWindowTitle".LocDef("First time? Neat!");
+                firstTimeWindow.SetTitle("FirstTimeWindowTitle".LocDef("First time? Neat!"));
                 firstTimeWindow.ShowCentered = true;
-                firstTimeWindow.MinSize = new Vector2(Screen.width / 2 - 5f, 192);
+                firstTimeWindow.MinSize = new Vector2(Screen.width / 2 - 5f, 32 + 32 + 5 + 5 + 5);
                 Text description = WindowManager.SpawnLabel();
                 description.text = GetSteamUsernameText();
                 Text description2 = WindowManager.SpawnLabel();
@@ -42,11 +42,14 @@ namespace Multiplayer.Core
                 Button openWikiButton = WindowManager.SpawnButton();
                 openWikiButton.GetComponentInChildren<Text>().text = "FirstTimeWindow_OpenWiki".LocDef("Open Wiki");
                 openWikiButton.onClick.AddListener(OpenWiki);
+                Button closeWindowButton = WindowManager.SpawnButton();
+                closeWindowButton.GetComponentInChildren<Text>().text = "FirstTimeWindow_OK".LocDef("Ok");
+                closeWindowButton.onClick.AddListener(() => firstTimeWindow.gameObject.SetActive(false));
                 firstTimeWindow.SizeButton.SetActive(false);
-
-                WindowManager.AddElementToWindow(description.gameObject, firstTimeWindow, new Rect(5, 5, Screen.width / 2 - 15f, 32), Rect.zero);
-                WindowManager.AddElementToWindow(openWikiButton.gameObject, firstTimeWindow, new Rect(5, 192 - 40f, Screen.width / 2 - 15f, 60f), Rect.zero);
-                
+                WindowManager.AddElementToWindow(description.gameObject, firstTimeWindow, new Rect(5, 15, (Screen.width / 2) - 15f, 32), Rect.zero);
+                WindowManager.AddElementToWindow(openWikiButton.gameObject, firstTimeWindow, new Rect(5, (32 * 2) + 25, (Screen.width / 2) - 15f, 60f), Rect.zero);
+                WindowManager.AddElementToWindow(closeWindowButton.gameObject, firstTimeWindow, new Rect(5, (32 * 2) + 90, (Screen.width / 2) - 15f, 60f), Rect.zero);
+                WindowManager.AddElementToWindow(description2.gameObject, firstTimeWindow, new Rect(5, 42 + 5, (Screen.width / 2) - 15f, 32), Rect.zero);
                 SettingsHandler.Set("firstTimeLaunch", false);
             }
         }

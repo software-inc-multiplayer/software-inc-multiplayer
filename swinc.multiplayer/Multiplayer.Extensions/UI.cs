@@ -7,6 +7,10 @@ namespace Multiplayer.Extensions
 {
     public static class UI
     {
+        public static void SetTitle(this GUIWindow Window, string title)
+        {
+            Window.InitialTitle = Window.TitleText.text = Window.NonLocTitle = title;
+        }
         public static Texture2D LoadPNG(string filePath, int width, int height)
         {
             Texture2D tex = null;
