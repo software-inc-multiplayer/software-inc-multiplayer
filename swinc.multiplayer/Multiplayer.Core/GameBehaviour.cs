@@ -41,20 +41,19 @@ namespace Multiplayer.Core
             MPButton.onClick.AddListener(CreateMultiplayerWindow);
             MPButton.GetComponentInChildren<Text>().text = "MultiplayerButton".LocDef("Multiplayer");         
             WindowManager.AddElementToElement(MPButton.gameObject, FanPanel, new Rect(264, 0, 100, 32), Rect.zero);
+            Logging.Info("Initalized multiplayer button in MainScene");
         }
 
         private void CreateMultiplayerWindow()
         {
-            Logging.Debug("It worked. Button was pressed!");
+            Logging.Info("Opened multiplayer window.");
         }
 
         public override void OnDeactivate()
         {
-            isEnabled = false;
-            if(MPButton != null)
-            {
-                Destroy(MPButton.gameObject);
-            }
+            MPButton.gameObject.SetActive(false);
+            Logging.Info("Destroyed multiplayer button in MainScene");
+            isEnabled = false;           
         }
     }
 }

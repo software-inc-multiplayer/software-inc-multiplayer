@@ -1,5 +1,9 @@
 ﻿using Multiplayer.Debugging;
 using Multiplayer.Networking;
+using System;
+using System.Collections;
+using System.IO;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Multiplayer.Core
@@ -7,9 +11,28 @@ namespace Multiplayer.Core
 	class DebugConsole : ModBehaviour
 	{
 		bool inmain = false;
+		public bool rrinuse { get; set; }
+		public void PlayRR()
+		{
+			if (rrinuse) return;
+			rrinuse = true;
+			string[] lines = File.ReadAllLines(Path.Combine(Meta.ThisMod.ModPath, "Assets", "rr.txt"));
+			StartCoroutine(ReadLines(lines));
+		}
+
+		private IEnumerator ReadLines(string[] lines)
+		{
+			foreach(string line in lines)
+			{
+				Logging.Info(line);
+				yield return new WaitForSeconds(0.95f);
+			}
+			rrinuse = false;
+		}
 
 		public override void OnActivate()
 		{
+			rrinuse = false;
 			SceneManager.sceneLoaded += OnSceneLoaded;
 			Logging.Info("[DebugConsole] Adding console commands");
 			DevConsole.Command<ushort> startservercmd = new DevConsole.Command<ushort>("MULTIPLAYER_START", OnStartServer);
@@ -24,6 +47,8 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(getuserlist);
 			DevConsole.Command getgameworld = new DevConsole.Command("MULTIPLAYER_GAMEWORLD", OnRequestGameWorld);
 			DevConsole.Console.AddCommand(getgameworld);
+			DevConsole.Command easterEgg = new DevConsole.Command("SIMULATE_SALT", PlayRR);
+			DevConsole.Console.AddCommand(easterEgg);
 		}
 
 		private void OnRequestGameWorld()
@@ -100,7 +125,7 @@ namespace Multiplayer.Core
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_STOP");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_USERS");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_GAMEWORLD");
-
+			DevConsole.Console.RemoveCommand("SIMULATE_SALT");
 			SceneManager.sceneLoaded -= OnSceneLoaded;
 		}
 	}
