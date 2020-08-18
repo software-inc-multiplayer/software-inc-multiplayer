@@ -5,5 +5,13 @@
   <a href="https://github.com/cal3432/software-inc-multiplayer/releases"><img  src="https://img.shields.io/github/downloads/cal3432/software-inc-multiplayer/total?style=for-the-badge" /></a>
   <a href="https://discord.gg/qExqQcW"><img width="156" height="28" src="https://i.imgur.com/RokeTxs.png" /></a>
   <hr>
-  <h2>Software Inc Multiplayer Mod</h2>
+  <h3>Software Inc Multiplayer Mod</h3>
+  <p>A multiplayer mod for the game "Software Inc"</p>
 </div>
+
+<h2>Contents</h2>
+
+- <a href="#install">Install</a>
+- <a href="#how-it-works">Install</a>
+- <a href="#install">Install</a>
+- <a href="#install">Install</a>
