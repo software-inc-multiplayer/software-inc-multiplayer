@@ -36,6 +36,7 @@ namespace Multiplayer.Core
             AppDomain.CurrentDomain.UnhandledException += ErrorCatcher;
             AppDomain.CurrentDomain.FirstChanceException += ErrorCatcher2;
             // AppDomain.CurrentDomain.AssemblyResolve += (x, y) => Assembly.LoadFrom(Path.Combine(parentMod.FolderPath(), "References\\" + y.Name.Substring(0, y.Name.IndexOf(",")) + ".dll"));
+            Application.runInBackground = true;
             base.Initialize(parentMod);
         }
 

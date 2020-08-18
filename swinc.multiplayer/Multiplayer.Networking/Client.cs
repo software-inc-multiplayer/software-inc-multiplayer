@@ -1,37 +1,54 @@
 ﻿using Multiplayer.Debugging;
-using RoWa;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace Multiplayer.Networking
 {
 	public static class Client
 	{
-        public static bool Connected { get { return isRunning; } }
+        public static bool Connected { get { return client.Connected; } }
         static Telepathy.Client client = new Telepathy.Client();
-		private static bool isRunning = false;
         static string Username = "Player";
-        static string ServerPassword = "test";
+        static string ServerPassword = "";
 
-        public static void Connect(string ip, ushort port)
+        public static async void Connect(string ip, ushort port)
         {
-            // create and connect the client
+			// create and connect the client
+			try
+			{
+                Username = Steamworks.SteamFriends.GetPersonaName();
+            }
+            catch(Exception ex)
+			{
+                Logging.Warn("[Client] Couldn't fetch username from Steam! If you've a DRM-Free version thats why. => " + ex.Message);
+			}
+
             client.Connect(ip, port);
-            isRunning = true;
-            Read();
+            Logging.Info("[Client] Trying to connect!");
+            await Task.Run(() => {
+                while (client.Connecting)
+                {
+
+                }
+                if (client.Connected)
+                {
+                    Logging.Info("[Client] Connected to the Server!");
+                    Read();
+                }
+                else
+                {
+                    Logging.Warn("[Client] Couldn't connect to the Server");
+                }
+            });
+            
         }
 
         static async void Read()
 		{
             Logging.Info("[Client] Starts reading");
             await Task.Run(() => {
-                while (isRunning)
+                while (Connected)
                 {
-                    // grab all new messages. do this in your Update loop.
                     Telepathy.Message msg;
                     while (client.GetNextMessage(out msg))
                     {
@@ -55,18 +72,22 @@ namespace Multiplayer.Networking
 
         static void Receive(byte[] data)
 		{
-            string datastr = Encoding.UTF8.GetString(data);
-            Logging.Info("[Client] Data from Server: " + datastr);
+            Logging.Info("[Client] Data from Server: " + data.Length + " bytes");
 
             //Handle TcpResponse
-            Helpers.TcpResponse tcpresponse = XML.From<Helpers.TcpResponse>(datastr);
+            Helpers.TcpResponse tcpresponse = Helpers.TcpResponse.Deserialize(data);
             if (tcpresponse != null && tcpresponse.Header == "response")
                 OnServerResponse(tcpresponse);
 
             //Handle TcpChat
-            Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
+            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnChatReceived(tcpchat);
+
+            //Handle GameWorld
+            Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
+            if (tcpworld != null && tcpchat.Header == "gameworld")
+                OnGameWorldReceived(tcpworld);
         }
 
         static void OnServerResponse(Helpers.TcpResponse response)
@@ -88,32 +109,56 @@ namespace Multiplayer.Networking
             Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
             if (sender == null)
                 sender = new Helpers.User() { Username = "Server" };
-            Logging.Info("[Client] Chat received from " + sender.Username + ": " + (string)chat.Data.GetValue("message"));
+            Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
+		}
+
+        static void OnGameWorldReceived(Helpers.TcpGameWorld world)
+		{
+            Logging.Info($"[Client] Updating GameWorld");
+            GameWorld.World changes = world.Data.GetValue("changes") as GameWorld.World;
+            bool addition = (bool)world.Data.GetValue("addition");
+            GameWorld.Client.Instance.UpdateWorld(changes, addition);
 		}
 
 		#region Messages
 		public static void Send(Helpers.TcpLogin login)
 		{
             Logging.Info("[Client] Sending login message");
-            client.Send(login.ToArray());
+            client.Send(login.Serialize());
 		}
 
         public static void Send(Helpers.TcpGameWorld changes)
 		{
             Logging.Info("[Client] Sending gameworld update");
-            client.Send(changes.ToArray());
+            client.Send(changes.Serialize());
 		}
 
         public static void Send(Helpers.TcpChat chatmsg)
 		{
-            Logging.Info("[Client] Sending chat message");
-            client.Send(chatmsg.ToArray());
+            Logging.Info("[Message] You: " + (string)chatmsg.Data.GetValue("message"));
+            client.Send(chatmsg.Serialize());
+		}
+
+        public static void Send(Helpers.TcpRequest request)
+		{
+            Logging.Info("[Client] Sending request");
+            client.Send(request.Serialize());
+		}
+
+        public static void Send(Helpers.TcpResponse response)
+		{
+            Logging.Info("[Client] Sending response");
+            client.Send(response.Serialize());
 		}
 		#endregion
 
 		public static void Disconnect()
 		{
-            isRunning = false;
+            if (!Connected)
+            {
+                Logging.Warn("[Client] You can't disconnect a client that isn't connected...");
+                return;
+			}
             client.Disconnect();
 		}
 	}

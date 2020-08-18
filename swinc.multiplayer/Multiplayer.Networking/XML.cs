@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -9,7 +10,9 @@ using Multiplayer.Debugging;
 namespace RoWa
 {
     public static class XML
-	{
+    {
+        [Serializable]
+        [Obsolete]
         /// <summary>
         /// A Dictionary that can be saved to an XML file/string
         /// </summary>
@@ -22,6 +25,10 @@ namespace RoWa
 			{
                 foreach(KeyValuePair<object, object> kvp in dict)
                     Pairs.Add(new XMLDictionaryPair(kvp.Key, kvp.Value));
+			}
+            public XMLDictionary(params XMLDictionaryPair[] pairs)
+			{
+                Pairs.AddRange(pairs);
 			}
 
             public bool Contains(object key)
@@ -66,6 +73,7 @@ namespace RoWa
 			}
 		}
 
+        [Serializable]
         /// <summary>
         /// A keyvaluepair of a XMLDictionary
         /// </summary>
@@ -79,6 +87,7 @@ namespace RoWa
             public XMLDictionaryPair(object key, object value) { Key = key; Value = value; }
 		}
 
+        [Obsolete]
         /// <summary>
         /// Transforms the object of type T into a XML string
         /// </summary>
@@ -102,6 +111,7 @@ namespace RoWa
             }
         }
 
+        [Obsolete]
         /// <summary>
         /// Transforms the XML string to an object of type T
         /// </summary>

@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Multiplayer.Debugging;
-using Multiplayer.Networking;
 using Newtonsoft.Json;
-using UnityEngine;
 
 namespace Multiplayer.Networking
 {

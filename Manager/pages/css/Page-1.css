@@ -1,0 +1,95 @@
+.svgIcon:hover {
+    cursor: pointer;
+}
+.modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('https://thumbs.gfycat.com/IlliterateRipeBronco-max-1mb.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+body.loading .modal {
+    overflow: hidden;   
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .modal {
+    display: block;
+}
+.u-section-1 .u-sheet-1 {min-height: 508px}
+.u-section-1 .u-group-1 {width: 800px; min-height: 250px; height: auto; margin: 68px auto 0 165px}
+.u-section-1 .u-container-layout-1 {padding: 30px}
+.u-section-1 .u-text-1 {margin: 10px auto 0 20px}
+.u-section-1 .u-custom-html-1 {min-height: 162px; height: auto; margin: -33px 12px 0 246px}
+.u-section-1 .u-text-2 {margin: -117px auto 0 20px}
+.u-section-1 .u-form-1 {height: 158px; width: 570px; margin: 12px 285px 20px}
+.u-section-1 .u-form-group-1 {margin-left: 0} 
+
+@media (max-width: 1199px){ .u-section-1 .u-sheet-1 {min-height: 431px}
+.u-section-1 .u-group-1 {margin-left: 140px}
+.u-section-1 .u-form-1 {margin-left: 185px; margin-right: 185px} }
+
+@media (max-width: 991px){ .u-section-1 .u-sheet-1 {min-height: 354px}
+.u-section-1 .u-group-1 {width: 720px; margin-left: 0}
+.u-section-1 .u-text-1 {margin-left: 18px}
+.u-section-1 .u-custom-html-1 {margin-right: 0; margin-left: 178px}
+.u-section-1 .u-text-2 {margin-left: 18px}
+.u-section-1 .u-form-1 {margin-left: 75px; margin-right: 75px} }
+
+@media (max-width: 767px){ .u-section-1 .u-sheet-1 {min-height: 861px}
+.u-section-1 .u-group-1 {width: 540px}
+.u-section-1 .u-container-layout-1 {padding-left: 10px; padding-right: 10px}
+.u-section-1 .u-text-1 {margin-left: 14px}
+.u-section-1 .u-custom-html-1 {margin-left: 38px}
+.u-section-1 .u-text-2 {margin-left: 14px}
+.u-section-1 .u-form-1 {width: 540px; margin-left: 0; margin-right: 0} }
+
+@media (max-width: 575px){ .u-section-1 .u-sheet-1 {min-height: 579px}
+.u-section-1 .u-group-1 {width: 340px}
+.u-section-1 .u-text-1 {margin-left: 9px}
+.u-section-1 .u-custom-html-1 {margin-left: 0}
+.u-section-1 .u-text-2 {margin-left: 9px}
+.u-section-1 .u-form-1 {width: 340px}
+.u-section-1 .u-form-group-1 {width: 100%}
+.u-section-1 .u-form-group-2 {width: 100%} }.u-section-2 .u-sheet-1 {min-height: 620px}
+.u-section-2 .u-layout-wrap-1 {width: 1140px; margin: 60px 0}
+.u-section-2 .u-layout-cell-1 {min-height: 510px}
+.u-section-2 .u-shape-1 {height: 421px; width: 472px; margin: 20px auto 0 12px}
+.u-section-2 .u-image-1 {object-position: 0% 100%; width: 403px; height: 370px; margin: -441px auto 0 0}
+.u-section-2 .u-layout-cell-2 {min-height: 510px}
+.u-section-2 .u-container-layout-2 {padding: 30px}
+.u-section-2 .u-text-1 {margin: 113px 0 0}
+.u-section-2 .u-text-2 {margin: 20px 0 0} 
+
+@media (max-width: 1199px){ .u-section-2 .u-sheet-1 {min-height: 495px}
+.u-section-2 .u-layout-wrap-1 {width: 940px}
+.u-section-2 .u-layout-cell-1 {min-height: 421px}
+.u-section-2 .u-shape-1 {width: 423px; margin-left: 0}
+.u-section-2 .u-image-1 {margin-top: -431px}
+.u-section-2 .u-layout-cell-2 {min-height: 421px} }
+
+@media (max-width: 991px){ .u-section-2 .u-sheet-1 {min-height: 425px}
+.u-section-2 .u-layout-wrap-1 {width: 720px}
+.u-section-2 .u-layout-cell-1 {min-height: 100px}
+.u-section-2 .u-shape-1 {width: 320px}
+.u-section-2 .u-image-1 {width: 320px; height: 294px; margin-top: -342px}
+.u-section-2 .u-layout-cell-2 {min-height: 100px} }
+
+@media (max-width: 767px){ .u-section-2 .u-sheet-1 {min-height: 319px}
+.u-section-2 .u-layout-wrap-1 {width: 540px}
+.u-section-2 .u-image-1 {margin-top: -409px}
+.u-section-2 .u-container-layout-2 {padding-left: 10px; padding-right: 10px} }
+
+@media (max-width: 575px){ .u-section-2 .u-sheet-1 {min-height: 201px}
+.u-section-2 .u-layout-wrap-1 {width: 340px}
+.u-section-2 .u-image-1 {margin-top: -352px} }
