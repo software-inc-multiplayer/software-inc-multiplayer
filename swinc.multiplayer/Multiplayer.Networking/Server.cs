@@ -16,6 +16,7 @@ namespace Multiplayer.Networking
         static Telepathy.Server server = new Telepathy.Server();
         static ServerData serverdata = new ServerData("test");
         static bool isRunning = false;
+        public static bool Runs { get { return isRunning; } }
 
         //gets fired if the server wants to save data.
         public static EventHandler OnSavingServer;
