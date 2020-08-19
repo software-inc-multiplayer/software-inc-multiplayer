@@ -47,7 +47,7 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(getuserlist);
 			DevConsole.Command getgameworld = new DevConsole.Command("MULTIPLAYER_GAMEWORLD", OnRequestGameWorld);
 			DevConsole.Console.AddCommand(getgameworld);
-			DevConsole.Command easterEgg = new DevConsole.Command("SIMULATE_SALT", PlayRR);
+			DevConsole.Command easterEgg = new DevConsole.Command("I_HATE_UI_UGH", PlayRR);
 			DevConsole.Console.AddCommand(easterEgg);
 		}
 
@@ -125,7 +125,7 @@ namespace Multiplayer.Core
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_STOP");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_USERS");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_GAMEWORLD");
-			DevConsole.Console.RemoveCommand("SIMULATE_SALT");
+			DevConsole.Console.RemoveCommand("I_HATE_UI_UGH");
 			SceneManager.sceneLoaded -= OnSceneLoaded;
 		}
 	}

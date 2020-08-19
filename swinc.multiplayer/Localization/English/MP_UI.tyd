@@ -4,3 +4,8 @@ FirstTimeWindowDescription "Thanks for participating in the Open Beta%steamusern
 FirstTimeWindowDescription2 "The wiki also contains useful info on how to configure your server, set passwords on your server, and lots more! It also contains some useful infomation on how to debug/fix problems related to multiplayer."
 FirstTimeWindow_OK "Ok"
 MultiplayerButton "Multiplayer"
+MultiplayerButtonConnect "Multiplayer - Connect"
+ConnectButtonText "Connect"
+GoBackButton "Go Back"
+CancelButton "Cancel"
+StartServerButtonText "Create Server"

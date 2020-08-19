@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Multiplayer.Debugging;
 using Multiplayer.Networking;
+using Multiplayer.Extensions;
 
 namespace Multiplayer.Core
 {
@@ -22,7 +23,7 @@ namespace Multiplayer.Core
         {          
             Button e = WindowManager.SpawnButton();
             e.onClick.AddListener(ErrorTest);
-            e.gameObject.GetComponentInChildren<Text>().text = "Test Error";
+            e.SetText("Test Error");
             WindowManager.AddElementToElement(e.gameObject, parent.gameObject, new Rect(0, 15, 192, 64), Rect.zero);
         }
 

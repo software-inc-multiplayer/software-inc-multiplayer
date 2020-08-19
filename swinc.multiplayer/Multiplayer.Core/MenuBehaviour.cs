@@ -11,10 +11,11 @@ namespace Multiplayer.Core
 {
     public class MenuBehaviour : ModBehaviour
     {
-        public bool isEnabled { get; set; }
+        public string OldText { get; set; }
+        public bool IsEnabled { get; set; }
         public override void OnActivate()
         {
-            isEnabled = true;
+            IsEnabled = true;
             SceneManager.sceneLoaded += OnScene;
             if(SceneManager.GetActiveScene().name == "MainMenu")
             {
@@ -24,7 +25,7 @@ namespace Multiplayer.Core
 
         private void OnScene(Scene arg0, LoadSceneMode arg1)
         {
-            if (!isEnabled) return;
+            if (!IsEnabled) return;
             if (arg0.name == "MainMenu")
             {
                 ModifyText();
@@ -33,8 +34,8 @@ namespace Multiplayer.Core
 
         private void ModifyText()
         {
-            string oldText = WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text;
-            string newText = "Multiplayer Mod v1.0.0-open - " + oldText.Replace(",", "");
+            OldText = WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text;
+            string newText = "Multiplayer Mod v1.0.0-open - " + OldText.Replace(",", "");
             WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = newText;
             RectTransform tran = WindowManager.FindElementPath("MainPanel/Text[2]");
             tran.localPosition += Vector3.left;
@@ -42,7 +43,11 @@ namespace Multiplayer.Core
 
         public override void OnDeactivate()
         {
-            isEnabled = false;
+            IsEnabled = false;
+            if (SceneManager.GetActiveScene().name == "MainMenu")
+            {
+                WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = OldText;
+            }
         }
     }
 }
