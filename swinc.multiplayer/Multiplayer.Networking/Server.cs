@@ -34,6 +34,7 @@ namespace Multiplayer.Networking
 			}
             Port = port;
             Logging.Info("[Server] Start listening on Port " + port);
+            server.MaxMessageSize = int.MaxValue;
             server.Start(port);
             isRunning = true;
             serverdata.UpdateServer();
@@ -119,7 +120,7 @@ namespace Multiplayer.Networking
 
         public static void Send(int clientid, Helpers.TcpGameWorld changes)
         {
-            Logging.Info("[Server] Sending GameWorldChanges to client " + clientid);
+            Logging.Info("[Server] Sending GameWorldChanges to client " + clientid + " => " + (bool)changes.Data.GetValue("addition"));
             server.Send(clientid, changes.Serialize());
         }
 

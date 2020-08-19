@@ -22,7 +22,7 @@ namespace Multiplayer.Networking
 			{
                 Logging.Warn("[Client] Couldn't fetch username from Steam! If you've a DRM-Free version thats why. => " + ex.Message);
 			}
-
+            client.MaxMessageSize = int.MaxValue;
             client.Connect(ip, port);
             Logging.Info("[Client] Trying to connect!");
             await Task.Run(() => {
@@ -153,11 +153,11 @@ namespace Multiplayer.Networking
 
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
 		{
-            Logging.Info($"[Client] Updating GameWorld");
             GameWorld.World changes = (GameWorld.World)world.Data.GetValue("changes");
             bool addition = (bool)world.Data.GetValue("addition");
+            Logging.Info($"[Client] Updating GameWorld => " + addition);
             GameWorld.Client.Instance.UpdateLocalWorld(changes, addition);
-		}
+        }
 
 		#region Messages
 		public static void Send(Helpers.TcpLogin login)
