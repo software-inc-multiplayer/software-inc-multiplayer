@@ -51,7 +51,8 @@ namespace Multiplayer.Core
 
         public override void OnDeactivate()
         {
-            MPButton.gameObject.SetActive(false);
+            if(MPButton != null)
+                MPButton.gameObject.SetActive(false);
             Logging.Info("Destroyed multiplayer button in MainScene");
             isEnabled = false;           
         }
