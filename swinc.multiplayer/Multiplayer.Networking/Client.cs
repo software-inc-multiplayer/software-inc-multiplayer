@@ -34,8 +34,7 @@ namespace Multiplayer.Networking
                 {
                     Logging.Info("[Client] Connected to the Server!");
                     Read();
-                    GameWorld.Client client = new GameWorld.Client();
-                    
+                    GameWorld.Client client = new GameWorld.Client();                 
                 }
                 else
                 {

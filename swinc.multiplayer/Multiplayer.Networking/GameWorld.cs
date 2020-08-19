@@ -13,8 +13,8 @@ namespace Multiplayer.Networking
 			public SDateTime dateTime;
 			public List<Helpers.UserCompany> UserCompanies = new List<Helpers.UserCompany>();
 			public List<Company> AICompanies = new List<Company>();
-			public List<Stock> Stocks = new List<Stock>();
-
+			public List<StockMarket> StockMarkets = new List<StockMarket>();
+			public List<SoftwareProduct> SoftwareProducts = new List<SoftwareProduct>();
 
 			public void UpdateData(World content, bool addition)
 			{
@@ -22,16 +22,44 @@ namespace Multiplayer.Networking
 				{
 					UserCompanies.AddRange(content.UserCompanies);
 					AICompanies.AddRange(content.AICompanies);
-					Stocks.AddRange(content.Stocks);
+					StockMarkets.AddRange(content.StockMarkets);
+					SoftwareProducts.AddRange(content.SoftwareProducts);
 				}else
 				{
 					foreach (Helpers.UserCompany c in content.UserCompanies)
 						UserCompanies.RemoveAll(x => x.ID == c.ID);
 					foreach (Company c in content.AICompanies)
 						AICompanies.RemoveAll(x => x.ID == c.ID);
-					foreach (Stock s in content.Stocks)
-						Stocks.RemoveAll(x => x.Owner == s.Owner);
+					foreach (StockMarket s in content.StockMarkets)
+						StockMarkets.RemoveAll(x => x.Name == s.Name);
+					foreach (SoftwareProduct s in content.SoftwareProducts)
+						SoftwareProducts.RemoveAll(x => x.Name == s.Name);
+
 				}
+			}
+
+			/// <summary>
+			/// Refreshs the ingame data
+			/// </summary>
+			public void RefreshData()
+			{
+				Logging.Info("[GameWorld] Refreshing data");
+
+				//Clear all stuff from the client first
+				GameSettings.Instance.StockMarkets.Clear();
+				//MarketSimulation.Active.Companies.Clear();
+				List<Company> tmpcompanies = new List<Company>();
+				tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
+				foreach(Company c in tmpcompanies)
+					if(!c.Player)
+						MarketSimulation.Active.RemoveCompany(c);
+				
+				GameSettings.Instance.StockMarkets.AddRange(StockMarkets); //Add stockmarkets
+				foreach (Company c in AICompanies)
+					MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
+				foreach (Helpers.UserCompany c in UserCompanies)
+					if(!c.Player)
+						MarketSimulation.Active.AddCompany(c.OwnerCompany, true); //Add User Companies
 			}
 		}
 
@@ -59,7 +87,11 @@ namespace Multiplayer.Networking
 				else
 				{
 					Logging.Info("[GameWorld] Removing all AI companies");
-					MarketSimulation.Active.Companies.Clear(); //Remove all AI companies (DEACTIVATE IN CONSOLE MODE!)
+					List<Company> tmpcompanies = new List<Company>();
+					tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
+					foreach (Company c in tmpcompanies)
+						if (!c.Player)
+							MarketSimulation.Active.RemoveCompany(c);
 				}
 			}
 
@@ -148,11 +180,11 @@ namespace Multiplayer.Networking
 						if (!world.AICompanies.Contains(c))
 							tmpworld.AICompanies.Add(c);
 
-					foreach (Stock s in oldworld.Stocks)
-						if (!world.Stocks.Contains(s))
-							tmpworld.Stocks.Add(s);
+					foreach (StockMarket s in oldworld.StockMarkets)
+						if (!world.StockMarkets.Contains(s))
+							tmpworld.StockMarkets.Add(s);
 
-					Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.Stocks.Count} objects were removed");
+					Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were removed");
 					return tmpworld;
 				}
 
@@ -172,12 +204,12 @@ namespace Multiplayer.Networking
 						tmpworld.AICompanies.Add(c);
 				}
 				//Compare Stocks
-				foreach (Stock s in world.Stocks)
+				foreach (StockMarket s in world.StockMarkets)
 				{
-					if (!oldworld.Stocks.Contains(s))
-						tmpworld.Stocks.Add(s);
+					if (!oldworld.StockMarkets.Contains(s))
+						tmpworld.StockMarkets.Add(s);
 				}
-				Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.Stocks.Count} objects were added");
+				Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were added");
 				return tmpworld;
 			}
 
@@ -203,12 +235,13 @@ namespace Multiplayer.Networking
 				{
 					Logging.Info("[GameWorld] Will add new content to the servers GameWorld");
 					world.UpdateData(servercontent, adds);
-
+					world.RefreshData();
 				}
 				else
 				{
 					Logging.Info("[GameWorld] Will remove content from the servers GameWorld");
 					world.UpdateData(servercontent, adds);
+					world.RefreshData();
 				}
 			}
 
@@ -267,16 +300,17 @@ namespace Multiplayer.Networking
 
 			public void UpdateLocalWorld(World servercontent, bool adds)
 			{
-				Logging.Info("[Debug] works");
 				if (adds)
 				{
 					Logging.Info("[GameWorld] Will add new content to the local GameWorld");
 					world.UpdateData(servercontent, adds);
+					world.RefreshData();
 				}
 				else
 				{
 					Logging.Info("[GameWorld] Will remove content from the local GameWorld");
 					world.UpdateData(servercontent, adds);
+					world.RefreshData();
 				}
 			}
 
@@ -286,7 +320,7 @@ namespace Multiplayer.Networking
 				{
 					if (disposing)
 					{
-						// TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+						
 					}
 					disposedValue = true;
 				}
