@@ -139,6 +139,21 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Redirecting Chat message from " + clientid + " to " + receiver);
             server.Send(receiver, new Helpers.TcpChat(msg, GetUser(clientid)).Serialize());
 		}
+
+        public static void Send(int clientid, Helpers.TcpGamespeed speed)
+		{
+            Logging.Info("[Server] Sending GameSpeed to client " + clientid);
+            server.Send(clientid, speed.Serialize());
+		}
+
+        public static void Send(Helpers.TcpGamespeed speed)
+		{
+            Logging.Info("[Server] Sending GameSpeed to all clients");
+            foreach(Helpers.User user in Users)
+			{
+                server.Send(user.ID, speed.Serialize());
+			}
+		}
         #endregion
 
         /// <summary>
@@ -174,6 +189,10 @@ namespace Multiplayer.Networking
                 else if (req == "userlist")
                     OnRequestUserList(msg.connectionId);
 			}
+
+            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(msg.data);
+            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
+                OnGamespeedChange(msg.connectionId, tcpspeed);
         }
 
         /// <summary>
@@ -243,6 +262,21 @@ namespace Multiplayer.Networking
             //server.Send(connectionid, response.ToArray());
 		}
 
+        static void OnGamespeedChange(int connectionid, Helpers.TcpGamespeed speed)
+		{
+            if ((int)speed.Data.GetValue("type") == 0)
+			{
+                Logging.Info($"[Server] Sending updated GameSpeed to all clients => {(int)speed.Data.GetValue("speed")} usercount: {Users.Count}");
+                foreach (Helpers.User u in Users)
+				{
+                    Logging.Info($"[Server] Sent GameSpeed to connection {u.ID}");
+                    Send(u.ID, speed);
+                }
+            }
+            else
+                Logging.Warn($"[Server] User {connectionid} can't change gamespeed if type is 1 (vote) because votes aren't included yet");
+		}
+
         /// <summary>
         /// Stops the Server
         /// </summary>
@@ -256,6 +290,7 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Stop listening");
             isRunning = false;
             server.Stop();
+            Users.Clear();
 		}
 
         /// <summary>

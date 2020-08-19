@@ -35,8 +35,7 @@ namespace Multiplayer.Networking
                     Logging.Info("[Client] Connected to the Server!");
                     Read();
 
-                    //Send request to get GameWorld
-                    Send(new Helpers.TcpRequest("gameworld"));
+                    
                 }
                 else
                 {
@@ -91,9 +90,25 @@ namespace Multiplayer.Networking
             Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
             if (tcpworld != null && tcpchat.Header == "gameworld")
                 OnGameWorldReceived(tcpworld);
+
+            //Handle Gamespeed
+            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(data);
+            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
+                OnGamespeedChange(tcpspeed);
         }
 
-        static void OnServerResponse(Helpers.TcpResponse response)
+		private static void OnGamespeedChange(Helpers.TcpGamespeed tcpspeed)
+		{
+            Logging.Info("gamespeedchange...");
+            int type = (int)tcpspeed.Data.GetValue("type");
+            int speed = (int)tcpspeed.Data.GetValue("speed");
+            if(type == 0)
+			{
+				HUD.Instance.GameSpeed = (int)speed;
+			}
+        }
+
+		static void OnServerResponse(Helpers.TcpResponse response)
 		{
             object type = response.Data.GetValue("type");
             if(type == null)
@@ -104,6 +119,28 @@ namespace Multiplayer.Networking
             if((string)type == "login_request")
 			{
                 Send(new Helpers.TcpLogin(Username, ServerPassword));
+			}
+            else if((string)type == "login_response")
+			{
+                string res = (string)response.Data.GetValue("data");
+                if(res == "ok")
+				{
+                    //Login ok
+                    Logging.Info("[Client] You're logged in now!");
+                    //Send request to get GameWorld
+                    Send(new Helpers.TcpRequest("gameworld"));
+
+                }
+                else if(res == "max_players")
+				{
+                    //Server full
+                    Logging.Warn("[Client] The server is full");
+				}
+                else if(res == "wrong_password")
+				{
+                    //Wrong password
+                    Logging.Warn("[Client] You did enter the wrong password");
+				}
 			}
 		}
 
@@ -153,6 +190,13 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Sending response");
             client.Send(response.Serialize());
 		}
+
+        public static void Send(Helpers.TcpGamespeed speed)
+		{
+            Logging.Info("[Client] Sending gamespeed");
+            client.Send(speed.Serialize());
+		}
+
 		#endregion
 
 		public static void Disconnect()

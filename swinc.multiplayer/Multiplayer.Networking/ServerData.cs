@@ -15,6 +15,7 @@ namespace Multiplayer.Networking
         public string Password;
         public ushort MaxPlayers;
         public GameWorld.Server Gameworld;
+        public GameTime Gametime;
         string serverpath;
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace Multiplayer.Networking
             {
                 Logging.Info("[ServerHandler] ServerData does not exist, will create new one");
                 Gameworld = new GameWorld.Server();
+                Gametime = new GameTime(new SDateTime(1, 70), 0);
                 ServerID = DateTime.Now.Ticks + "";
                 UpdateData();
             }
@@ -37,12 +39,14 @@ namespace Multiplayer.Networking
             {
                 Logging.Info($"[ServerHandler] Trying to load ServerData from '{fname}'");
                 ServerData data = JsonConvert.DeserializeObject<ServerData>(File.ReadAllText(Path.Combine(serverpath, fname + ".json")));
+                data.Gametime.Speed = 0; //Pause the game at startup
                 ServerID = data.ServerID;
                 Clients = data.Clients;
                 ServerName = data.ServerName;
                 Password = data.Password;
                 MaxPlayers = data.MaxPlayers;
                 Gameworld = data.Gameworld;
+                Gametime = data.Gametime;
                 UpdateServer();
             }
         }

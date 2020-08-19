@@ -49,6 +49,31 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(getgameworld);
 			DevConsole.Command easterEgg = new DevConsole.Command("SIMULATE_SALT", PlayRR);
 			DevConsole.Console.AddCommand(easterEgg);
+			DevConsole.Command savegameworld = new DevConsole.Command("MULTIPLAYER_SAVE", OnSaveGameWorld);
+			DevConsole.Console.AddCommand(savegameworld);
+			DevConsole.Command<int> setgamespeed = new DevConsole.Command<int>("MULTIPLAYER_SPEED", OnSetGameSpeed);
+			DevConsole.Console.AddCommand(setgamespeed);
+		}
+
+		private void OnSetGameSpeed(int speed)
+		{
+			if(speed < 0 || speed > 4)
+			{
+				Logging.Warn("[DebugConsole] Gamespeed can't be less than 0 or more than 4!");
+				return;
+			}
+			Logging.Info("[DebugConsole] Set gamespeed");
+			Client.Send(new Helpers.TcpGamespeed(speed, 0));
+		}
+
+		private void OnSaveGameWorld()
+		{
+			if (!Networking.Server.Runs)
+			{
+				Logging.Warn("You need to have a Server running to use this command!");
+				return;
+			}
+			Networking.Server.Save();
 		}
 
 		private void OnRequestGameWorld()
@@ -126,6 +151,9 @@ namespace Multiplayer.Core
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_USERS");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_GAMEWORLD");
 			DevConsole.Console.RemoveCommand("SIMULATE_SALT");
+			DevConsole.Console.RemoveCommand("MULTIPLAYER_SAVE");
+			DevConsole.Console.RemoveCommand("MULTIPLAYER_SPEED");
+
 			SceneManager.sceneLoaded -= OnSceneLoaded;
 		}
 	}

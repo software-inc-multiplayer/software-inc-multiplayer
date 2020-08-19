@@ -62,6 +62,11 @@ namespace Multiplayer.Networking
 
 			public void UpdateClient(Helpers.User user)
 			{
+				if (user == null)
+				{
+					Logging.Error("User is null =(");
+					return;
+				}
 				Logging.Info("[GameWorld] Updating Client " + user.Username);
 				SendGameWorldChanges(user);
 			}

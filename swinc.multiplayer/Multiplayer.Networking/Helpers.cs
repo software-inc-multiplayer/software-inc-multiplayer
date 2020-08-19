@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Policy;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -384,9 +385,37 @@ namespace Multiplayer.Networking
 		}
 
 		[Serializable]
+		public class TcpGamespeed : TcpMessage
+		{
+			public TcpGamespeed() {}
+			/// <summary>
+			/// Todo
+			/// </summary>
+			/// <param name="speed">The GameTime.GameSpeed object</param>
+			/// <param name="type">The type of request. 0 = skip vote (should only be used by server/admin. 1 = request</param>
+			public TcpGamespeed(int speed, int type = 0)
+			{
+				Header = "gamespeed";
+				Data.Add("type", type);
+				Data.Add("speed", speed);
+			}
+
+			public override byte[] Serialize()
+			{
+				return Helpers.Serialize(this);
+			}
+
+			new public static TcpGamespeed Deserialize(byte[] array)
+			{
+				return Helpers.Deserialize<TcpGamespeed>(array);
+			}
+		}
+
+		[Serializable]
 		public enum UserRole
 		{
 			Host,
+			Admin,
 			Client
 		}
 	}
