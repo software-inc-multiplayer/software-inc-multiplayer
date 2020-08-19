@@ -1,6 +1,7 @@
 ﻿using Multiplayer.Debugging;
 using System;
 using System.Collections.Generic;
+using System.Security.Permissions;
 
 namespace Multiplayer.Networking
 {
@@ -13,6 +14,25 @@ namespace Multiplayer.Networking
 			public List<Helpers.UserCompany> UserCompanies = new List<Helpers.UserCompany>();
 			public List<Company> AICompanies = new List<Company>();
 			public List<Stock> Stocks = new List<Stock>();
+
+
+			public void UpdateData(World content, bool addition)
+			{
+				if(addition)
+				{
+					UserCompanies.AddRange(content.UserCompanies);
+					AICompanies.AddRange(content.AICompanies);
+					Stocks.AddRange(content.Stocks);
+				}else
+				{
+					foreach (Helpers.UserCompany c in content.UserCompanies)
+						UserCompanies.RemoveAll(x => x.ID == c.ID);
+					foreach (Company c in content.AICompanies)
+						AICompanies.RemoveAll(x => x.ID == c.ID);
+					foreach (Stock s in content.Stocks)
+						Stocks.RemoveAll(x => x.Owner == s.Owner);
+				}
+			}
 		}
 
 		[Serializable]
@@ -79,7 +99,12 @@ namespace Multiplayer.Networking
 				if(users.Length < 1)
 				{
 					//If users aren't set, it will send it to all users connected to the server
-					users = Networking.Server.Users.ToArray();
+					foreach (Helpers.User u in Networking.Server.Users.ToArray())
+					{
+						Networking.Server.Send(u.ID, add);
+						Networking.Server.Send(u.ID, remove);
+					}
+					return;
 				}
 
 				foreach(Helpers.User user in users)
@@ -156,6 +181,37 @@ namespace Multiplayer.Networking
 				return tmpworld;
 			}
 
+			public void UpdateWorld(World servercontent, bool adds)
+			{
+				if (adds)
+				{
+					Logging.Info("[GameWorld] Will add new content to the clients GameWorld");
+					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
+					Networking.Server.Send(gwc);
+				}
+				else
+				{
+					Logging.Info("[GameWorld] Will remove content from the clients GameWorld");
+					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
+					Networking.Server.Send(gwc);
+				}
+			}
+
+			public void UpdateLocalWorld(World servercontent, bool adds)
+			{
+				if (adds)
+				{
+					Logging.Info("[GameWorld] Will add new content to the servers GameWorld");
+					world.UpdateData(servercontent, adds);
+
+				}
+				else
+				{
+					Logging.Info("[GameWorld] Will remove content from the servers GameWorld");
+					world.UpdateData(servercontent, adds);
+				}
+			}
+
 			protected virtual void Dispose(bool disposing)
 			{
 				if (!disposedValue)
@@ -206,6 +262,21 @@ namespace Multiplayer.Networking
 					Logging.Info("[GameWorld] Will remove content from the GameWorld");
 					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
 					Networking.Client.Send(gwc);
+				}
+			}
+
+			public void UpdateLocalWorld(World servercontent, bool adds)
+			{
+				Logging.Info("[Debug] works");
+				if (adds)
+				{
+					Logging.Info("[GameWorld] Will add new content to the local GameWorld");
+					world.UpdateData(servercontent, adds);
+				}
+				else
+				{
+					Logging.Info("[GameWorld] Will remove content from the local GameWorld");
+					world.UpdateData(servercontent, adds);
 				}
 			}
 

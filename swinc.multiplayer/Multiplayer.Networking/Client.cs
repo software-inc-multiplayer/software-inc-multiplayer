@@ -34,7 +34,7 @@ namespace Multiplayer.Networking
                 {
                     Logging.Info("[Client] Connected to the Server!");
                     Read();
-
+                    GameWorld.Client client = new GameWorld.Client();
                     
                 }
                 else
@@ -88,7 +88,7 @@ namespace Multiplayer.Networking
 
             //Handle GameWorld
             Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
-            if (tcpworld != null && tcpchat.Header == "gameworld")
+            if (tcpworld != null && tcpworld.Header == "gameworld")
                 OnGameWorldReceived(tcpworld);
 
             //Handle Gamespeed
@@ -155,9 +155,9 @@ namespace Multiplayer.Networking
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
 		{
             Logging.Info($"[Client] Updating GameWorld");
-            GameWorld.World changes = world.Data.GetValue("changes") as GameWorld.World;
+            GameWorld.World changes = (GameWorld.World)world.Data.GetValue("changes");
             bool addition = (bool)world.Data.GetValue("addition");
-            GameWorld.Client.Instance.UpdateWorld(changes, addition);
+            GameWorld.Client.Instance.UpdateLocalWorld(changes, addition);
 		}
 
 		#region Messages
