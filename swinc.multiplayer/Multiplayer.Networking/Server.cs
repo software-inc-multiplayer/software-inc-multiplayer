@@ -12,6 +12,7 @@ namespace Multiplayer.Networking
         public static string Password = "";
         public static ushort MaxPlayers = 10;
         public static ushort Port;
+        public static int Difficulty;
         public static bool hasAI = false;
         static Telepathy.Server server = new Telepathy.Server();
         static ServerData serverdata = new ServerData("test");
@@ -33,6 +34,7 @@ namespace Multiplayer.Networking
                 return;
 			}
             Port = port;
+            Difficulty = GameSettings.Instance.Difficulty;
             Logging.Info("[Server] Start listening on Port " + port);
             server.MaxMessageSize = int.MaxValue;
             server.Start(port);

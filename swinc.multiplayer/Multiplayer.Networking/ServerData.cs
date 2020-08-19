@@ -14,6 +14,7 @@ namespace Multiplayer.Networking
         public string ServerName;
         public string Password;
         public ushort MaxPlayers;
+        public int Difficulty;
         public GameWorld.Server Gameworld;
         public GameTime Gametime;
         string serverpath;
@@ -47,6 +48,7 @@ namespace Multiplayer.Networking
                 MaxPlayers = data.MaxPlayers;
                 Gameworld = data.Gameworld;
                 Gametime = data.Gametime;
+                Difficulty = data.Difficulty;
                 UpdateServer();
             }
         }
@@ -61,6 +63,7 @@ namespace Multiplayer.Networking
             ServerName = Server.ServerName;
             Password = Server.Password;
             MaxPlayers = Server.MaxPlayers;
+            Difficulty = Server.Difficulty;
         }
 
         /// <summary>
@@ -73,6 +76,7 @@ namespace Multiplayer.Networking
             Server.ServerName = ServerName;
             Server.Password = Password;
             Server.MaxPlayers = MaxPlayers;
+            Server.Difficulty = Difficulty;
         }
 
         /// <summary>
