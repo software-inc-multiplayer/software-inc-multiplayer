@@ -1,2 +1,6 @@
-CS_Dialog "Coming soon."
-MainMenu_MP_Button "Multiplayer"
+FirstTimeWindowTitle "First time? Neat!"
+FirstTimeWindow_OpenWiki "Open Wiki"
+FirstTimeWindowDescription "Thanks for participating in the Open Beta%steamusername%!\nCheckout the wiki on how to start a server, join or play with friends!"
+FirstTimeWindowDescription2 "The wiki also contains useful info on how to configure your server, set passwords on your server, and lots more! It also contains some useful infomation on how to debug/fix problems related to multiplayer."
+FirstTimeWindow_OK "Ok"
+MultiplayerButton "Multiplayer"
