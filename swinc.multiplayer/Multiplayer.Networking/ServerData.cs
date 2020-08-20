@@ -14,7 +14,9 @@ namespace Multiplayer.Networking
         public string ServerName;
         public string Password;
         public ushort MaxPlayers;
+        public int Difficulty;
         public GameWorld.Server Gameworld;
+        public GameTime Gametime;
         string serverpath;
 
         /// <summary>
@@ -23,13 +25,14 @@ namespace Multiplayer.Networking
         /// <param name="fname">The filename to the saved Server, if empty it will load from the ServerClass.Instance</param>
         public ServerData(string fname = "")
         {
-            serverpath = Path.Combine(ModController.ModFolder, "Multiplayer", "Servers"); //Use this for SINC
-            //serverpath = Path.Combine(new FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).DirectoryName, "Multiplayer", "Servers"); //Use this for Console
+            Server.OnSavingServer += SaveData;
+            serverpath = Path.Combine(ModController.ModFolder, "Multiplayer", "Servers");
             Directory.CreateDirectory(serverpath); //Create path if not exists
             if (string.IsNullOrEmpty(fname) || !File.Exists(Path.Combine(serverpath, fname + ".json")))
             {
                 Logging.Info("[ServerHandler] ServerData does not exist, will create new one");
                 Gameworld = new GameWorld.Server();
+                Gametime = new GameTime(new SDateTime(1, 70), 0);
                 ServerID = DateTime.Now.Ticks + "";
                 UpdateData();
             }
@@ -37,12 +40,15 @@ namespace Multiplayer.Networking
             {
                 Logging.Info($"[ServerHandler] Trying to load ServerData from '{fname}'");
                 ServerData data = JsonConvert.DeserializeObject<ServerData>(File.ReadAllText(Path.Combine(serverpath, fname + ".json")));
+                data.Gametime.Speed = 0; //Pause the game at startup
                 ServerID = data.ServerID;
                 Clients = data.Clients;
                 ServerName = data.ServerName;
                 Password = data.Password;
                 MaxPlayers = data.MaxPlayers;
                 Gameworld = data.Gameworld;
+                Gametime = data.Gametime;
+                Difficulty = data.Difficulty;
                 UpdateServer();
             }
         }
@@ -57,6 +63,7 @@ namespace Multiplayer.Networking
             ServerName = Server.ServerName;
             Password = Server.Password;
             MaxPlayers = Server.MaxPlayers;
+            Difficulty = Server.Difficulty;
         }
 
         /// <summary>
@@ -69,12 +76,13 @@ namespace Multiplayer.Networking
             Server.ServerName = ServerName;
             Server.Password = Password;
             Server.MaxPlayers = MaxPlayers;
+            Server.Difficulty = Difficulty;
         }
 
         /// <summary>
         /// Saves the ServerData to a File inside the "./Multiplayer/Servers/" directory
         /// </summary>
-        public void SaveData()
+        public void SaveData(object sender, EventArgs args)
         {
             string fname = ServerName;
             string floca = Path.Combine(serverpath, fname + ".json");

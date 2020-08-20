@@ -1,4 +1,5 @@
 ﻿using Multiplayer.Debugging;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,10 +12,15 @@ namespace Multiplayer.Networking
         public static string Password = "";
         public static ushort MaxPlayers = 10;
         public static ushort Port;
+        public static int Difficulty;
         public static bool hasAI = false;
         static Telepathy.Server server = new Telepathy.Server();
-        static ServerData serverdata = new ServerData();
+        static ServerData serverdata = new ServerData("test");
         static bool isRunning = false;
+        public static bool Runs { get { return isRunning; } }
+
+        //gets fired if the server wants to save data.
+        public static EventHandler OnSavingServer;
 
         /// <summary>
         /// Starts the server, use Server.Stop() to stop it.
@@ -28,9 +34,12 @@ namespace Multiplayer.Networking
                 return;
 			}
             Port = port;
+            Difficulty = GameSettings.Instance.Difficulty;
             Logging.Info("[Server] Start listening on Port " + port);
+            server.MaxMessageSize = int.MaxValue;
             server.Start(port);
             isRunning = true;
+            serverdata.UpdateServer();
             Read();
         }
 
@@ -113,8 +122,7 @@ namespace Multiplayer.Networking
 
         public static void Send(int clientid, Helpers.TcpGameWorld changes)
         {
-            Logging.Info("[Server] Sending GameWorldChanges to client " + clientid);
-            //server.Send(clientid, changes.ToArray());
+            Logging.Info("[Server] Sending GameWorldChanges to client " + clientid + " => " + (bool)changes.Data.GetValue("addition"));
             server.Send(clientid, changes.Serialize());
         }
 
@@ -123,7 +131,6 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Sending GameWorldChanges to all clients");
             foreach(Helpers.User user in Users)
 			{
-                //server.Send(user.ID, changes.ToArray());
                 server.Send(user.ID, changes.Serialize());
 			}
         }
@@ -134,6 +141,21 @@ namespace Multiplayer.Networking
             string msg = (string)message.Data.GetValue("message");
             Logging.Info("[Server] Redirecting Chat message from " + clientid + " to " + receiver);
             server.Send(receiver, new Helpers.TcpChat(msg, GetUser(clientid)).Serialize());
+		}
+
+        public static void Send(int clientid, Helpers.TcpGamespeed speed)
+		{
+            Logging.Info("[Server] Sending GameSpeed to client " + clientid);
+            server.Send(clientid, speed.Serialize());
+		}
+
+        public static void Send(Helpers.TcpGamespeed speed)
+		{
+            Logging.Info("[Server] Sending GameSpeed to all clients");
+            foreach(Helpers.User user in Users)
+			{
+                server.Send(user.ID, speed.Serialize());
+			}
 		}
         #endregion
 
@@ -170,6 +192,10 @@ namespace Multiplayer.Networking
                 else if (req == "userlist")
                     OnRequestUserList(msg.connectionId);
 			}
+
+            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(msg.data);
+            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
+                OnGamespeedChange(msg.connectionId, tcpspeed);
         }
 
         /// <summary>
@@ -212,16 +238,18 @@ namespace Multiplayer.Networking
 		{
             if(chat.Data.GetValue("receiver") == null)
 			{
+                Helpers.TcpChat chatmsg = new Helpers.TcpChat((string)chat.Data.GetValue("message"), GetUser(connectionid));
                 //Send to all connected users
                 Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
                 foreach (Helpers.User u in Users)
                     if(u.ID != connectionid)
-                        server.Send(u.ID, chat.Serialize());
+                        server.Send(u.ID, chatmsg.Serialize());
 			}else
-			{
+            {
+                Helpers.TcpChat chatmsg = new Helpers.TcpChat((string)chat.Data.GetValue("message"), GetUser(connectionid));
                 //Send to a receiver
-                Logging.Info($"[Server] User {connectionid} sends a chat to {(int)chat.Data.GetValue("receiver")}");
-                server.Send((int)chat.Data.GetValue("receiver"), chat.Serialize());
+                Logging.Info($"[Server] User {connectionid} sends a chat to {(int)chatmsg.Data.GetValue("receiver")}");
+                server.Send((int)chatmsg.Data.GetValue("receiver"), chatmsg.Serialize());
 			}
 		}
 
@@ -239,6 +267,21 @@ namespace Multiplayer.Networking
             //server.Send(connectionid, response.ToArray());
 		}
 
+        static void OnGamespeedChange(int connectionid, Helpers.TcpGamespeed speed)
+		{
+            if ((int)speed.Data.GetValue("type") == 0)
+			{
+                Logging.Info($"[Server] Sending updated GameSpeed to all clients => {(int)speed.Data.GetValue("speed")} usercount: {Users.Count}");
+                foreach (Helpers.User u in Users)
+				{
+                    Logging.Info($"[Server] Sent GameSpeed to connection {u.ID}");
+                    Send(u.ID, speed);
+                }
+            }
+            else
+                Logging.Warn($"[Server] User {connectionid} can't change gamespeed if type is 1 (vote) because votes aren't included yet");
+		}
+
         /// <summary>
         /// Stops the Server
         /// </summary>
@@ -252,6 +295,15 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Stop listening");
             isRunning = false;
             server.Stop();
+            Users.Clear();
+		}
+
+        /// <summary>
+        /// Saves the server by firing the OnSavingServer event
+        /// </summary>
+        public static void Save()
+		{
+            OnSavingServer?.Invoke(null, null);
 		}
 
         /// <summary>
