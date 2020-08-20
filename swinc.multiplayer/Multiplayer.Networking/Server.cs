@@ -238,16 +238,18 @@ namespace Multiplayer.Networking
 		{
             if(chat.Data.GetValue("receiver") == null)
 			{
+                Helpers.TcpChat chatmsg = new Helpers.TcpChat((string)chat.Data.GetValue("message"), GetUser(connectionid));
                 //Send to all connected users
                 Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
                 foreach (Helpers.User u in Users)
                     if(u.ID != connectionid)
-                        server.Send(u.ID, chat.Serialize());
+                        server.Send(u.ID, chatmsg.Serialize());
 			}else
-			{
+            {
+                Helpers.TcpChat chatmsg = new Helpers.TcpChat((string)chat.Data.GetValue("message"), GetUser(connectionid));
                 //Send to a receiver
-                Logging.Info($"[Server] User {connectionid} sends a chat to {(int)chat.Data.GetValue("receiver")}");
-                server.Send((int)chat.Data.GetValue("receiver"), chat.Serialize());
+                Logging.Info($"[Server] User {connectionid} sends a chat to {(int)chatmsg.Data.GetValue("receiver")}");
+                server.Send((int)chatmsg.Data.GetValue("receiver"), chatmsg.Serialize());
 			}
 		}
 
