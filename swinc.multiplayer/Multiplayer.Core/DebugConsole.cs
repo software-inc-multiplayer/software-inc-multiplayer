@@ -11,11 +11,11 @@ namespace Multiplayer.Core
 	class DebugConsole : ModBehaviour
 	{
 		bool inmain = false;
-		public bool rrinuse { get; set; }
+		public bool Rrinuse { get; set; }
 		public void PlayRR()
 		{
-			if (rrinuse) return;
-			rrinuse = true;
+			if (Rrinuse) return;
+			Rrinuse = true;
 			string[] lines = File.ReadAllLines(Path.Combine(Meta.ThisMod.ModPath, "Assets", "rr.txt"));
 			StartCoroutine(ReadLines(lines));
 		}
@@ -27,12 +27,12 @@ namespace Multiplayer.Core
 				Logging.Info(line);
 				yield return new WaitForSeconds(0.95f);
 			}
-			rrinuse = false;
+			Rrinuse = false;
 		}
 
 		public override void OnActivate()
 		{
-			rrinuse = false;
+			Rrinuse = false;
 			SceneManager.sceneLoaded += OnSceneLoaded;
 			Logging.Info("[DebugConsole] Adding console commands");
 			DevConsole.Command<ushort> startservercmd = new DevConsole.Command<ushort>("MULTIPLAYER_START", OnStartServer);
@@ -53,6 +53,14 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(savegameworld);
 			DevConsole.Command<int> setgamespeed = new DevConsole.Command<int>("MULTIPLAYER_SPEED", OnSetGameSpeed);
 			DevConsole.Console.AddCommand(setgamespeed);
+			DevConsole.Command<ushort> connecthamachi = new DevConsole.Command<ushort>("MULTIPLAYER_HAMACHI", OnConnectHamachi);
+			DevConsole.Console.AddCommand(connecthamachi);
+		}
+
+		private void OnConnectHamachi(ushort arg0)
+		{
+			Logging.Info("[Hamachi] Trying to connect to hamachi server at ", arg0);
+			OnClientConnect("0.0.0.0", arg0);
 		}
 
 		private void OnSetGameSpeed(int speed)

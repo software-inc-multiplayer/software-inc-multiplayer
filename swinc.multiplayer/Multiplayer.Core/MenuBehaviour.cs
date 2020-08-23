@@ -12,10 +12,8 @@ namespace Multiplayer.Core
     public class MenuBehaviour : ModBehaviour
     {
         public string OldText { get; set; }
-        public bool IsEnabled { get; set; }
         public override void OnActivate()
         {
-            IsEnabled = true;
             SceneManager.sceneLoaded += OnScene;
             if(SceneManager.GetActiveScene().name == "MainMenu")
             {
@@ -25,7 +23,7 @@ namespace Multiplayer.Core
 
         private void OnScene(Scene arg0, LoadSceneMode arg1)
         {
-            if (!IsEnabled) return;
+            if (!isActiveAndEnabled) return;
             if (arg0.name == "MainMenu")
             {
                 ModifyText();
@@ -43,7 +41,7 @@ namespace Multiplayer.Core
 
         public override void OnDeactivate()
         {
-            IsEnabled = false;
+            SceneManager.sceneLoaded -= OnScene;
             if (SceneManager.GetActiveScene().name == "MainMenu")
             {
                 WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = OldText;

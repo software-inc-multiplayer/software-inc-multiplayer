@@ -13,10 +13,8 @@ namespace Multiplayer.Core
     {
         public Button MPButton { get; set; }
         public GUIWindow MPWindow { get; set; }
-        public bool IsEnabled { get; set; }
         public override void OnActivate()
         {
-            IsEnabled = true;
             SceneManager.sceneLoaded += OnScene;
             if (SceneManager.GetActiveScene().name == "MainScene")
             {
@@ -26,7 +24,7 @@ namespace Multiplayer.Core
 
         private void OnScene(Scene arg0, LoadSceneMode arg1)
         {
-            if (!IsEnabled) return;
+            if (!isActiveAndEnabled) return;
             if (arg0.name == "MainScene")
             {
                 CreateButton();
@@ -109,10 +107,10 @@ namespace Multiplayer.Core
 
         public override void OnDeactivate()
         {
-            if(MPButton != null)
+            SceneManager.sceneLoaded -= OnScene;
+            if (MPButton != null)
                 MPButton.gameObject.SetActive(false);
             Logging.Info("Destroyed multiplayer button in MainScene");
-            IsEnabled = false;
         }
     }
 }
