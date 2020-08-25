@@ -122,14 +122,30 @@ namespace Multiplayer.Networking
             else if((string)type == "login_response")
 			{
                 string res = (string)response.Data.GetValue("data");
-                if(res == "ok")
+                Logging.Info($"[Debug] res = " + res);
+                if(int.TryParse(res, out int i))
 				{
                     //Login ok
-                    Logging.Info("[Client] You're logged in now!");
+                    Logging.Info($"[Client] You're logged in now and you've the ID {i}!");
                     //Send request to get GameWorld
                     Send(new Helpers.TcpRequest("gameworld"));
 
-                }
+					try
+					{
+                        Logging.Warn("[Client] Add client company to server");
+                        //Send your company to the server
+                        GameWorld.World world = new GameWorld.World();
+                        Helpers.UserCompany uc = GameSettings.Instance.MyCompany as Helpers.UserCompany;
+                        uc.Owner = i;
+                        world.UserCompanies.Add(uc);
+                        GameWorld.Client.Instance.UpdateLocalWorld(world, true);
+                        GameWorld.Client.Instance.UpdateWorld(world, true);
+                    }
+                    catch(Exception ex)
+					{
+                        Logging.Error(ex.Message, ex.StackTrace);
+					}
+				}
                 else if(res == "max_players")
 				{
                     //Server full

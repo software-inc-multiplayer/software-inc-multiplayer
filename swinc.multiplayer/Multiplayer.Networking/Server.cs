@@ -218,7 +218,7 @@ namespace Multiplayer.Networking
             }
             else if (Users.Count < MaxPlayers && Password == (string)login.Data.GetValue("password"))
 			{
-                Send(connectionid, new Helpers.TcpResponse("login_response", "ok"));
+                Send(connectionid, new Helpers.TcpResponse("login_response", connectionid + ""));
                 Users.Add(new Helpers.User()
                 {
                     ID = connectionid,
