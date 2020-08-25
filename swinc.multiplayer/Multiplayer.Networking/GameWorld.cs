@@ -31,7 +31,7 @@ namespace Multiplayer.Networking
 					else
 					{
 						foreach (Helpers.UserCompany c in content.UserCompanies)
-							UserCompanies.RemoveAll(x => x.ID == c.ID);
+							UserCompanies.RemoveAll(x => x.company.ID == c.company.ID);
 						foreach (Company c in content.AICompanies)
 							AICompanies.RemoveAll(x => x.ID == c.ID);
 						foreach (StockMarket s in content.StockMarkets)
@@ -69,8 +69,8 @@ namespace Multiplayer.Networking
 				foreach (Company c in AICompanies)
 					MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
 				foreach (Helpers.UserCompany c in UserCompanies)
-					if(!c.Player)
-						MarketSimulation.Active.AddCompany(c.OwnerCompany, true); //Add User Companies
+					if(!c.company.Player)
+						MarketSimulation.Active.AddCompany(c.company, true); //Add User Companies
 			}
 		}
 

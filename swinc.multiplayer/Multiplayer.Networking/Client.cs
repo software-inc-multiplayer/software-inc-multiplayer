@@ -1,4 +1,5 @@
 ﻿using Multiplayer.Debugging;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -122,7 +123,6 @@ namespace Multiplayer.Networking
             else if((string)type == "login_response")
 			{
                 string res = (string)response.Data.GetValue("data");
-                Logging.Info($"[Debug] res = " + res);
                 if(int.TryParse(res, out int i))
 				{
                     //Login ok
@@ -132,10 +132,18 @@ namespace Multiplayer.Networking
 
 					try
 					{
-                        Logging.Warn("[Client] Add client company to server");
+                        Logging.Info("[Client] Add client company to server");
                         //Send your company to the server
                         GameWorld.World world = new GameWorld.World();
-                        Helpers.UserCompany uc = GameSettings.Instance.MyCompany as Helpers.UserCompany;
+
+                        Helpers.UserCompany uc = new Helpers.UserCompany(GameSettings.Instance.MyCompany);
+
+                        if (uc == null)
+						{
+                            Logging.Error("UserCompany is NULL");
+                            return;
+                        }
+
                         uc.Owner = i;
                         world.UserCompanies.Add(uc);
                         GameWorld.Client.Instance.UpdateLocalWorld(world, true);
@@ -143,7 +151,7 @@ namespace Multiplayer.Networking
                     }
                     catch(Exception ex)
 					{
-                        Logging.Error(ex.Message, ex.StackTrace);
+                        Logging.Error("Can't add company: " + ex.Message, ex.StackTrace);
 					}
 				}
                 else if(res == "max_players")

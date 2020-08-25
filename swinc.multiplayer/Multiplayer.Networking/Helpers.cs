@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Policy;
@@ -128,7 +129,7 @@ namespace Multiplayer.Networking
 
 			public User()
 			{
-				Usercompany = new UserCompany(this);
+				//Usercompany = new UserCompany(this);
 			}
 
 			public bool IsAdmin()
@@ -147,18 +148,28 @@ namespace Multiplayer.Networking
 		}
 
 		[Serializable]
-		public class UserCompany : Company
+		public class UserCompany
 		{
+			public Company company;
+
 			/// <summary>
 			/// The player who owns the company
 			/// </summary>
 			public int Owner { get; set; }
 			
-			public UserCompany() { }
+			public UserCompany() {
+				company = new Company();
+			}
+
+			public UserCompany(Company comp)
+			{
+				company = comp;
+			}
 
 			public UserCompany(User owner)
 			{
 				Owner = owner.ID;
+				company = new Company();
 			}
 		}
 		
