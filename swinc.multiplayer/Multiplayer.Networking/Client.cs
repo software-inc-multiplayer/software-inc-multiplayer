@@ -83,8 +83,7 @@ namespace Multiplayer.Networking
             //Handle TcpChat
             Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
             if (tcpchat != null && tcpchat.Header == "chat")
-                OnChatReceived(tcpchat);
-
+                Chat.RecieveMessage(tcpchat);
             //Handle GameWorld
             Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
             if (tcpworld != null && tcpworld.Header == "gameworld")
@@ -106,50 +105,41 @@ namespace Multiplayer.Networking
 				HUD.Instance.GameSpeed = (int)speed;
 			}
         }
-
-		static void OnServerResponse(Helpers.TcpResponse response)
-		{
+        static void OnServerResponse(Helpers.TcpResponse response)
+        {
             object type = response.Data.GetValue("type");
-            if(type == null)
-			{
+            if (type == null)
+            {
                 Logging.Warn("[Client] Type is null!");
                 return;
-			}
-            if((string)type == "login_request")
-			{
+            }
+            if ((string)type == "login_request")
+            {
                 Send(new Helpers.TcpLogin(Username, ServerPassword));
-			}
-            else if((string)type == "login_response")
-			{
+            }
+            else if ((string)type == "login_response")
+            {
                 string res = (string)response.Data.GetValue("data");
-                if(res == "ok")
-				{
+                if (res == "ok")
+                {
                     //Login ok
                     Logging.Info("[Client] You're logged in now!");
                     //Send request to get GameWorld
                     Send(new Helpers.TcpRequest("gameworld"));
 
                 }
-                else if(res == "max_players")
-				{
+                else if (res == "max_players")
+                {
                     //Server full
                     Logging.Warn("[Client] The server is full");
-				}
-                else if(res == "wrong_password")
-				{
+                }
+                else if (res == "wrong_password")
+                {
                     //Wrong password
                     Logging.Warn("[Client] You did enter the wrong password");
-				}
-			}
-		}
-
-        static void OnChatReceived(Helpers.TcpChat chat)
-		{
-            Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
-            if (sender == null)
-                sender = new Helpers.User() { Username = "Server" };
-            Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
-		}
+                }
+            }
+        }
 
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
 		{
@@ -205,6 +195,7 @@ namespace Multiplayer.Networking
                 Logging.Warn("[Client] You can't disconnect a client that isn't connected...");
                 return;
 			}
+            Chat.ClearHistory();
             client.Disconnect();
 		}
 	}

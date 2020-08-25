@@ -49,7 +49,6 @@ namespace Multiplayer.Core
             MPWindow.ShowCentered = true;
             MPWindow.MinSize = new Vector2(640, 480);
             MPWindow.SizeButton.SetActive(false);
-
             Button connectButton = WindowManager.SpawnButton();
             connectButton.SetText("ConnectButtonText".LocDef("Connect"));
             connectButton.onClick.AddListener(() =>
@@ -98,6 +97,11 @@ namespace Multiplayer.Core
 
             Button startServerButton = WindowManager.SpawnButton();
             startServerButton.SetText("StartServerButtonText".LocDef("Create Server"));
+
+            //Chat window here, will be added to MPWindow and takes up the rest of the space minus the bottom (reserved for chat input)
+
+            //TODO: (i am working on this -CyaCal) Input box.
+            // I haven't pushed it because its broken atm, fixing it though.
 
             MPWindow.Show();
 

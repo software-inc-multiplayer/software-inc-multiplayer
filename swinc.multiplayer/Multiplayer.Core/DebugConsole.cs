@@ -55,6 +55,14 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(setgamespeed);
 			DevConsole.Command<ushort> connecthamachi = new DevConsole.Command<ushort>("MULTIPLAYER_HAMACHI", OnConnectHamachi);
 			DevConsole.Console.AddCommand(connecthamachi);
+			DevConsole.Command clearChatHistory = new DevConsole.Command("MULTIPLAYER_CHAT_CLEAR", OnClearChat);
+			DevConsole.Console.AddCommand(clearChatHistory);
+		}
+
+		private void OnClearChat()
+		{
+			Logging.Warn("Clearing chat can sometimes break the chat window, use at your own risk.");
+			Networking.Chat.ClearHistory(true);			
 		}
 
 		private void OnConnectHamachi(ushort arg0)
