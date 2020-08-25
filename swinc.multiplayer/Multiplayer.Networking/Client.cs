@@ -134,7 +134,7 @@ namespace Multiplayer.Networking
 					{
                         Logging.Info("[Client] Add client company to server");
                         //Send your company to the server
-                        GameWorld.World world = new GameWorld.World();
+                        GameWorld.World world = new GameWorld.World(false);
 
                         Helpers.UserCompany uc = new Helpers.UserCompany(GameSettings.Instance.MyCompany);
 

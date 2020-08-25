@@ -10,11 +10,18 @@ namespace Multiplayer.Networking
 		[Serializable]
 		public class World
 		{
+			private bool _isServer;
+
 			public SDateTime dateTime;
 			public List<Helpers.UserCompany> UserCompanies = new List<Helpers.UserCompany>();
 			public List<Company> AICompanies = new List<Company>();
 			public List<StockMarket> StockMarkets = new List<StockMarket>();
 			public List<SoftwareProduct> SoftwareProducts = new List<SoftwareProduct>();
+
+			public World(bool isServer)
+			{
+				_isServer = isServer;
+			}
 
 			public void UpdateData(World content, bool addition)
 			{
@@ -53,6 +60,9 @@ namespace Multiplayer.Networking
 			/// </summary>
 			public void RefreshData()
 			{
+				if (_isServer)
+					return;
+
 				Logging.Info("[GameWorld] Refreshing data");
 				Logging.Info($"[GameWorld]", $"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
 				//Clear all stuff from the client first
@@ -67,10 +77,18 @@ namespace Multiplayer.Networking
 				GameSettings.Instance.StockMarkets.AddRange(StockMarkets); //Add stockmarkets
 				MarketSimulation.Active.FixStocks();
 				foreach (Company c in AICompanies)
-					MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
+				{
+					SimulatedCompany comp = (SimulatedCompany)c;
+					comp.Autonomous = false;
+					MarketSimulation.Active.AddCompany(comp, true); //Add AI Companies
+				}
 				foreach (Helpers.UserCompany c in UserCompanies)
 					if(!c.company.Player)
-						MarketSimulation.Active.AddCompany(c.company, true); //Add User Companies
+					{
+						SimulatedCompany comp = (SimulatedCompany)c.company;
+						comp.Autonomous = false;
+						MarketSimulation.Active.AddCompany(comp, true); //Add User Companies
+					}
 			}
 		}
 
@@ -79,8 +97,8 @@ namespace Multiplayer.Networking
 		{
 			public static Server Instance;
 
-			public World world = new World();
-			public World oldworld = new World(); //When the world is updated save the old world to see what did change and only send the changed stuff
+			public World world = new World(true);
+			public World oldworld = new World(true); //When the world is updated save the old world to see what did change and only send the changed stuff
 			private bool disposedValue;
 
 			public Server()
@@ -188,7 +206,7 @@ namespace Multiplayer.Networking
 			/// <returns>A World object with the changes</returns>
 			private World CompareWorlds(bool isAdded)
 			{
-				World tmpworld = new World();
+				World tmpworld = new World(true);
 
 				if(oldworld == null)
 				{
@@ -303,13 +321,13 @@ namespace Multiplayer.Networking
 		{
 			public static Client Instance;
 
-			public World world = new World();
+			public World world = new World(false);
 			private bool disposedValue;
 
 			public Client(World gworld = null)
 			{
 				if (gworld == null)
-					world = new World();
+					world = new World(false);
 				else
 					world = gworld;
 
