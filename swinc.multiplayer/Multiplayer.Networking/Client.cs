@@ -1,4 +1,5 @@
 ﻿using Multiplayer.Debugging;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -102,7 +103,7 @@ namespace Multiplayer.Networking
             int speed = (int)tcpspeed.Data.GetValue("speed");
             if(type == 0)
 			{
-				HUD.Instance.GameSpeed = (int)speed;
+				GameSettings.GameSpeed = (int)speed;
 			}
         }
         static void OnServerResponse(Helpers.TcpResponse response)
@@ -120,16 +121,39 @@ namespace Multiplayer.Networking
             else if ((string)type == "login_response")
             {
                 string res = (string)response.Data.GetValue("data");
-                if (res == "ok")
-                {
+                if(int.TryParse(res, out int i))
+				{
                     //Login ok
-                    Logging.Info("[Client] You're logged in now!");
+                    Logging.Info($"[Client] You're logged in now and you've the ID {i}!");
                     //Send request to get GameWorld
                     Send(new Helpers.TcpRequest("gameworld"));
 
-                }
-                else if (res == "max_players")
-                {
+					try
+					{
+                        Logging.Info("[Client] Add client company to server");
+                        //Send your company to the server
+                        GameWorld.World world = new GameWorld.World(false);
+
+                        Helpers.UserCompany uc = new Helpers.UserCompany(GameSettings.Instance.MyCompany);
+
+                        if (uc == null)
+						{
+                            Logging.Error("UserCompany is NULL");
+                            return;
+                        }
+
+                        uc.Owner = i;
+                        world.UserCompanies.Add(uc);
+                        GameWorld.Client.Instance.UpdateLocalWorld(world, true);
+                        GameWorld.Client.Instance.UpdateWorld(world, true);
+                    }
+                    catch(Exception ex)
+					{
+                        Logging.Error("Can't add company: " + ex.Message, ex.StackTrace);
+					}
+				}
+                else if(res == "max_players")
+				{
                     //Server full
                     Logging.Warn("[Client] The server is full");
                 }

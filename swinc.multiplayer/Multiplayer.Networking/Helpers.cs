@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Policy;
@@ -21,15 +22,23 @@ namespace Multiplayer.Networking
 		/// <returns>A byte array representation of the object</returns>
 		public static byte[] Serialize(this object obj)
 		{
-			if (obj == null)
+			try
 			{
-				return null;
+				if (obj == null)
+				{
+					throw new NullReferenceException("Can't serialize object, because object is NULL!");
+				}
+				var bf = new BinaryFormatter();
+				using (var ms = new MemoryStream())
+				{
+					bf.Serialize(ms, obj);
+					return ms.ToArray();
+				}
 			}
-			var bf = new BinaryFormatter();
-			using (var ms = new MemoryStream())
+			catch(Exception ex)
 			{
-				bf.Serialize(ms, obj);
-				return ms.ToArray();
+				Logging.Error(ex.Message, ex.StackTrace);
+				return null;
 			}
 		}
 
@@ -120,33 +129,47 @@ namespace Multiplayer.Networking
 
 			public User()
 			{
-				Usercompany = new UserCompany(this);
+				//Usercompany = new UserCompany(this);
+			}
+
+			public bool IsAdmin()
+			{
+				if (Role == UserRole.Host || Role == UserRole.Admin)
+					return true;
+				return false;
+			}
+
+			public bool IsHost()
+			{
+				if (Role == UserRole.Host)
+					return true;
+				return false;
 			}
 		}
 
 		[Serializable]
-		public class UserCompany : Company
+		public class UserCompany
 		{
+			public Company company;
+
 			/// <summary>
 			/// The player who owns the company
 			/// </summary>
-			public User Owner { get; private set; }
+			public int Owner { get; set; }
 			
-			public UserCompany() { }
+			public UserCompany() {
+				company = new Company();
+			}
+
+			public UserCompany(Company comp)
+			{
+				company = comp;
+			}
 
 			public UserCompany(User owner)
 			{
-				Owner = owner;
-				FetchEmployees();
-			}
-
-			/// <summary>
-			/// Fetches the employees from the company the User (owner) owns
-			/// </summary>
-			public List<Employee> FetchEmployees()
-			{
-				//TODO: Fetch the employees from the users company
-				return null;
+				Owner = owner.ID;
+				company = new Company();
 			}
 		}
 		
@@ -367,7 +390,7 @@ namespace Multiplayer.Networking
 				}
 			}
 
-			public TcpData(string key, string value)
+			public TcpData(object key, object value)
 			{
 				Header = "data";
 				Data.Add(key, value);
