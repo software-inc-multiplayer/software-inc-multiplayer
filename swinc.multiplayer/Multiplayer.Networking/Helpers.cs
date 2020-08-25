@@ -130,6 +130,20 @@ namespace Multiplayer.Networking
 			{
 				Usercompany = new UserCompany(this);
 			}
+
+			public bool IsAdmin()
+			{
+				if (Role == UserRole.Host || Role == UserRole.Admin)
+					return true;
+				return false;
+			}
+
+			public bool IsHost()
+			{
+				if (Role == UserRole.Host)
+					return true;
+				return false;
+			}
 		}
 
 		[Serializable]
