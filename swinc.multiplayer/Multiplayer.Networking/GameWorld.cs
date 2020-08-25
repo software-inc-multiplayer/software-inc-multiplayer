@@ -80,14 +80,20 @@ namespace Multiplayer.Networking
 				{
 					SimulatedCompany comp = (SimulatedCompany)c;
 					comp.Autonomous = false;
-					MarketSimulation.Active.AddCompany(comp, true); //Add AI Companies
+					MarketSimulation.Active.AddCompany(comp); //Add AI Companies
 				}
 				foreach (Helpers.UserCompany c in UserCompanies)
 					if(!c.company.Player)
 					{
-						SimulatedCompany comp = (SimulatedCompany)c.company;
-						comp.Autonomous = false;
-						MarketSimulation.Active.AddCompany(comp, true); //Add User Companies
+						Logging.Debug("Adding company " + c.company.Name);
+						//SimulatedCompany comp = (SimulatedCompany)c.company;
+						//comp.Autonomous = false;
+						MarketSimulation.Active.AddCompany(c.company); //Add User Companies
+					}
+					else
+					{
+						Logging.Debug("Adding company " + c.company.Name + " as player company");
+						MarketSimulation.Active.AddCompany(c.company);
 					}
 			}
 		}

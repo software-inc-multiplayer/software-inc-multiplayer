@@ -141,10 +141,11 @@ namespace Multiplayer.Networking
                             Logging.Error("UserCompany is NULL");
                             return;
                         }
-
+                        
                         uc.Owner = i;
                         world.UserCompanies.Add(uc);
                         GameWorld.Client.Instance.UpdateLocalWorld(world, true);
+                        world.UserCompanies[0].company.Player = false;
                         GameWorld.Client.Instance.UpdateWorld(world, true);
                     }
                     catch(Exception ex)

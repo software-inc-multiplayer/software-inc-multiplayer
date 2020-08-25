@@ -39,7 +39,6 @@ namespace Multiplayer.Networking
             else
             {
                 Logging.Info($"[ServerHandler] Trying to load ServerData from '{fname}'");
-                //ServerData data = JsonConvert.DeserializeObject<ServerData>(File.ReadAllText(Path.Combine(serverpath, fname + ".json")));
                 ServerData data = Helpers.Deserialize<ServerData>(File.ReadAllBytes(Path.Combine(serverpath, fname + ".server")));
                 data.Gametime.Speed = 0; //Pause the game at startup
                 ServerID = data.ServerID;
@@ -86,8 +85,6 @@ namespace Multiplayer.Networking
         public void SaveData(object sender, EventArgs args)
         {
             string fname = ServerName;
-            //string floca = Path.Combine(serverpath, fname + ".json");
-            //File.WriteAllText(floca, JsonConvert.SerializeObject(this));
             string floca = Path.Combine(serverpath, fname + ".server");
             File.WriteAllBytes(floca, Helpers.Serialize(this));
             Logging.Info($"[ServerHandler] Saving ServerData to '{floca}'");

@@ -13,7 +13,7 @@ namespace Multiplayer.Networking
         public static ushort MaxPlayers = 10;
         public static ushort Port;
         public static int Difficulty;
-        public static bool hasAI = false;
+        public static bool hasAI = true;
         static Telepathy.Server server = new Telepathy.Server();
         static ServerData serverdata = new ServerData("test");
         static bool isRunning = false;
@@ -196,6 +196,10 @@ namespace Multiplayer.Networking
             Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(msg.data);
             if (tcpspeed != null && tcpspeed.Header == "gamespeed")
                 OnGamespeedChange(msg.connectionId, tcpspeed);
+
+            Helpers.TcpGameWorld tcpgameworld = Helpers.TcpGameWorld.Deserialize(msg.data);
+            if (tcpgameworld != null && tcpgameworld.Header == "gameworld")
+                OnGameWorldReceived(tcpgameworld);
         }
 
         /// <summary>
@@ -281,6 +285,14 @@ namespace Multiplayer.Networking
             else
                 Logging.Warn($"[Server] User {connectionid} can't change gamespeed if type is 1 (vote) because votes aren't included yet");
 		}
+
+        static void OnGameWorldReceived(Helpers.TcpGameWorld world)
+        {
+            GameWorld.World changes = (GameWorld.World)world.Data.GetValue("changes");
+            bool addition = (bool)world.Data.GetValue("addition");
+            Logging.Info($"[Client] Updating GameWorld => " + addition);
+            GameWorld.Server.Instance.UpdateLocalWorld(changes, addition);
+        }
 
         /// <summary>
         /// Stops the Server
