@@ -85,8 +85,8 @@ namespace Multiplayer.Networking
         public void SaveData(object sender, EventArgs args)
         {
             string fname = ServerName;
-            string floca = Path.Combine(serverpath, fname + ".json");
-            File.WriteAllText(floca, JsonConvert.SerializeObject(this));
+            string floca = Path.Combine(serverpath, fname + ".serverdata");
+            File.WriteAllBytes(floca, this.Serialize());
             Logging.Info($"[ServerHandler] Saving ServerData to '{floca}'");
         }
     }

@@ -45,15 +45,23 @@ namespace Multiplayer.Core
 
         private void CreateBaseMultiplayerWindow()
         {
+            /** 
+                Box 200, 200, 730, 500 "Multiplayer"
+                Button 230, 230, 159, 25 "Connect"
+                Button 399, 230, 159, 25 "Manage Server"
+                Button 568, 230, 159, 25 "Sabotage"
+                Button 737, 230, 159, 25 "Manage Users"
+                Input 230, 275, 670, 355 "ChatWindow"
+                Input 230, 640, 670, 50 "Type here to chat..."
+            **/
             Logging.Info("Opened multiplayer window.");
-            MPWindow = WindowManager.SpawnWindow();
+            MPWindow = WindowManager.SpawnWindow();           
             MPWindow.SetTitle("MultiplayerButton".LocDef("Multiplayer"));
             MPWindow.ShowCentered = true;
             MPWindow.MinSize = new Vector2(640, 480);
             MPWindow.SizeButton.SetActive(false);
-            Button connectButton = WindowManager.SpawnButton();
-            connectButton.SetText("ConnectButtonText".LocDef("Connect"));
-            connectButton.onClick.AddListener(() =>
+
+            new Utils.Controls.Element.UIButton("ConnectButtonText".LocDef("Connect"), new Rect(30, 30, 159, 25), () =>
             {
                 #region Connect Window
                 MPWindow.gameObject.SetActive(false);
@@ -61,13 +69,13 @@ namespace Multiplayer.Core
                 /**
                  * Box 200, 200, 750, 200 "Multiplayer - Connect"
                  * Button 230, 275, 159, 25 "Go Back"
-                 * Label 230, 230, 700, 45 "Connect to a multiplayer server via IP and Port, specify a password if the server has a password set."
-                 * Input 230, 310, 159, 25 "IP Address"
-                 * Input 399, 310, 159, 25 "Port"
-                 * Input 230, 345, 159, 25 "Password"
-                 * Button 588, 310, 159, 25 "Connect"
+                  Label 230, 230, 700, 45 "Connect to a multiplayer server via IP and Port, specify a password if the server has a password set."
+                  Input 230, 310, 159, 25 "IP Address"
+                  Input 399, 310, 159, 25 "Port"
+                  Input 230, 345, 159, 25 "Password"
+                  Button 588, 310, 159, 25 "Connect"
                 **/
-                
+
                 GUIWindow connectWindow = WindowManager.SpawnWindow();
                 connectWindow.SetTitle("MultiplayerButtonConnect".LocDef("Multiplayer - Connect"));
                 connectWindow.ShowCentered = true;
@@ -133,16 +141,15 @@ namespace Multiplayer.Core
                         }),
                     };
                     diag.Show("AlreadyConnectedToServer".LocDef("You are already connected to a server, would you like to disconnect?"), !true, DialogWindow.DialogType.Warning, actions);
-                } else
+                }
+                else
                 {
                     connectWindow.Show();
                 }
                 #endregion
                 #endregion
-            });
-
-            Button startServerButton = WindowManager.SpawnButton();
-            startServerButton.SetText("StartServerButtonText".LocDef("Create Server"));
+            }, MPWindow.MainPanel, "", "Connect to a multiplayer server.");
+            //new Utils.Controls.Element.UIButton("")
 
             //Chat window here, will be added to MPWindow and takes up the rest of the space minus the bottom (reserved for chat input)
 
@@ -150,9 +157,6 @@ namespace Multiplayer.Core
             // I haven't pushed it because its broken atm, fixing it though.
 
             MPWindow.Show();
-
-            MPWindow.AddElement(connectButton.gameObject, new Rect(5, 5, 96, 64), Rect.zero);
-            MPWindow.AddElement(startServerButton.gameObject, new Rect(96 + 10, 5, 96, 64), Rect.zero);
         }
 
         public override void OnDeactivate()
