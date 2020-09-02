@@ -1,19 +1,25 @@
 ﻿using Multiplayer.Debugging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine.UI;
 
 namespace Multiplayer.Networking
 {
 	public static class Client
 	{
         public static bool Connected { get { return client.Connected; } }
-        static Telepathy.Client client = new Telepathy.Client();
-        static string Username = "Player";
-        static string ServerPassword = "";
-
+        public static Telepathy.Client client = new Telepathy.Client();
+        public static string Username = "Player";
+        public static string ServerPassword = "";
+        public static Text chatWindow { get; set; }
+        public static List<string> chatMessages { get; set; }
+        
         public static async void Connect(string ip, ushort port)
         {
-			// create and connect the client
+            // create and connect the client
+            chatMessages = new List<string>();
 			try
 			{
                 Username = Steamworks.SteamFriends.GetPersonaName();
@@ -22,7 +28,7 @@ namespace Multiplayer.Networking
 			{
                 Logging.Warn("[Client] Couldn't fetch username from Steam! If you've a DRM-Free version thats why. => " + ex.Message);
 			}
-
+            client.MaxMessageSize = int.MaxValue;
             client.Connect(ip, port);
             Logging.Info("[Client] Trying to connect!");
             await Task.Run(() => {
@@ -34,6 +40,7 @@ namespace Multiplayer.Networking
                 {
                     Logging.Info("[Client] Connected to the Server!");
                     Read();
+                    GameWorld.Client client = new GameWorld.Client();                 
                 }
                 else
                 {
@@ -86,11 +93,27 @@ namespace Multiplayer.Networking
 
             //Handle GameWorld
             Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
-            if (tcpworld != null && tcpchat.Header == "gameworld")
+            if (tcpworld != null && tcpworld.Header == "gameworld")
                 OnGameWorldReceived(tcpworld);
+
+            //Handle Gamespeed
+            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(data);
+            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
+                OnGamespeedChange(tcpspeed);
         }
 
-        static void OnServerResponse(Helpers.TcpResponse response)
+		private static void OnGamespeedChange(Helpers.TcpGamespeed tcpspeed)
+		{
+            Logging.Info("gamespeedchange...");
+            int type = (int)tcpspeed.Data.GetValue("type");
+            int speed = (int)tcpspeed.Data.GetValue("speed");
+            if(type == 0)
+			{
+				HUD.Instance.GameSpeed = (int)speed;
+			}
+        }
+
+		static void OnServerResponse(Helpers.TcpResponse response)
 		{
             object type = response.Data.GetValue("type");
             if(type == null)
@@ -102,6 +125,28 @@ namespace Multiplayer.Networking
 			{
                 Send(new Helpers.TcpLogin(Username, ServerPassword));
 			}
+            else if((string)type == "login_response")
+			{
+                string res = (string)response.Data.GetValue("data");
+                if(res == "ok")
+				{
+                    //Login ok
+                    Logging.Info("[Client] You're logged in now!");
+                    //Send request to get GameWorld
+                    Send(new Helpers.TcpRequest("gameworld"));
+
+                }
+                else if(res == "max_players")
+				{
+                    //Server full
+                    Logging.Warn("[Client] The server is full");
+				}
+                else if(res == "wrong_password")
+				{
+                    //Wrong password
+                    Logging.Warn("[Client] You did enter the wrong password");
+				}
+			}
 		}
 
         static void OnChatReceived(Helpers.TcpChat chat)
@@ -110,15 +155,17 @@ namespace Multiplayer.Networking
             if (sender == null)
                 sender = new Helpers.User() { Username = "Server" };
             Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
+            chatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}\n");
+            Logging.Debug(chatMessages.Count);
 		}
 
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
 		{
-            Logging.Info($"[Client] Updating GameWorld");
-            GameWorld.World changes = world.Data.GetValue("changes") as GameWorld.World;
+            GameWorld.World changes = (GameWorld.World)world.Data.GetValue("changes");
             bool addition = (bool)world.Data.GetValue("addition");
-            GameWorld.Client.Instance.UpdateWorld(changes, addition);
-		}
+            Logging.Info($"[Client] Updating GameWorld => " + addition);
+            GameWorld.Client.Instance.UpdateLocalWorld(changes, addition);
+        }
 
 		#region Messages
 		public static void Send(Helpers.TcpLogin login)
@@ -135,9 +182,14 @@ namespace Multiplayer.Networking
 
         public static void Send(Helpers.TcpChat chatmsg)
 		{
-            Logging.Info("[Message] You: " + (string)chatmsg.Data.GetValue("message"));
+            Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
             client.Send(chatmsg.Serialize());
-		}
+            if (chatMessages.Count == 25)
+                chatMessages.RemoveAt(0);
+            chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}\n");
+            chatWindow.text = string.Join("\n", chatMessages);
+            Logging.Debug(chatMessages.Count);
+        }
 
         public static void Send(Helpers.TcpRequest request)
 		{
@@ -150,6 +202,13 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Sending response");
             client.Send(response.Serialize());
 		}
+
+        public static void Send(Helpers.TcpGamespeed speed)
+		{
+            Logging.Info("[Client] Sending gamespeed");
+            client.Send(speed.Serialize());
+		}
+
 		#endregion
 
 		public static void Disconnect()

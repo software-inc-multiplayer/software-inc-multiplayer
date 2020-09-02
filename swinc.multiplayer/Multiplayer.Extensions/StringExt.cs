@@ -13,5 +13,9 @@ namespace Multiplayer.Extensions
         {
             GUIUtility.systemCopyBuffer = str;
         }
+        public static string SetStringVariable(this string str, string varName, string toSet)
+        {
+            return str.Replace($"%{varName}%", toSet);           
+        }
     }
 }
