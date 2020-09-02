@@ -10,6 +10,7 @@ namespace Multiplayer.Core
 {
 	class DebugConsole : ModBehaviour
 	{
+		public static DebugConsole instance;
 		bool inmain = false;
 		public bool Rrinuse { get; set; }
 		public void PlayRR()
@@ -20,7 +21,7 @@ namespace Multiplayer.Core
 			StartCoroutine(ReadLines(lines));
 		}
 
-		private IEnumerator ReadLines(string[] lines)
+		public IEnumerator ReadLines(string[] lines)
 		{
 			foreach (string line in lines)
 			{
@@ -55,7 +56,7 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(setgamespeed);
 		}
 
-		private void OnSetGameSpeed(int speed)
+		public void OnSetGameSpeed(int speed)
 		{
 			if (speed < 0 || speed > 4)
 			{
@@ -66,7 +67,7 @@ namespace Multiplayer.Core
 			Client.Send(new Helpers.TcpGamespeed(speed, 0));
 		}
 
-		private void OnSaveGameWorld()
+		public void OnSaveGameWorld()
 		{
 			if (!Networking.Server.Runs)
 			{
@@ -76,7 +77,7 @@ namespace Multiplayer.Core
 			Networking.Server.Save();
 		}
 
-		private void OnRequestGameWorld()
+		public void OnRequestGameWorld()
 		{
 			if (!Networking.Client.Connected)
 				Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
@@ -84,7 +85,7 @@ namespace Multiplayer.Core
 			Networking.Client.Send(new Helpers.TcpRequest("gameworld"));
 		}
 
-		private void OnRequestUserList()
+		public void OnRequestUserList()
 		{
 			if (!Networking.Client.Connected)
 				Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
@@ -92,13 +93,13 @@ namespace Multiplayer.Core
 			Networking.Client.Send(new Helpers.TcpRequest("userlist"));
 		}
 
-		private void OnServerStop()
+		public void OnServerStop()
 		{
 			Networking.Client.Disconnect();
 			Networking.Server.Stop();
 		}
 
-		private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+		public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 		{
 			if (scene.name == "MainScene")
 			{
@@ -110,7 +111,7 @@ namespace Multiplayer.Core
 			}
 		}
 
-		private void OnClientConnect(string ip, ushort port)
+		public void OnClientConnect(string ip, ushort port)
 		{
 			if (!inmain)
 			{
@@ -125,7 +126,7 @@ namespace Multiplayer.Core
 			Networking.Client.Connect(ip, port);
 		}
 
-		private void OnSendChat(string arg0)
+		public void OnSendChat(string arg0)
 		{
 			if (!inmain || !Networking.Client.Connected)
 			{
@@ -138,7 +139,7 @@ namespace Multiplayer.Core
 			Networking.Client.Send(chatClass);
 		}
 
-		private void OnStartServer(ushort port)
+		public void OnStartServer(ushort port)
 		{
 			if (!inmain)
 			{

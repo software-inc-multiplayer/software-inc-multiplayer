@@ -292,6 +292,7 @@ namespace Multiplayer.Networking
 			}
             Logging.Info("[Server] Stop listening");
             isRunning = false;
+            serverdata.SaveData(null, null);
             server.Stop();
             Users.Clear();
 		}
