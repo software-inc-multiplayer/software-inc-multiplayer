@@ -11,11 +11,11 @@ namespace Multiplayer.Core
 	class DebugConsole : ModBehaviour
 	{
 		bool inmain = false;
-		public bool rrinuse { get; set; }
+		public bool Rrinuse { get; set; }
 		public void PlayRR()
 		{
-			if (rrinuse) return;
-			rrinuse = true;
+			if (Rrinuse) return;
+			Rrinuse = true;
 			string[] lines = File.ReadAllLines(Path.Combine(Meta.ThisMod.ModPath, "Assets", "rr.txt"));
 			StartCoroutine(ReadLines(lines));
 		}
@@ -27,12 +27,12 @@ namespace Multiplayer.Core
 				Logging.Info(line);
 				yield return new WaitForSeconds(0.95f);
 			}
-			rrinuse = false;
+			Rrinuse = false;
 		}
 
 		public override void OnActivate()
 		{
-			rrinuse = false;
+			Rrinuse = false;
 			SceneManager.sceneLoaded += OnSceneLoaded;
 			Logging.Info("[DebugConsole] Adding console commands");
 			DevConsole.Command<ushort> startservercmd = new DevConsole.Command<ushort>("MULTIPLAYER_START", OnStartServer);
@@ -53,6 +53,20 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(savegameworld);
 			DevConsole.Command<int> setgamespeed = new DevConsole.Command<int>("MULTIPLAYER_SPEED", OnSetGameSpeed);
 			DevConsole.Console.AddCommand(setgamespeed);
+			DevConsole.Command clearChatHistory = new DevConsole.Command("MULTIPLAYER_CHAT_CLEAR", OnClearChat);
+			DevConsole.Console.AddCommand(clearChatHistory);
+		}
+
+		private void OnClearChat()
+		{
+			Logging.Warn("Clearing chat can sometimes break the chat window, use at your own risk.");
+			Networking.Chat.WriteLogs(true);			
+		}
+
+		private void OnConnectHamachi(ushort arg0)
+		{
+			Logging.Info("[Hamachi] Trying to connect to hamachi server at ", arg0);
+			OnClientConnect("0.0.0.0", arg0);
 		}
 
 		private void OnSetGameSpeed(int speed)
@@ -117,6 +131,11 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
+			//DEBUG
+			if (ip == ".")
+				ip = "127.0.0.1";
+			//DEBUG END
+
 			Networking.Client.Connect(ip, port);
 		}
 
@@ -127,7 +146,8 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-			Networking.Client.Send(new Helpers.TcpChat(arg0));
+			Helpers.TcpChat chatClass = new Helpers.TcpChat(Client.Username, arg0);
+			Networking.Client.Send(chatClass);
 		}
 
 		private void OnStartServer(ushort port)
@@ -153,7 +173,7 @@ namespace Multiplayer.Core
 			DevConsole.Console.RemoveCommand("SIMULATE_SALT");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_SAVE");
 			DevConsole.Console.RemoveCommand("MULTIPLAYER_SPEED");
-
+			DevConsole.Console.RemoveCommand("MULTIPLAYER_CHAT_CLEAR");
 			SceneManager.sceneLoaded -= OnSceneLoaded;
 		}
 	}

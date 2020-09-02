@@ -14,9 +14,9 @@ namespace Multiplayer.Networking
         public static ushort Port;
         public static int Difficulty;
         public static bool hasAI = false;
-        static Telepathy.Server server = new Telepathy.Server();
-        static ServerData serverdata = new ServerData("test");
-        static bool isRunning = false;
+        public static Telepathy.Server server = new Telepathy.Server();
+        public static ServerData serverdata = new ServerData("test");
+        public static bool isRunning = false;
         public static bool Runs { get { return isRunning; } }
 
         //gets fired if the server wants to save data.

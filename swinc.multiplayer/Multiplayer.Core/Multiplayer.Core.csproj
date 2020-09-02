@@ -31,7 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -243,13 +244,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugConsole.cs" />
-    <Compile Include="GameBehaviour.cs" />
-    <Compile Include="IPUtils.cs" />
-    <Compile Include="LaunchBehaviour.cs" />
-    <Compile Include="MenuBehaviour.cs" />
+    <Compile Include="Behaviours\GameBehaviour.cs" />
+    <Compile Include="Utils\IPUtils.cs" />
+    <Compile Include="Behaviours\LaunchBehaviour.cs" />
+    <Compile Include="Behaviours\MenuBehaviour.cs" />
     <Compile Include="Meta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SettingsHandler.cs" />
+    <Compile Include="Utils\SettingsHandler.cs" />
+    <Compile Include="Utils\UItils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Multiplayer.Debugging\Multiplayer.Debugging.csproj">
@@ -266,10 +268,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icon.ico" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Folder Include="DiscordBehaviour\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

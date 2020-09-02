@@ -7,10 +7,10 @@ namespace Multiplayer.Networking
 	public static class Client
 	{
         public static bool Connected { get { return client.Connected; } }
-        static Telepathy.Client client = new Telepathy.Client();
-        static string Username = "Player";
-        static string ServerPassword = "";
-
+        public static Telepathy.Client client = new Telepathy.Client();
+        public static string Username = "Player";
+        public static string ServerPassword = "";
+        
         public static async void Connect(string ip, ushort port)
         {
 			// create and connect the client
