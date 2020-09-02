@@ -156,8 +156,8 @@ namespace Multiplayer.Networking
                 sender = new Helpers.User() { Username = "Server" };
             Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
             chatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}\n");
-            Logging.Debug(chatMessages.Count);
-		}
+            chatWindow.text = string.Join("\n", chatMessages);
+        }
 
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
 		{
@@ -188,7 +188,6 @@ namespace Multiplayer.Networking
                 chatMessages.RemoveAt(0);
             chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}\n");
             chatWindow.text = string.Join("\n", chatMessages);
-            Logging.Debug(chatMessages.Count);
         }
 
         public static void Send(Helpers.TcpRequest request)

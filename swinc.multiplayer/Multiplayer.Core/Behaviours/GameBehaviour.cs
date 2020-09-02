@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Multiplayer.Core.Utils;
-using System.Linq;
 
 namespace Multiplayer.Core
 {
@@ -58,12 +56,12 @@ namespace Multiplayer.Core
                 Input 230, 640, 670, 50 "Type here to chat..."
             **/
             Logging.Info("Opened multiplayer window.");
-            if(MPWindow != null)
+            if (MPWindow != null)
             {
                 MPWindow.Show();
                 return;
             }
-            MPWindow = WindowManager.SpawnWindow();           
+            MPWindow = WindowManager.SpawnWindow();
             MPWindow.SetTitle("MultiplayerButton".LocDef("Multiplayer"));
             MPWindow.ShowCentered = true;
             MPWindow.MinSize = new Vector2(730, 500);
@@ -106,21 +104,40 @@ namespace Multiplayer.Core
                 Utils.Controls.Element.UITextbox PasswordTextBox = new Utils.Controls.Element.UITextbox(new Rect(30, 145, 159, 25), connectWindow.MainPanel, "PasswordInput".LocDef("Password"), "", null, 12, true);
                 new Utils.Controls.Element.UIButton("ConnectButtonText".LocDef("Connect"), new Rect(488, 110, 159, 25), () =>
                 {
-                    if (IpTextBox.obj.text.IsEmpty())
+                    if (String.IsNullOrWhiteSpace(IpTextBox.obj.text))
                     {
                         WindowManager.SpawnDialog("NoIPText".LocDef("Please enter a IP into the text box labeled \"Server IP\""), true, DialogWindow.DialogType.Error);
                         return;
                     }
-                    else if (PortTextBox.obj.text.IsEmpty())
+                    else if (String.IsNullOrWhiteSpace(PortTextBox.obj.text))
                     {
                         WindowManager.SpawnDialog("NoPortText".LocDef("Please enter a Port into the text box labeled \"Server Port\""), true, DialogWindow.DialogType.Error);
+                        return;
                     }
                     else
                     {
+                        if (Client.Connected)
+                        {
+                            // If user is already connected to a server.
+                            GameObject diagObj = UnityEngine.Object.Instantiate(WindowManager.Instance.DialogPrefab);
+                            diagObj.transform.SetParent(WindowManager.Instance.Canvas.transform, worldPositionStays: false);
+                            DialogWindow diag = gameObject.GetComponent<DialogWindow>();
+                            KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
+                            {
+                                new KeyValuePair<string, Action>("DisconnnectButton".LocDef("Disconnect"), delegate {
+                                    Client.Disconnect();
+                                }),
+                                new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
+                                    diag.Window.Close();
+                                    return;
+                                }),
+                            };
+                            diag.Show("AlreadyConnectedToServer".LocDef("You are already connected to a server, would you like to disconnect?"), !true, DialogWindow.DialogType.Warning, actions);
+                        }
                         try
                         {
                             Client.Connect(IpTextBox.obj.text, ushort.Parse(PortTextBox.obj.text));
-                            WindowManager.SpawnDialog("NoIPText".LocDef("Please enter a IP into the text box labeled \"Server IP\""), true, DialogWindow.DialogType.Error);
+                            WindowManager.SpawnDialog("SuccessfullyConnected".LocDef("Successfully connected to the server!"), true, DialogWindow.DialogType.Error);
                         }
                         catch (Exception e)
                         {
@@ -131,36 +148,16 @@ namespace Multiplayer.Core
                     }
                 }, connectWindow.MainPanel);
                 #region Window Show management.
-                if (Client.Connected)
-                {
-                    // If user is already connected to a server.
-                    GameObject diagObj = UnityEngine.Object.Instantiate(WindowManager.Instance.DialogPrefab);
-                    diagObj.transform.SetParent(WindowManager.Instance.Canvas.transform, worldPositionStays: false);
-                    DialogWindow diag = gameObject.GetComponent<DialogWindow>();
-                    KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
-                    {
-                        new KeyValuePair<string, Action>("DisconnnectButton".LocDef("Disconnect"), delegate {
-                            Client.Disconnect();
-                            diag.Window.Close();
-                            connectWindow.Show();
-                        }),
-                        new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
-                            diag.Window.Close();
-                        }),
-                    };
-                    diag.Show("AlreadyConnectedToServer".LocDef("You are already connected to a server, would you like to disconnect?"), !true, DialogWindow.DialogType.Warning, actions);
-                }
-                else
-                {
-                    connectWindow.Show();
-                }
+                connectWindow.Show();
                 #endregion
                 #endregion
             }, MPWindow.MainPanel);
-            new Utils.Controls.Element.UIButton("ServerButtonText".LocDef("Manage Server"), new Rect(199, 30, 159, 25), () => {
+            new Utils.Controls.Element.UIButton("ServerButtonText".LocDef("Manage Server"), new Rect(199, 30, 159, 25), () =>
+            {
                 WindowManager.SpawnDialog("ComingSoon".LocDef("Coming soon!"), true, DialogWindow.DialogType.Error);
             }, MPWindow.MainPanel);
-            new Utils.Controls.Element.UIButton("GameplayButtonText".LocDef("Gameplay"), new Rect(369, 30, 159, 25), () => {
+            new Utils.Controls.Element.UIButton("GameplayButtonText".LocDef("Gameplay"), new Rect(369, 30, 159, 25), () =>
+            {
                 WindowManager.SpawnDialog("ComingSoon".LocDef("Coming soon!"), true, DialogWindow.DialogType.Error);
             }, MPWindow.MainPanel);
 
@@ -168,7 +165,8 @@ namespace Multiplayer.Core
             Client.chatWindow = WindowManager.SpawnLabel();
             Client.chatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
             Utils.Controls.Element.UITextbox chatBox = new Utils.Controls.Element.UITextbox(new Rect(30, 440, 511, 50), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox");
-            Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(30, 541, 189, 50), () => {
+            Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(30, 541, 189, 50), () =>
+            {
                 if (!Client.Connected)
                 {
                     WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
