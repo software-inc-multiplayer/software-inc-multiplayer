@@ -1,6 +1,9 @@
 ﻿using Multiplayer.Debugging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine.UI;
 
 namespace Multiplayer.Networking
 {
@@ -10,10 +13,13 @@ namespace Multiplayer.Networking
         public static Telepathy.Client client = new Telepathy.Client();
         public static string Username = "Player";
         public static string ServerPassword = "";
+        public static Text chatWindow { get; set; }
+        public static List<string> chatMessages { get; set; }
         
         public static async void Connect(string ip, ushort port)
         {
-			// create and connect the client
+            // create and connect the client
+            chatMessages = new List<string>();
 			try
 			{
                 Username = Steamworks.SteamFriends.GetPersonaName();
@@ -149,6 +155,8 @@ namespace Multiplayer.Networking
             if (sender == null)
                 sender = new Helpers.User() { Username = "Server" };
             Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
+            chatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}\n");
+            Logging.Debug(chatMessages.Count);
 		}
 
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
@@ -174,9 +182,14 @@ namespace Multiplayer.Networking
 
         public static void Send(Helpers.TcpChat chatmsg)
 		{
-            Logging.Info("[Message] You: " + (string)chatmsg.Data.GetValue("message"));
+            Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
             client.Send(chatmsg.Serialize());
-		}
+            if (chatMessages.Count == 25)
+                chatMessages.RemoveAt(0);
+            chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}\n");
+            chatWindow.text = string.Join("\n", chatMessages);
+            Logging.Debug(chatMessages.Count);
+        }
 
         public static void Send(Helpers.TcpRequest request)
 		{

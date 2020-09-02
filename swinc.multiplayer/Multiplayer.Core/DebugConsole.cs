@@ -22,7 +22,7 @@ namespace Multiplayer.Core
 
 		private IEnumerator ReadLines(string[] lines)
 		{
-			foreach(string line in lines)
+			foreach (string line in lines)
 			{
 				Logging.Info(line);
 				yield return new WaitForSeconds(0.95f);
@@ -57,7 +57,7 @@ namespace Multiplayer.Core
 
 		private void OnSetGameSpeed(int speed)
 		{
-			if(speed < 0 || speed > 4)
+			if (speed < 0 || speed > 4)
 			{
 				Logging.Warn("[DebugConsole] Gamespeed can't be less than 0 or more than 4!");
 				return;
@@ -100,7 +100,7 @@ namespace Multiplayer.Core
 
 		private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 		{
-			if(scene.name == "MainScene")
+			if (scene.name == "MainScene")
 			{
 				inmain = true;
 			}
@@ -112,7 +112,7 @@ namespace Multiplayer.Core
 
 		private void OnClientConnect(string ip, ushort port)
 		{
-			if(!inmain)
+			if (!inmain)
 			{
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
@@ -132,7 +132,9 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-			Helpers.TcpChat chatClass = new Helpers.TcpChat(Client.Username, arg0);
+			var tmpUser = new Helpers.User();
+			tmpUser.Username = Client.Username;
+			Helpers.TcpChat chatClass = new Helpers.TcpChat(arg0, tmpUser);
 			Networking.Client.Send(chatClass);
 		}
 

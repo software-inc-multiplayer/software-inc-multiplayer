@@ -7,13 +7,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Multiplayer.Core.Utils;
+using System.Linq;
 
 namespace Multiplayer.Core
 {
     public class GameBehaviour : ModBehaviour
     {
         public Button MPButton { get; set; }
+        public int PreviousCount { get; set; }
         public GUIWindow MPWindow { get; set; }
+        public Text ChatWindow { get; set; }
         public override void OnActivate()
         {
             SceneManager.sceneLoaded += OnScene;
@@ -49,16 +52,21 @@ namespace Multiplayer.Core
                 Box 200, 200, 730, 500 "Multiplayer"
                 Button 230, 230, 159, 25 "Connect"
                 Button 399, 230, 159, 25 "Manage Server"
-                Button 568, 230, 159, 25 "Sabotage"
+                Button 568, 230, 159, 25 "Gameplay"
                 Button 737, 230, 159, 25 "Manage Users"
                 Input 230, 275, 670, 355 "ChatWindow"
                 Input 230, 640, 670, 50 "Type here to chat..."
             **/
             Logging.Info("Opened multiplayer window.");
+            if(MPWindow != null)
+            {
+                MPWindow.Show();
+                return;
+            }
             MPWindow = WindowManager.SpawnWindow();           
             MPWindow.SetTitle("MultiplayerButton".LocDef("Multiplayer"));
             MPWindow.ShowCentered = true;
-            MPWindow.MinSize = new Vector2(640, 480);
+            MPWindow.MinSize = new Vector2(730, 500);
             MPWindow.SizeButton.SetActive(false);
 
             new Utils.Controls.Element.UIButton("ConnectButtonText".LocDef("Connect"), new Rect(30, 30, 159, 25), () =>
@@ -148,14 +156,30 @@ namespace Multiplayer.Core
                 }
                 #endregion
                 #endregion
-            }, MPWindow.MainPanel, "", "Connect to a multiplayer server.");
-            //new Utils.Controls.Element.UIButton("")
+            }, MPWindow.MainPanel);
+            new Utils.Controls.Element.UIButton("ServerButtonText".LocDef("Manage Server"), new Rect(199, 30, 159, 25), () => {
+                WindowManager.SpawnDialog("ComingSoon".LocDef("Coming soon!"), true, DialogWindow.DialogType.Error);
+            }, MPWindow.MainPanel);
+            new Utils.Controls.Element.UIButton("GameplayButtonText".LocDef("Gameplay"), new Rect(369, 30, 159, 25), () => {
+                WindowManager.SpawnDialog("ComingSoon".LocDef("Coming soon!"), true, DialogWindow.DialogType.Error);
+            }, MPWindow.MainPanel);
 
             //Chat window here, will be added to MPWindow and takes up the rest of the space minus the bottom (reserved for chat input)
-
-            //TODO: (i am working on this -CyaCal) Input box.
-            // I haven't pushed it because its broken atm, fixing it though.
-
+            Client.chatWindow = WindowManager.SpawnLabel();
+            Client.chatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
+            Utils.Controls.Element.UITextbox chatBox = new Utils.Controls.Element.UITextbox(new Rect(30, 440, 511, 50), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox");
+            Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(30, 541, 189, 50), () => {
+                if (!Client.Connected)
+                {
+                    WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
+                    return;
+                }
+                var tmpUser = new Helpers.User();
+                tmpUser.Username = Client.Username;
+                Helpers.TcpChat chatClass = new Helpers.TcpChat(chatBox.obj.text, tmpUser);
+                Client.Send(chatClass);
+            }, MPWindow.MainPanel);
+            MPWindow.AddElement(Client.chatWindow.gameObject, new Rect(30, 75, 670, 355), Rect.zero);
             MPWindow.Show();
         }
 
