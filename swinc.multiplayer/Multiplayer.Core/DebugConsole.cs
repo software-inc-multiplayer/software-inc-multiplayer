@@ -53,20 +53,6 @@ namespace Multiplayer.Core
 			DevConsole.Console.AddCommand(savegameworld);
 			DevConsole.Command<int> setgamespeed = new DevConsole.Command<int>("MULTIPLAYER_SPEED", OnSetGameSpeed);
 			DevConsole.Console.AddCommand(setgamespeed);
-			DevConsole.Command clearChatHistory = new DevConsole.Command("MULTIPLAYER_CHAT_CLEAR", OnClearChat);
-			DevConsole.Console.AddCommand(clearChatHistory);
-		}
-
-		private void OnClearChat()
-		{
-			Logging.Warn("Clearing chat can sometimes break the chat window, use at your own risk.");
-			Networking.Chat.WriteLogs(true);			
-		}
-
-		private void OnConnectHamachi(ushort arg0)
-		{
-			Logging.Info("[Hamachi] Trying to connect to hamachi server at ", arg0);
-			OnClientConnect("0.0.0.0", arg0);
 		}
 
 		private void OnSetGameSpeed(int speed)
