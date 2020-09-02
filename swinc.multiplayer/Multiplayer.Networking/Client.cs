@@ -42,12 +42,11 @@ namespace Multiplayer.Networking
                     Read();
                     GameWorld.Client client = new GameWorld.Client();                 
                 }
-                else
-                {
-                    Logging.Warn("[Client] Couldn't connect to the Server");
-                }
             });
-            
+            if(!client.Connected)
+            {
+                throw new Exception("[Client] Couldn't connect to the Server");
+            }
         }
 
         static async void Read()
@@ -155,9 +154,11 @@ namespace Multiplayer.Networking
             if (sender == null)
                 sender = new Helpers.User() { Username = "Server" };
             Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
+            if (chatMessages.Count == 6)
+                chatMessages.RemoveAt(0);
             chatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}\n");
-            Logging.Debug(chatMessages.Count);
-		}
+            chatWindow.text = string.Join("\n", chatMessages);
+        }
 
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
 		{
@@ -184,11 +185,10 @@ namespace Multiplayer.Networking
 		{
             Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
             client.Send(chatmsg.Serialize());
-            if (chatMessages.Count == 25)
+            if (chatMessages.Count == 6)
                 chatMessages.RemoveAt(0);
             chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}\n");
             chatWindow.text = string.Join("\n", chatMessages);
-            Logging.Debug(chatMessages.Count);
         }
 
         public static void Send(Helpers.TcpRequest request)

@@ -35,23 +35,9 @@ namespace Multiplayer.Core
         public override void Initialize(ModController.DLLMod parentMod)
         {
             ThisMod = parentMod;
-            AppDomain.CurrentDomain.UnhandledException += ErrorCatcher;
-            AppDomain.CurrentDomain.FirstChanceException += ErrorCatcher2;
             // AppDomain.CurrentDomain.AssemblyResolve += (x, y) => Assembly.LoadFrom(Path.Combine(parentMod.FolderPath(), "References\\" + y.Name.Substring(0, y.Name.IndexOf(",")) + ".dll"));
             Application.runInBackground = true;
             base.Initialize(parentMod);
-        }
-
-        private void ErrorCatcher2(object sender, FirstChanceExceptionEventArgs e)
-        {
-            Exception t = (Exception)e.Exception;
-            Logging.Error(t.ToString());
-        }
-
-        private void ErrorCatcher(object sender, UnhandledExceptionEventArgs e)
-        {
-            Exception t = (Exception)e.ExceptionObject;
-            Logging.Error(t.ToString());
         }
     }
 }
