@@ -64,7 +64,7 @@
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Users\calum\source\repos\software-inc-multiplayer\swinc.multiplayer\References\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\References\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
