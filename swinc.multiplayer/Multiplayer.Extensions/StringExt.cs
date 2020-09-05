@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,11 @@ namespace Multiplayer.Extensions
 {
     public static class StringExt
     {
+        private static readonly char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+        public static string MakeSafe(this string str)
+        {
+            return new string(str.Select(ch => invalidFileNameChars.Contains(ch) ? '_' : ch).ToArray());
+        }
         public static void CopyToClipboard(this string str)
         {
             GUIUtility.systemCopyBuffer = str;

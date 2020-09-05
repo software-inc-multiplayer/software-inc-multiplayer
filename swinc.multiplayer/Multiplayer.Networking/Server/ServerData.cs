@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Multiplayer.Debugging;
-using Newtonsoft.Json;
 
 namespace Multiplayer.Networking
 {
