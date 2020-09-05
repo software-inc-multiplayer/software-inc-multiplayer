@@ -169,7 +169,7 @@ namespace Multiplayer.Core
                 Utils.Controls.Element.UITextbox PasswordTextBox = new Utils.Controls.Element.UITextbox(new Rect(35 + 159, 110, 159, 25), connectWindow.MainPanel, "PasswordInput".LocDef("Password"), "", null, 12, true);
                 Utils.Controls.Element.UIButton ConnectButton = new Utils.Controls.Element.UIButton("StartButtonText".LocDef("Start"), new Rect(488, 110, 159, 25), () =>
                 {
-
+                    DialogWindow dia2g = WindowManager.SpawnDialog();
                     if (string.IsNullOrWhiteSpace(PortTextBox.obj.text) || !ushort.TryParse(PortTextBox.obj.text, out ushort nedfro))
                     {
                         WindowManager.SpawnDialog("NoPortText".LocDef("Please enter a valid Port into the text box labeled \"Port\""), true, DialogWindow.DialogType.Error);
@@ -177,6 +177,27 @@ namespace Multiplayer.Core
                     }
                     else
                     {
+                        KeyValuePair<string, Action>[] action2s = new KeyValuePair<string, Action>[]
+                        {
+                                new KeyValuePair<string, Action>("Yes".LocDef("Yes"), delegate {
+                                    if(Client.Connected) Client.Disconnect();
+                                    dia2g.Window.Close();
+                                    try
+                                    {
+                                        Client.Connect("127.0.0.1", ushort.Parse(PortTextBox.obj.text));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        WindowManager.SpawnDialog($"There was an error trying to connect to the server. See console for error.", true, DialogWindow.DialogType.Error);
+                                        Logging.Error(e);
+                                        return;
+                                    }
+                                    WindowManager.SpawnDialog("SuccessfullyCreated".LocDef("Successfully created server!"), true, DialogWindow.DialogType.Information);
+                                }),
+                                new KeyValuePair<string, Action>("No".LocDef("No"), delegate {
+                                    dia2g.Window.Close();
+                                }),
+                        };
                         if (Client.Connected)
                         {
                             Client.Disconnect();
@@ -200,7 +221,7 @@ namespace Multiplayer.Core
                                         Logging.Error(e);
                                         return;
                                     }
-                                    WindowManager.SpawnDialog("SuccessfullyCreated".LocDef("Successfully created server!"), true, DialogWindow.DialogType.Information);
+                                    dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
                                 }),
                                 new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
                                     diag.Window.Close();
@@ -210,6 +231,7 @@ namespace Multiplayer.Core
                             return;
                         }
                         Networking.Server.Start(ushort.Parse(PortTextBox.obj.text));
+                        dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
                     }
                     connectWindow.gameObject.SetActive(false);
                 }, connectWindow.MainPanel);

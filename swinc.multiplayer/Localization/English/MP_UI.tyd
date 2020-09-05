@@ -23,6 +23,7 @@ NoMessages "Its pretty quiet in here, seems to be no sign of chat messages anywh
 ComingSoon "Coming soon."
 SuccessfullyConnected "Successfully connected to the server!"
 Yes "Yes"
+No "No"
 UsersButtonText "Manage Users"
 StartButtonText "Start"
 SuccessfullyCreated "Successfully created server!"
