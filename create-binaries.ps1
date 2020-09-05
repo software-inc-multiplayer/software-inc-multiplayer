@@ -13,7 +13,6 @@ Try {
     # .\swinc.multiplayer\References
     Copy-Item -Path ".\swinc.multiplayer\References\Telepathy.dll" -Destination ".\installer-binaries\manage\" -Force
     Copy-Item -Path ".\swinc.multiplayer\References\Newtonsoft.Json.dll" -Destination ".\installer-binaries\manage\" -Force
-    Copy-Item -Path ".\swinc.multiplayer\References\zdiscord_game_sdk.dll" -Destination ".\installer-binaries\mf\" -Force
     Compress-Archive -Path ".\installer-binaries\*" -DestinationPath ".\installer-binaries.zip" -Force
 } 
 Catch {
