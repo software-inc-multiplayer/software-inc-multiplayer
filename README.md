@@ -26,3 +26,19 @@ The manager is a desktop app you can use to install different versions of the mo
 
 The multiplayer mod is based on the Peer To Peer system currently, with dedicated servers coming soon.
 
+First, the client connects to the server and sends their "GameWorld", which is their company, their stocks, etc.
+Secondly, the client will recieve a collection of GameWorlds from the other clients and merges them with theirs, showing other players companies and their stocks etc.
+Lastly, any changes will be sent to the server to be sent to the other clients and vice versa.
+
+<h2>Bug Reports and Feature Requests</h2>
+
+Anyone can submit a bug report <a href="https://github.com/cal3432/software-inc-multiplayer/issues">via the issues tab on GitHub</a>, please provide as much infomation as possible.
+Same for feature requests.
+
+<h2>Contributing</h2>
+
+See <a href="https://github.com/cal3432/software-inc-multiplayer/blob/nightly/CONTRIBUTING.md">CONTRIBUTING.md</a>
+
+
+
+

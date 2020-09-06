@@ -18,6 +18,11 @@ namespace Multiplayer.Networking
         
         public static async void Connect(string ip, ushort port)
         {
+            if(client.Connecting)
+			{
+                Logging.Warn("[Client] You're already connecting to a server!");
+                return;
+			}
             // create and connect the client
             chatMessages = new List<string>();
 			try
@@ -45,7 +50,9 @@ namespace Multiplayer.Networking
             });
             if(!client.Connected)
             {
-                throw new Exception("[Client] Couldn't connect to the Server");
+                WindowManager.SpawnDialog("Couldn't connect to the Server!", true, DialogWindow.DialogType.Warning);
+                Logging.Warn("[Client] Couldn't connect to the Server!");
+                //throw new Exception("[Client] Couldn't connect to the Server");
             }
         }
 
@@ -108,7 +115,8 @@ namespace Multiplayer.Networking
             int speed = (int)tcpspeed.Data.GetValue("speed");
             if(type == 0)
 			{
-				HUD.Instance.GameSpeed = (int)speed;
+                GameSettings.GameSpeed = speed;
+				//HUD.Instance.GameSpeed = (int)speed;
 			}
         }
 
@@ -183,6 +191,12 @@ namespace Multiplayer.Networking
 
         public static void Send(Helpers.TcpChat chatmsg)
 		{
+            if (string.IsNullOrEmpty((string)chatmsg.Data.GetValue("message")))
+            {
+                Logging.Warn("[Message] Your chat message can't be empty!");
+                WindowManager.SpawnDialog("Your chat message can't be empty!", true, DialogWindow.DialogType.Warning);
+                return;
+            }
             Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
             client.Send(chatmsg.Serialize());
             if (chatMessages.Count == 6)
