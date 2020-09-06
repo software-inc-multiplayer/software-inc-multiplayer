@@ -50,9 +50,9 @@ namespace Multiplayer.Networking
             });
             if(!client.Connected)
             {
-                WindowManager.SpawnDialog("Couldn't connect to the Server!", true, DialogWindow.DialogType.Warning);
-                Logging.Warn("[Client] Couldn't connect to the Server!");
-                //throw new Exception("[Client] Couldn't connect to the Server");
+                //WindowManager.SpawnDialog("Couldn't connect to the Server!", true, DialogWindow.DialogType.Warning);
+                //Logging.Warn("[Client] Couldn't connect to the Server!");
+                throw new Exception("[Client] Couldn't connect to the Server");
             }
         }
 
