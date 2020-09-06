@@ -121,6 +121,7 @@ namespace Multiplayer.Core
 			if(Client.Connected)
 			{
 				Logging.Warn("[DebugConsole] You're already connected to a Server, please disconnect first!");
+				WindowManager.SpawnDialog("You're already connected to a Server, please disconnect first!", true, DialogWindow.DialogType.Warning);
 				return;
 			}
 			//DEBUG

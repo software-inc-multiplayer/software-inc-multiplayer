@@ -191,8 +191,8 @@ namespace Multiplayer.Networking
 		{
             if (string.IsNullOrEmpty((string)chatmsg.Data.GetValue("message")))
             {
-                //TODO: Change the console message with a popup
-                Logging.Warn("[Message] Your message cant be empty!");
+                Logging.Warn("[Message] Your chat message can't be empty!");
+                WindowManager.SpawnDialog("Your chat message can't be empty!", true, DialogWindow.DialogType.Warning);
                 return;
             }
             Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
