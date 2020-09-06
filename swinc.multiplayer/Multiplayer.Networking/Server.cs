@@ -31,7 +31,7 @@ namespace Multiplayer.Networking
             if(server.Active)
 			{
                 Logging.Warn("[Server] You can't start the server because its already active!");
-                WindowManager.SpawnDialog("You can't start the server because its already active!", true, DialogWindow.DialogType.Warning);
+                //WindowManager.SpawnDialog("You can't start the server because its already active!", true, DialogWindow.DialogType.Warning);
                 return;
 			}
             Port = port;

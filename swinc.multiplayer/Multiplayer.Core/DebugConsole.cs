@@ -95,8 +95,14 @@ namespace Multiplayer.Core
 
 		public void OnServerStop()
 		{
-			Networking.Client.Disconnect();
-			Networking.Server.Stop();
+			try
+			{
+				Networking.Client.Disconnect();
+				Networking.Server.Stop();
+			} catch (Exception e)
+			{
+				Logging.Error(e.ToString());
+			}			
 		}
 
 		public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -128,8 +134,14 @@ namespace Multiplayer.Core
 			if (ip == ".")
 				ip = "127.0.0.1";
 			//DEBUG END
-
-			Networking.Client.Connect(ip, port);
+			try
+			{
+				Networking.Client.Connect(ip, port);
+			} catch (Exception e)
+			{
+				Logging.Error(e.ToString());
+			}
+			
 		}
 
 		public void OnSendChat(string arg0)
@@ -152,8 +164,16 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
-			Networking.Server.Start(port);
-			Networking.Client.Connect("127.0.0.1", port);
+			
+			try
+			{
+				Networking.Server.Start(port);
+				Networking.Client.Connect("127.0.0.1", port);
+			} catch (Exception e)
+			{
+				Logging.Error(e.ToString());
+			}
+			
 		}
 
 		public override void OnDeactivate()
