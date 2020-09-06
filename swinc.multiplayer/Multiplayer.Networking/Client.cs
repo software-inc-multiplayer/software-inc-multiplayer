@@ -108,7 +108,8 @@ namespace Multiplayer.Networking
             int speed = (int)tcpspeed.Data.GetValue("speed");
             if(type == 0)
 			{
-				HUD.Instance.GameSpeed = (int)speed;
+                GameSettings.GameSpeed = speed;
+				//HUD.Instance.GameSpeed = (int)speed;
 			}
         }
 
