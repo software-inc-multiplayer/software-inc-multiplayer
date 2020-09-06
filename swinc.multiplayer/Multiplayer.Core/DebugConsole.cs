@@ -118,6 +118,11 @@ namespace Multiplayer.Core
 				Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
 				return;
 			}
+			if(Client.Connected)
+			{
+				Logging.Warn("[DebugConsole] You're already connected to a Server, please disconnect first!");
+				return;
+			}
 			//DEBUG
 			if (ip == ".")
 				ip = "127.0.0.1";

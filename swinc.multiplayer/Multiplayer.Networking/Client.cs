@@ -18,6 +18,11 @@ namespace Multiplayer.Networking
         
         public static async void Connect(string ip, ushort port)
         {
+            if(client.Connecting)
+			{
+                Logging.Warn("[Client] You're already connecting to a server!");
+                return;
+			}
             // create and connect the client
             chatMessages = new List<string>();
 			try
