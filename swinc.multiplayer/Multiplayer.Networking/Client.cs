@@ -183,6 +183,12 @@ namespace Multiplayer.Networking
 
         public static void Send(Helpers.TcpChat chatmsg)
 		{
+            if (string.IsNullOrEmpty((string)chatmsg.Data.GetValue("message")))
+            {
+                //TODO: Change the console message with a popup
+                Logging.Warn("[Message] Your message cant be empty!");
+                return;
+            }
             Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
             client.Send(chatmsg.Serialize());
             if (chatMessages.Count == 6)
