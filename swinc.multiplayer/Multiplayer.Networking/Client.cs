@@ -7,14 +7,13 @@ using UnityEngine.UI;
 
 namespace Multiplayer.Networking
 {
-	public static class Client
+    public static partial class Client
 	{
         public static bool Connected { get { return client.Connected; } }
         public static Telepathy.Client client = new Telepathy.Client();
         public static string Username = "Player";
         public static string ServerPassword = "";
-        public static Text chatWindow { get; set; }
-        public static List<string> chatMessages { get; set; }
+        
         
         public static async void Connect(string ip, ushort port)
         {
@@ -25,6 +24,7 @@ namespace Multiplayer.Networking
 			}
             // create and connect the client
             chatMessages = new List<string>();
+            chatLogMessages = new List<string>();
 			try
 			{
                 Username = Steamworks.SteamFriends.GetPersonaName();
@@ -44,6 +44,7 @@ namespace Multiplayer.Networking
                 if (client.Connected)
                 {
                     Logging.Info("[Client] Connected to the Server!");
+                    OnServerChatRecieved(new Helpers.TcpServerChat($"Connected to the server.", Helpers.TcpServerChatType.Info));
                     Read();
                     GameWorld.Client client = new GameWorld.Client();                 
                 }
@@ -69,6 +70,7 @@ namespace Multiplayer.Networking
                         {
                             case Telepathy.EventType.Connected:
                                 Logging.Info("[Client] Connected");
+                                
                                 break;
                             case Telepathy.EventType.Data:
                                 Receive(msg.data);
@@ -92,11 +94,16 @@ namespace Multiplayer.Networking
             if (tcpresponse != null && tcpresponse.Header == "response")
                 OnServerResponse(tcpresponse);
 
+            //Handle TcpServerChat
+            Helpers.TcpServerChat tcpServerChat = Helpers.TcpServerChat.Deserialize(data);
+            if (tcpServerChat != null && tcpServerChat.Header == "serverchat")
+                OnServerChatRecieved(tcpServerChat);
+
             //Handle TcpChat
             Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnChatReceived(tcpchat);
-
+            
             //Handle GameWorld
             Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
             if (tcpworld != null && tcpworld.Header == "gameworld")
@@ -106,9 +113,8 @@ namespace Multiplayer.Networking
             Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(data);
             if (tcpspeed != null && tcpspeed.Header == "gamespeed")
                 OnGamespeedChange(tcpspeed);
-        }
-
-		private static void OnGamespeedChange(Helpers.TcpGamespeed tcpspeed)
+        }        
+        private static void OnGamespeedChange(Helpers.TcpGamespeed tcpspeed)
 		{
             Logging.Info("gamespeedchange...");
             int type = (int)tcpspeed.Data.GetValue("type");
@@ -118,6 +124,7 @@ namespace Multiplayer.Networking
                 GameSettings.GameSpeed = speed;
 				//HUD.Instance.GameSpeed = (int)speed;
 			}
+            OnServerChatRecieved(new Helpers.TcpServerChat($"The gamespeed has been changed to {speed}", Helpers.TcpServerChatType.Info));
         }
 
 		static void OnServerResponse(Helpers.TcpResponse response)
@@ -155,19 +162,6 @@ namespace Multiplayer.Networking
 				}
 			}
 		}
-
-        static void OnChatReceived(Helpers.TcpChat chat)
-		{
-            Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
-            if (sender == null)
-                sender = new Helpers.User() { Username = "Server" };
-            Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
-            if (chatMessages.Count == 6)
-                chatMessages.RemoveAt(0);
-            chatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}\n");
-            chatWindow.text = string.Join("\n", chatMessages);
-        }
-
         static void OnGameWorldReceived(Helpers.TcpGameWorld world)
 		{
             GameWorld.World changes = (GameWorld.World)world.Data.GetValue("changes");
@@ -199,9 +193,9 @@ namespace Multiplayer.Networking
             }
             Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
             client.Send(chatmsg.Serialize());
-            if (chatMessages.Count == 6)
+            if (chatMessages.Count == 18)
                 chatMessages.RemoveAt(0);
-            chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}\n");
+            chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}");
             chatWindow.text = string.Join("\n", chatMessages);
         }
 
@@ -222,7 +216,6 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Sending gamespeed");
             client.Send(speed.Serialize());
 		}
-
 		#endregion
 
 		public static void Disconnect()
@@ -232,6 +225,11 @@ namespace Multiplayer.Networking
                 Logging.Warn("[Client] You can't disconnect a client that isn't connected...");
                 return;
 			}
+            if(!chatMessages.Contains($"<color=orange>The server has been stopped and you have been disconnected from it.</color>"))
+            {
+                OnServerChatRecieved(new Helpers.TcpServerChat("You've disconnected from the server. Probably because the server stopped.", Helpers.TcpServerChatType.Error));
+            }
+            CreateChatLogFile();
             client.Disconnect();
 		}
 	}
