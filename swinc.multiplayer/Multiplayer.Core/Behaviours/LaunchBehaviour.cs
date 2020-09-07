@@ -78,8 +78,8 @@ namespace Multiplayer.Core
             foreach (GameObject copye in copy)
             {
                 ActiveObjects.Remove(copye);
-            } 
-            if(Networking.Client.Connected)
+            }
+            if (Networking.Client.Connected)
             {
                 Networking.Client.Disconnect();
             }

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Multiplayer.Debugging;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Multiplayer.Debugging;
 
 namespace Multiplayer.Networking
 {
@@ -16,7 +16,7 @@ namespace Multiplayer.Networking
         public int Difficulty;
         public GameWorld.Server Gameworld;
         public GameTime Gametime;
-        string serverpath;
+        private string serverpath;
 
         /// <summary>
         /// Creates a new ServerData based on the ServerClass.Instance

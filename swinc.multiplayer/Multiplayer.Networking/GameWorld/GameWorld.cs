@@ -1,370 +1,369 @@
 ﻿using Multiplayer.Debugging;
 using System;
 using System.Collections.Generic;
-using System.Security.Permissions;
 
 namespace Multiplayer.Networking
 {
-	namespace GameWorld
-	{
-		[Serializable]
-		public class World
-		{
-			public SDateTime dateTime;
-			public List<Helpers.UserCompany> UserCompanies = new List<Helpers.UserCompany>();
-			public List<Company> AICompanies = new List<Company>();
-			public List<StockMarket> StockMarkets = new List<StockMarket>();
-			public List<SoftwareProduct> SoftwareProducts = new List<SoftwareProduct>();
+    namespace GameWorld
+    {
+        [Serializable]
+        public class World
+        {
+            public SDateTime dateTime;
+            public List<Helpers.UserCompany> UserCompanies = new List<Helpers.UserCompany>();
+            public List<Company> AICompanies = new List<Company>();
+            public List<StockMarket> StockMarkets = new List<StockMarket>();
+            public List<SoftwareProduct> SoftwareProducts = new List<SoftwareProduct>();
 
-			public void UpdateData(World content, bool addition)
-			{
-				Logging.Info($"[GameWorld] UpdateData({addition})");
-				try
-				{
-					if (addition)
-					{
-						UserCompanies.AddRange(content.UserCompanies);
-						AICompanies.AddRange(content.AICompanies);
-						StockMarkets.AddRange(content.StockMarkets);
-						SoftwareProducts.AddRange(content.SoftwareProducts);
-					}
-					else
-					{
-						foreach (Helpers.UserCompany c in content.UserCompanies)
-							UserCompanies.RemoveAll(x => x.ID == c.ID);
-						foreach (Company c in content.AICompanies)
-							AICompanies.RemoveAll(x => x.ID == c.ID);
-						foreach (StockMarket s in content.StockMarkets)
-							StockMarkets.RemoveAll(x => x.Name == s.Name);
-						foreach (SoftwareProduct s in content.SoftwareProducts)
-							SoftwareProducts.RemoveAll(x => x.Name == s.Name);
-					}
-				}
-				catch(Exception ex)
-				{
-					Logging.Error(ex.Message);
-				}
-				
-				Logging.Info($"[GameWorld] UpdateData() done");
-			}
+            public void UpdateData(World content, bool addition)
+            {
+                Logging.Info($"[GameWorld] UpdateData({addition})");
+                try
+                {
+                    if (addition)
+                    {
+                        UserCompanies.AddRange(content.UserCompanies);
+                        AICompanies.AddRange(content.AICompanies);
+                        StockMarkets.AddRange(content.StockMarkets);
+                        SoftwareProducts.AddRange(content.SoftwareProducts);
+                    }
+                    else
+                    {
+                        foreach (Helpers.UserCompany c in content.UserCompanies)
+                            UserCompanies.RemoveAll(x => x.ID == c.ID);
+                        foreach (Company c in content.AICompanies)
+                            AICompanies.RemoveAll(x => x.ID == c.ID);
+                        foreach (StockMarket s in content.StockMarkets)
+                            StockMarkets.RemoveAll(x => x.Name == s.Name);
+                        foreach (SoftwareProduct s in content.SoftwareProducts)
+                            SoftwareProducts.RemoveAll(x => x.Name == s.Name);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logging.Error(ex.Message);
+                }
 
-			/// <summary>
-			/// Refreshs the ingame data
-			/// </summary>
-			public void RefreshData()
-			{
-				Logging.Info("[GameWorld] Refreshing data");
-				Logging.Info($"[GameWorld]", $"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
-				//Clear all stuff from the client first
-				GameSettings.Instance.StockMarkets.Clear();
-				//MarketSimulation.Active.Companies.Clear();
-				List<Company> tmpcompanies = new List<Company>();
-				tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
-				foreach(Company c in tmpcompanies)
-					if(!c.Player)
-						MarketSimulation.Active.RemoveCompany(c);
+                Logging.Info($"[GameWorld] UpdateData() done");
+            }
 
-				GameSettings.Instance.StockMarkets.AddRange(StockMarkets); //Add stockmarkets
-				MarketSimulation.Active.FixStocks();
-				foreach (Company c in AICompanies)
-					MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
-				foreach (Helpers.UserCompany c in UserCompanies)
-					if(!c.Player)
-						MarketSimulation.Active.AddCompany(c.OwnerCompany, true); //Add User Companies
-			}
-		}
+            /// <summary>
+            /// Refreshs the ingame data
+            /// </summary>
+            public void RefreshData()
+            {
+                Logging.Info("[GameWorld] Refreshing data");
+                Logging.Info($"[GameWorld]", $"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
+                //Clear all stuff from the client first
+                GameSettings.Instance.StockMarkets.Clear();
+                //MarketSimulation.Active.Companies.Clear();
+                List<Company> tmpcompanies = new List<Company>();
+                tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
+                foreach (Company c in tmpcompanies)
+                    if (!c.Player)
+                        MarketSimulation.Active.RemoveCompany(c);
 
-		[Serializable]
-		public class Server : IDisposable
-		{
-			public static Server Instance;
+                GameSettings.Instance.StockMarkets.AddRange(StockMarkets); //Add stockmarkets
+                MarketSimulation.Active.FixStocks();
+                foreach (Company c in AICompanies)
+                    MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
+                foreach (Helpers.UserCompany c in UserCompanies)
+                    if (!c.Player)
+                        MarketSimulation.Active.AddCompany(c.OwnerCompany, true); //Add User Companies
+            }
+        }
 
-			public World world = new World();
-			public World oldworld = new World(); //When the world is updated save the old world to see what did change and only send the changed stuff
-			private bool disposedValue;
+        [Serializable]
+        public class Server : IDisposable
+        {
+            public static Server Instance;
 
-			public Server()
-			{
-				Instance = this;
-				TimeOfDay.OnDayPassed += UpdateClients;
+            public World world = new World();
+            public World oldworld = new World(); //When the world is updated save the old world to see what did change and only send the changed stuff
+            private bool disposedValue;
 
-				//Create World
-				if (Networking.Server.hasAI)
-				{
-					Logging.Info("[GameWorld] Populate Gameworld with AI companies");
-					foreach (KeyValuePair<uint, SimulatedCompany> c in MarketSimulation.Active.Companies)
-					{
-						c.Value.Autonomous = false; //Sets the AI companies to do nothing, should be in client only
-						try
-						{
+            public Server()
+            {
+                Instance = this;
+                TimeOfDay.OnDayPassed += UpdateClients;
 
-							world.AICompanies.Add(c.Value);
-						}
-						catch(Exception ex)
-						{
-							Logging.Error(ex.Message, ex.StackTrace);
-						}
-					}
+                //Create World
+                if (Networking.Server.hasAI)
+                {
+                    Logging.Info("[GameWorld] Populate Gameworld with AI companies");
+                    foreach (KeyValuePair<uint, SimulatedCompany> c in MarketSimulation.Active.Companies)
+                    {
+                        c.Value.Autonomous = false; //Sets the AI companies to do nothing, should be in client only
+                        try
+                        {
 
-				}
-				else
-				{
-					Logging.Info("[GameWorld] Removing all AI companies");
-					List<Company> tmpcompanies = new List<Company>();
-					tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
-					foreach (Company c in tmpcompanies)
-						if (!c.Player)
-							MarketSimulation.Active.RemoveCompany(c);
-				}
-			}
+                            world.AICompanies.Add(c.Value);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logging.Error(ex.Message, ex.StackTrace);
+                        }
+                    }
 
-			private void UpdateClients(object sender, EventArgs e)
-			{
-				if (oldworld != null)
-				{
-					Logging.Info("[GameWorld] Updating GameWorld");
-					SendGameWorldChanges();
-				}
-				else
-				{
-					Logging.Info("[GameWorld] Sending GameWorld because oldworld is null!");
-					Helpers.TcpGameWorld gwm = new Helpers.TcpGameWorld(world, true);
-					Networking.Server.Send(gwm);
-				}
+                }
+                else
+                {
+                    Logging.Info("[GameWorld] Removing all AI companies");
+                    List<Company> tmpcompanies = new List<Company>();
+                    tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
+                    foreach (Company c in tmpcompanies)
+                        if (!c.Player)
+                            MarketSimulation.Active.RemoveCompany(c);
+                }
+            }
 
-				oldworld = world; //Set oldworld to world to see if anything did change
-			}
+            private void UpdateClients(object sender, EventArgs e)
+            {
+                if (oldworld != null)
+                {
+                    Logging.Info("[GameWorld] Updating GameWorld");
+                    SendGameWorldChanges();
+                }
+                else
+                {
+                    Logging.Info("[GameWorld] Sending GameWorld because oldworld is null!");
+                    Helpers.TcpGameWorld gwm = new Helpers.TcpGameWorld(world, true);
+                    Networking.Server.Send(gwm);
+                }
 
-			public void UpdateClient(Helpers.User user)
-			{
-				if (user == null)
-				{
-					Logging.Error("User is null =(");
-					return;
-				}
-				Logging.Info("[GameWorld] Updating Client " + user.Username);
-				SendGameWorldChanges(user);
-			}
+                oldworld = world; //Set oldworld to world to see if anything did change
+            }
 
-			void SendGameWorldChanges(params Helpers.User[] users)
-			{
-				try 
-				{
-					Helpers.TcpGameWorld add = new Helpers.TcpGameWorld(CompareWorlds(true), true);
-					Helpers.TcpGameWorld remove = new Helpers.TcpGameWorld(CompareWorlds(false), false);
+            public void UpdateClient(Helpers.User user)
+            {
+                if (user == null)
+                {
+                    Logging.Error("User is null =(");
+                    return;
+                }
+                Logging.Info("[GameWorld] Updating Client " + user.Username);
+                SendGameWorldChanges(user);
+            }
 
-					Logging.Info("[Debug] SendGameWorldChanges() => Add: " + add.Serialize().Length + " Remove: " + remove.Serialize().Length);
+            private void SendGameWorldChanges(params Helpers.User[] users)
+            {
+                try
+                {
+                    Helpers.TcpGameWorld add = new Helpers.TcpGameWorld(CompareWorlds(true), true);
+                    Helpers.TcpGameWorld remove = new Helpers.TcpGameWorld(CompareWorlds(false), false);
 
-					if (users.Length < 1)
-					{
-						//If users aren't set, it will send it to all users connected to the server
-						foreach (Helpers.User u in Networking.Server.Users.ToArray())
-						{
-							Networking.Server.Send(u.ID, add);
-							Networking.Server.Send(u.ID, remove);
-						}
-						return;
-					}
+                    Logging.Info("[Debug] SendGameWorldChanges() => Add: " + add.Serialize().Length + " Remove: " + remove.Serialize().Length);
 
-					foreach (Helpers.User user in users)
-					{
-						Networking.Server.Send(user.ID, add);
-						Networking.Server.Send(user.ID, remove);
-					}
+                    if (users.Length < 1)
+                    {
+                        //If users aren't set, it will send it to all users connected to the server
+                        foreach (Helpers.User u in Networking.Server.Users.ToArray())
+                        {
+                            Networking.Server.Send(u.ID, add);
+                            Networking.Server.Send(u.ID, remove);
+                        }
+                        return;
+                    }
 
-				}
-				catch(Exception ex)
-				{
-					Logging.Error(ex.Message, ex.StackTrace);
-				}
-				
-			}
+                    foreach (Helpers.User user in users)
+                    {
+                        Networking.Server.Send(user.ID, add);
+                        Networking.Server.Send(user.ID, remove);
+                    }
 
-			/// <summary>
-			/// Compares the 'world' gameworld with the 'oldworld gameworld and checks if there is any differences.
-			/// If isAdded is false it will check if 'world' has anything removed compared to 'oldworld'
-			/// </summary>
-			/// <param name="isAdded">If is true (default) it will check if there are any things added into the 'world', if false it will check if there are things removed in the 'world'</param>
-			/// <returns>A World object with the changes</returns>
-			private World CompareWorlds(bool isAdded)
-			{
-				World tmpworld = new World();
+                }
+                catch (Exception ex)
+                {
+                    Logging.Error(ex.Message, ex.StackTrace);
+                }
 
-				if(oldworld == null)
-				{
-					Logging.Warn("[GameWorld] oldworld is null but CompareWorlds() is called!");
-					return world;
-				}
+            }
 
-				//Compare dateTime (Do this with Added & Removed ones. Will probably change it in the future to sync the gametime
-				if (world.dateTime != oldworld.dateTime)
-				{
-					tmpworld.dateTime = world.dateTime;
-				}
+            /// <summary>
+            /// Compares the 'world' gameworld with the 'oldworld gameworld and checks if there is any differences.
+            /// If isAdded is false it will check if 'world' has anything removed compared to 'oldworld'
+            /// </summary>
+            /// <param name="isAdded">If is true (default) it will check if there are any things added into the 'world', if false it will check if there are things removed in the 'world'</param>
+            /// <returns>A World object with the changes</returns>
+            private World CompareWorlds(bool isAdded)
+            {
+                World tmpworld = new World();
 
-				//CHECK IF SOMETHING WAS REMOVED AND RETURN THE TMPWORLD WITH THE REMOVED CONTENT
-				if (!isAdded)
-				{
-					Logging.Info("[GameWorld] Check if something was removed from servers gameworld");
-					foreach (Helpers.UserCompany c in oldworld.UserCompanies)
-						if (!world.UserCompanies.Contains(c))
-							tmpworld.UserCompanies.Add(c);
+                if (oldworld == null)
+                {
+                    Logging.Warn("[GameWorld] oldworld is null but CompareWorlds() is called!");
+                    return world;
+                }
 
-					foreach (Company c in oldworld.AICompanies)
-						if (!world.AICompanies.Contains(c))
-							tmpworld.AICompanies.Add(c);
+                //Compare dateTime (Do this with Added & Removed ones. Will probably change it in the future to sync the gametime
+                if (world.dateTime != oldworld.dateTime)
+                {
+                    tmpworld.dateTime = world.dateTime;
+                }
 
-					foreach (StockMarket s in oldworld.StockMarkets)
-						if (!world.StockMarkets.Contains(s))
-							tmpworld.StockMarkets.Add(s);
+                //CHECK IF SOMETHING WAS REMOVED AND RETURN THE TMPWORLD WITH THE REMOVED CONTENT
+                if (!isAdded)
+                {
+                    Logging.Info("[GameWorld] Check if something was removed from servers gameworld");
+                    foreach (Helpers.UserCompany c in oldworld.UserCompanies)
+                        if (!world.UserCompanies.Contains(c))
+                            tmpworld.UserCompanies.Add(c);
 
-					Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were removed");
-					return tmpworld;
-				}
+                    foreach (Company c in oldworld.AICompanies)
+                        if (!world.AICompanies.Contains(c))
+                            tmpworld.AICompanies.Add(c);
 
-				//ELSE CHECK IF SOMETHING WAS ADDED
-				Logging.Info("[GameWorld] Check if something was added to servers gameworld");
+                    foreach (StockMarket s in oldworld.StockMarkets)
+                        if (!world.StockMarkets.Contains(s))
+                            tmpworld.StockMarkets.Add(s);
 
-				//Compare UserCompanies
-				foreach (Helpers.UserCompany c in world.UserCompanies)
-				{
-					if (!oldworld.UserCompanies.Contains(c))
-						tmpworld.UserCompanies.Add(c);
-				}
-				//Compare AICompanies
-				foreach (Company c in world.AICompanies)
-				{
-					if (!oldworld.AICompanies.Contains(c))
-						tmpworld.AICompanies.Add(c);
-				}
-				//Compare Stocks
-				foreach (StockMarket s in world.StockMarkets)
-				{
-					if (!oldworld.StockMarkets.Contains(s))
-						tmpworld.StockMarkets.Add(s);
-				}
-				Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were added");
-				return tmpworld;
-			}
+                    Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were removed");
+                    return tmpworld;
+                }
 
-			public void UpdateWorld(World servercontent, bool adds)
-			{
-				if (adds)
-				{
-					Logging.Info("[GameWorld] Will add new content to the clients GameWorld");
-					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
-					Networking.Server.Send(gwc);
-				}
-				else
-				{
-					Logging.Info("[GameWorld] Will remove content from the clients GameWorld");
-					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
-					Networking.Server.Send(gwc);
-				}
-			}
+                //ELSE CHECK IF SOMETHING WAS ADDED
+                Logging.Info("[GameWorld] Check if something was added to servers gameworld");
 
-			public void UpdateLocalWorld(World servercontent, bool adds)
-			{
-				if (adds)
-				{
-					Logging.Info("[GameWorld] Will add new content to the servers GameWorld");
-					world.UpdateData(servercontent, adds);
-					world.RefreshData();
-				}
-				else
-				{
-					Logging.Info("[GameWorld] Will remove content from the servers GameWorld");
-					world.UpdateData(servercontent, adds);
-					world.RefreshData();
-				}
-			}
+                //Compare UserCompanies
+                foreach (Helpers.UserCompany c in world.UserCompanies)
+                {
+                    if (!oldworld.UserCompanies.Contains(c))
+                        tmpworld.UserCompanies.Add(c);
+                }
+                //Compare AICompanies
+                foreach (Company c in world.AICompanies)
+                {
+                    if (!oldworld.AICompanies.Contains(c))
+                        tmpworld.AICompanies.Add(c);
+                }
+                //Compare Stocks
+                foreach (StockMarket s in world.StockMarkets)
+                {
+                    if (!oldworld.StockMarkets.Contains(s))
+                        tmpworld.StockMarkets.Add(s);
+                }
+                Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were added");
+                return tmpworld;
+            }
 
-			protected virtual void Dispose(bool disposing)
-			{
-				if (!disposedValue)
-				{
-					if (disposing)
-					{
-						TimeOfDay.OnDayPassed -= UpdateClients;
-					}
-					disposedValue = true;
-				}
-			}
+            public void UpdateWorld(World servercontent, bool adds)
+            {
+                if (adds)
+                {
+                    Logging.Info("[GameWorld] Will add new content to the clients GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
+                    Networking.Server.Send(gwc);
+                }
+                else
+                {
+                    Logging.Info("[GameWorld] Will remove content from the clients GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
+                    Networking.Server.Send(gwc);
+                }
+            }
 
-			public void Dispose()
-			{
-				Dispose(disposing: true);
-				GC.SuppressFinalize(this);
-			}
-		}
+            public void UpdateLocalWorld(World servercontent, bool adds)
+            {
+                if (adds)
+                {
+                    Logging.Info("[GameWorld] Will add new content to the servers GameWorld");
+                    world.UpdateData(servercontent, adds);
+                    world.RefreshData();
+                }
+                else
+                {
+                    Logging.Info("[GameWorld] Will remove content from the servers GameWorld");
+                    world.UpdateData(servercontent, adds);
+                    world.RefreshData();
+                }
+            }
 
-		[Serializable]
-		public class Client : IDisposable
-		{
-			public static Client Instance;
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        TimeOfDay.OnDayPassed -= UpdateClients;
+                    }
+                    disposedValue = true;
+                }
+            }
 
-			public World world = new World();
-			private bool disposedValue;
+            public void Dispose()
+            {
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
+            }
+        }
 
-			public Client(World gworld = null)
-			{
-				if (gworld == null)
-					world = new World();
-				else
-					world = gworld;
+        [Serializable]
+        public class Client : IDisposable
+        {
+            public static Client Instance;
 
-				Instance = this;
-			}
+            public World world = new World();
+            private bool disposedValue;
 
-			public void UpdateWorld(World servercontent, bool adds)
-			{
-				if (adds)
-				{
-					Logging.Info("[GameWorld] Will add new content to the GameWorld");
-					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
-					Networking.Client.Send(gwc);
-				}
-				else
-				{
-					Logging.Info("[GameWorld] Will remove content from the GameWorld");
-					Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
-					Networking.Client.Send(gwc);
-				}
-			}
+            public Client(World gworld = null)
+            {
+                if (gworld == null)
+                    world = new World();
+                else
+                    world = gworld;
 
-			public void UpdateLocalWorld(World servercontent, bool adds)
-			{
-				if (adds)
-				{
-					Logging.Info("[GameWorld] Client will add new content to the local GameWorld");
-					world.UpdateData(servercontent, adds);
-					world.RefreshData();
-				}
-				else
-				{
-					Logging.Info("[GameWorld] Client will remove content from the local GameWorld");
-					world.UpdateData(servercontent, adds);
-					world.RefreshData();
-				}
-			}
+                Instance = this;
+            }
 
-			protected virtual void Dispose(bool disposing)
-			{
-				if (!disposedValue)
-				{
-					if (disposing)
-					{
-						
-					}
-					disposedValue = true;
-				}
-			}
+            public void UpdateWorld(World servercontent, bool adds)
+            {
+                if (adds)
+                {
+                    Logging.Info("[GameWorld] Will add new content to the GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
+                    Networking.Client.Send(gwc);
+                }
+                else
+                {
+                    Logging.Info("[GameWorld] Will remove content from the GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
+                    Networking.Client.Send(gwc);
+                }
+            }
 
-			public void Dispose()
-			{
-				Dispose(disposing: true);
-				GC.SuppressFinalize(this);
-			}
-		}
-	}
+            public void UpdateLocalWorld(World servercontent, bool adds)
+            {
+                if (adds)
+                {
+                    Logging.Info("[GameWorld] Client will add new content to the local GameWorld");
+                    world.UpdateData(servercontent, adds);
+                    world.RefreshData();
+                }
+                else
+                {
+                    Logging.Info("[GameWorld] Client will remove content from the local GameWorld");
+                    world.UpdateData(servercontent, adds);
+                    world.RefreshData();
+                }
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+
+                    }
+                    disposedValue = true;
+                }
+            }
+
+            public void Dispose()
+            {
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
+            }
+        }
+    }
 }

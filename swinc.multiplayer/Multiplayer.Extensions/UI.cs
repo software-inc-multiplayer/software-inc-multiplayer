@@ -37,7 +37,7 @@ namespace Multiplayer.Extensions
         }
         public static void AddBulk<T>(this List<T> list, params T[] bulkToAdd)
         {
-            foreach(T a in bulkToAdd)
+            foreach (T a in bulkToAdd)
             {
                 list.Add(a);
             }

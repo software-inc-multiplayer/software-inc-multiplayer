@@ -3,25 +3,25 @@ using Multiplayer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine.UI;
 
 namespace Multiplayer.Networking
 {
     public static partial class Client
     {
-        public static string LogFilesPath { get
+        public static string LogFilesPath
+        {
+            get
             {
                 string path = "";
-                foreach(ModController.DLLMod mod in ModController.Instance.Mods)
+                foreach (ModController.DLLMod mod in ModController.Instance.Mods)
                 {
                     if (mod.Meta.Name != "Software Inc Multiplayer") continue;
                     path = Path.Combine(mod.ModPath, "Logs");
                 }
                 return path;
-            } }
+            }
+        }
         public static Text chatWindow { get; set; }
         public static List<string> chatMessages { get; set; }
         public static List<string> chatLogMessages { get; set; }
@@ -35,7 +35,7 @@ namespace Multiplayer.Networking
             if (chatMessages.Count == 18)
                 chatMessages.RemoveAt(0);
             string color = "";
-            switch((Helpers.TcpServerChatType) tcpServerChat.Data.GetValue("type"))
+            switch ((Helpers.TcpServerChatType)tcpServerChat.Data.GetValue("type"))
             {
                 case Helpers.TcpServerChatType.Error:
                     color = "red";
@@ -51,7 +51,8 @@ namespace Multiplayer.Networking
             chatLogMessages.Add($"[Server] [{DateTime.Now.ToString()}] [{Enum.GetName(typeof(Helpers.TcpServerChatType), (Helpers.TcpServerChatType)tcpServerChat.Data.GetValue("type"))}] {(string)tcpServerChat.Data.GetValue("message")}");
             chatWindow.text = string.Join("\n", chatMessages);
         }
-        static void OnChatReceived(Helpers.TcpChat chat)
+
+        private static void OnChatReceived(Helpers.TcpChat chat)
         {
             Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
             if (sender == null)

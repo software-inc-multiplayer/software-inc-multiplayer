@@ -253,6 +253,9 @@
     <Compile Include="Utils\UItils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Multiplayer.Debugging\Multiplayer.Debugging.csproj">
       <Project>{3ba2b696-5228-429f-8fff-fbf6ca7a5303}</Project>
       <Name>Multiplayer.Debugging</Name>
@@ -266,9 +269,5 @@
       <Name>Multiplayer.Networking</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

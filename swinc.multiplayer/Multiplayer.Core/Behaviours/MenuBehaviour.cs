@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -15,7 +10,7 @@ namespace Multiplayer.Core
         public override void OnActivate()
         {
             SceneManager.sceneLoaded += OnScene;
-            if(SceneManager.GetActiveScene().name == "MainMenu")
+            if (SceneManager.GetActiveScene().name == "MainMenu")
             {
                 ModifyText();
             }

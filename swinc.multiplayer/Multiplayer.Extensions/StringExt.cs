@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Multiplayer.Extensions
@@ -21,7 +17,7 @@ namespace Multiplayer.Extensions
         }
         public static string SetStringVariable(this string str, string varName, string toSet)
         {
-            return str.Replace($"%{varName}%", toSet);           
+            return str.Replace($"%{varName}%", toSet);
         }
     }
 }

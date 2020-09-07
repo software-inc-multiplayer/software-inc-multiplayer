@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Multiplayer.Debugging
 {
@@ -69,7 +65,7 @@ namespace Multiplayer.Debugging
         }
         public static void Debug(params object[] obj)
         {
-            foreach(object e in obj)
+            foreach (object e in obj)
             {
                 DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
@@ -77,15 +73,15 @@ namespace Multiplayer.Debugging
         }
         public static void Info(params object[] obj)
         {
-            foreach(object e in obj)
-            {             
+            foreach (object e in obj)
+            {
                 DevConsole.Console.LogInfo(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
             }
         }
         public static void Warn(params object[] obj)
         {
-            foreach(object e in obj)
+            foreach (object e in obj)
             {
                 DevConsole.Console.LogWarning(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
@@ -93,7 +89,7 @@ namespace Multiplayer.Debugging
         }
         public static void Error(params object[] obj)
         {
-            foreach(object e in obj)
+            foreach (object e in obj)
             {
                 DevConsole.Console.LogError(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
