@@ -65,8 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
-    <Compile Include="Server\GameTime.cs" />
-    <Compile Include="Server\GameWorld.cs" />
+    <Compile Include="Client\Chat.cs" />
+    <Compile Include="GameWorld\GameTime.cs" />
+    <Compile Include="GameWorld\GameWorld.cs" />
     <Compile Include="Server\Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
@@ -78,6 +79,16 @@
       <Project>{3ba2b696-5228-429f-8fff-fbf6ca7a5303}</Project>
       <Name>Multiplayer.Debugging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Multiplayer.Extensions\Multiplayer.Extensions.csproj">
+      <Project>{816FE3F3-50EF-44A7-A54A-F2EE0346E9F8}</Project>
+      <Name>Multiplayer.Extensions</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameWorld\ClientGameWorld.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameWorld\ServerGameWorld.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Multiplayer.Networking
 {
-	public static class Server
+	public static partial class Server
     {
         public static List<Helpers.User> Users = new List<Helpers.User>();
         public static string ServerName = "My Server";
@@ -15,7 +15,7 @@ namespace Multiplayer.Networking
         public static int Difficulty;
         public static bool hasAI = false;
         public static Telepathy.Server server = new Telepathy.Server();
-        public static ServerData serverdata = new ServerData("test");
+        public static ServerData Serverdata { get; set; }
         public static bool isRunning = false;
         public static bool Runs { get { return isRunning; } }
 
@@ -34,13 +34,14 @@ namespace Multiplayer.Networking
                 WindowManager.SpawnDialog("You can't start the server because its already active!", true, DialogWindow.DialogType.Warning);
                 return;
 			}
+            Serverdata = new ServerData(port.ToString());
             Port = port;
             Difficulty = GameSettings.Instance.Difficulty;
             Logging.Info("[Server] Start listening on Port " + port);
             server.MaxMessageSize = int.MaxValue;
             server.Start(port);
             isRunning = true;
-            serverdata.UpdateServer();
+            Serverdata.UpdateServer();
             Read();
         }
 
@@ -119,21 +120,6 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Sending response to client " + clientid);
             //server.Send(clientid, response.ToArray());
             server.Send(clientid, response.Serialize());
-        }
-
-        public static void Send(int clientid, Helpers.TcpGameWorld changes)
-        {
-            Logging.Info("[Server] Sending GameWorldChanges to client " + clientid + " => " + (bool)changes.Data.GetValue("addition"));
-            server.Send(clientid, changes.Serialize());
-        }
-
-        public static void Send(Helpers.TcpGameWorld changes)
-        {
-            Logging.Info("[Server] Sending GameWorldChanges to all clients");
-            foreach(Helpers.User user in Users)
-			{
-                server.Send(user.ID, changes.Serialize());
-			}
         }
 
         public static void Send(int clientid, Helpers.TcpChat message)
@@ -293,7 +279,7 @@ namespace Multiplayer.Networking
 			}
             Logging.Info("[Server] Stop listening");
             isRunning = false;
-            serverdata.SaveData(null, null);
+            Serverdata.SaveData(null, null);
             server.Stop();
             Users.Clear();
 		}
