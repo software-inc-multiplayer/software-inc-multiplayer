@@ -31,7 +31,7 @@ namespace Multiplayer.Networking
             if(server.Active)
 			{
                 Logging.Warn("[Server] You can't start the server because its already active!");
-                WindowManager.SpawnDialog("You can't start the server because its already active!", true, DialogWindow.DialogType.Warning);
+                //WindowManager.SpawnDialog("You can't start the server because its already active!", true, DialogWindow.DialogType.Warning);
                 return;
 			}
             Serverdata = new ServerData(port.ToString());
@@ -108,6 +108,15 @@ namespace Multiplayer.Networking
         }
 
 		#region Messages
+        public static void Send(Helpers.TcpServerChat tcpServerChat)
+        {
+            Logging.Info("[Server] Sending server wide message: " + (string)tcpServerChat.Data.GetValue("message"));
+            foreach(Helpers.User user in Users)
+            {
+                server.Send(user.ID, tcpServerChat.Serialize());
+            }
+        }
+
         public static void Send(int clientid, Helpers.TcpRequest request)
 		{
             Logging.Info("[Server] Sending request to client " + clientid);
@@ -214,6 +223,7 @@ namespace Multiplayer.Networking
                     Username = (string)login.Data.GetValue("username")
                 });
                 Logging.Info($"[Server] User {(string)login.Data.GetValue("username")} logged in!");
+                Send(new Helpers.TcpServerChat($"{(string)login.Data.GetValue("username")} has joined the server.", Helpers.TcpServerChatType.Info));
                 return;
             }
             else
@@ -270,13 +280,14 @@ namespace Multiplayer.Networking
         /// <summary>
         /// Stops the Server
         /// </summary>
-        public static void Stop()
+        public static async void Stop()
 		{
             if(!isRunning)
 			{
                 Logging.Warn("[Server] Can't stop a Server that isn't running...");
                 return;
 			}
+            await Task.Run(() => Send(new Helpers.TcpServerChat($"The server has been stopped and you have been disconnected from it.", Helpers.TcpServerChatType.Warn)));
             Logging.Info("[Server] Stop listening");
             isRunning = false;
             Serverdata.SaveData(null, null);
@@ -290,7 +301,8 @@ namespace Multiplayer.Networking
         public static void Save()
 		{
             OnSavingServer?.Invoke(null, null);
-		}
+            Send(new Helpers.TcpServerChat($"Saved server.", Helpers.TcpServerChatType.Info));
+        }
 
         /// <summary>
         /// Returns the user with the ID id

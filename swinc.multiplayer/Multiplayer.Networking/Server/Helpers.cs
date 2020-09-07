@@ -270,6 +270,34 @@ namespace Multiplayer.Networking
 			}
 		}
 
+		public enum TcpServerChatType
+		{
+			Info,
+			Error,
+			Warn,
+		}
+
+		[Serializable]
+		public class TcpServerChat : TcpMessage
+		{
+			public TcpServerChat() { }
+			public TcpServerChat(string message, TcpServerChatType type)
+			{
+				Header = "serverchat";
+				Data.Add("message", message);
+				Data.Add("type", type);
+			}
+			public override byte[] Serialize()
+			{
+				return Helpers.Serialize(this);
+			}
+
+			new public static TcpServerChat Deserialize(byte[] array)
+			{
+				return Helpers.Deserialize<TcpServerChat>(array);
+			}
+		}
+
 		[Serializable]
 		public class TcpChat : TcpMessage
 		{

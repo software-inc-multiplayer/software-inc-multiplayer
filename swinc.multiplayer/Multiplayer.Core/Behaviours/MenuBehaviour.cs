@@ -33,10 +33,9 @@ namespace Multiplayer.Core
         private void ModifyText()
         {
             OldText = Versioning.SimpleVersionString;
-            string newText = "Multiplayer Mod v0.3.1-closed - " + OldText.Replace(",", "");
+            string newText = "Multiplayer Mod v0.3.2-closed - " + OldText.Replace(",", "");
             WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = newText;
             RectTransform tran = WindowManager.FindElementPath("MainPanel/Text[2]");
-            tran.localPosition += Vector3.left;
         }
 
         public override void OnDeactivate()
