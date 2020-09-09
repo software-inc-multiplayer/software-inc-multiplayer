@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Client\Client.cs" />
     <Compile Include="Client\Chat.cs" />
+    <Compile Include="Client\PrivateMessages.cs" />
     <Compile Include="GameWorld\GameTime.cs" />
     <Compile Include="GameWorld\GameWorld.cs" />
     <Compile Include="Server\Helpers.cs" />

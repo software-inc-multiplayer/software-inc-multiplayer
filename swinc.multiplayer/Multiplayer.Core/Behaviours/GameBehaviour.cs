@@ -3,6 +3,7 @@ using Multiplayer.Extensions;
 using Multiplayer.Networking;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,13 +15,32 @@ namespace Multiplayer.Core
         public Button MPButton { get; set; }
         public int PreviousCount { get; set; }
         public GUIWindow MPWindow { get; set; }
-        public Text ChatWindow { get; set; }
+        public Utils.Controls.Element.UITextbox ChatInput { get; set; }
+        public Text CommandTooltip { get; set; }
         public override void OnActivate()
         {
             SceneManager.sceneLoaded += OnScene;
             if (SceneManager.GetActiveScene().name == "MainScene")
             {
                 CreateButton();
+            }
+            ChatLoop();
+        }
+
+        public void ChatLoop()
+        {
+            while(isActiveAndEnabled)
+            {
+                if (Client.ChatWindow || CommandTooltip == null) continue;
+                if(ChatInput.obj.text.Trim()[0].Equals("/"))
+                {
+                    if (CommandTooltip.text == "For a full list of commands, see the wiki.") continue;
+                    CommandTooltip.text = "For a full list of commands, see the wiki.";
+                } else
+                {
+                    if (CommandTooltip.text == "") continue;
+                    CommandTooltip.text = "";
+                }
             }
         }
 
@@ -243,10 +263,13 @@ namespace Multiplayer.Core
                 WindowManager.SpawnDialog("ComingSoon".LocDef("Coming soon!"), true, DialogWindow.DialogType.Error);
             }, MPWindow.MainPanel);
 
-            Client.chatWindow = WindowManager.SpawnLabel();
-            Client.chatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
-            MPWindow.AddElement(Client.chatWindow.gameObject, new Rect(30, 75, 670, 255), Rect.zero);
-            Utils.Controls.Element.UITextbox chatBox = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", null, 15, false);
+            Client.ChatWindow = WindowManager.SpawnLabel();
+            Client.ChatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
+            MPWindow.AddElement(Client.ChatWindow.gameObject, new Rect(30, 75, 670, 255), Rect.zero);
+            ChatInput = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", null, 15, false);
+            CommandTooltip = WindowManager.SpawnLabel();
+            CommandTooltip.text = "";
+            MPWindow.AddElement(CommandTooltip.gameObject, new Rect(30, 390 + 50, 471, 45), Rect.zero);
             Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(541, 390, 159, 45), () =>
             {
                 if (!Client.client.Connected)
@@ -254,13 +277,48 @@ namespace Multiplayer.Core
                     WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
                     return;
                 }
+                if(ChatInput.obj.text.StartsWith("/"))
+                {
+                    ParseChatCommand(ChatInput.obj.text);
+                    return;
+                }
                 var tmpUser = new Helpers.User();
                 tmpUser.Username = Client.Username;
-                Helpers.TcpChat chatClass = new Helpers.TcpChat(chatBox.obj.text, tmpUser);
-                chatBox.obj.text = "";
+                Helpers.TcpChat chatClass = new Helpers.TcpChat(ChatInput.obj.text, tmpUser);
+                ChatInput.obj.text = "";
                 Client.Send(chatClass);
             }, MPWindow.MainPanel);
             MPWindow.Show();
+        }
+
+        private void ParseChatCommand(string text)
+        {
+            if(text.StartsWith("/msg"))
+            {
+                try
+                {
+                    List<string> args = text.Split(" ".ToCharArray()).ToList();
+                    args.Remove("/msg");
+                    string username = args[0];                 
+                    args.Remove(username);                  
+                    string message = string.Join(" ", args.ToArray());
+                    Helpers.User rec = new Helpers.User()
+                    {
+                        Username = username
+                    };
+                    Helpers.User sender = new Helpers.User()
+                    {
+                        Username = Client.Username
+                    };
+                    Client.Send(new Helpers.TcpChat(message, rec, sender));
+                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"Sent private message to: {rec.Username}", Helpers.TcpServerChatType.Info));
+                    Logging.Info("[Commands] used /msg: " + message, rec.Username, sender.Username);
+                } catch (Exception e)
+                {
+                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"There was an error running the chat command: {text}{$"\nAre you sure you typed the command in correctly?\n\n{e}"}", Helpers.TcpServerChatType.Error));
+                }
+
+            }
         }
 
         public override void OnDeactivate()

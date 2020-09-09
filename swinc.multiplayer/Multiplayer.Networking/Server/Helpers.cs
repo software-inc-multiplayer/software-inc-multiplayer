@@ -300,40 +300,19 @@ namespace Multiplayer.Networking
         public class TcpChat : TcpMessage
         {
             public TcpChat() { }
-            public TcpChat(User receiver, string message, User sender = null)
+            public TcpChat(string message, User receiver, User sender)
             {
                 Header = "chat";
+                Data.Add("isPrivate", true);
                 Data.Add("sender", sender);
-                Data.Add("receiver", receiver.ID);
+                Data.Add("receiver", receiver);
                 Data.Add("message", message);
             }
-
-            public TcpChat(string receivername, string message)
-            {
-                Logging.Warn("[Helpers] TcpChat(receivername, message) is non functional!");
-            }
-
             public TcpChat(string message, User sender = null)
             {
                 Header = "chat";
                 Data.Add("sender", sender);
                 Data.Add("receiver", null);
-                Data.Add("message", message);
-            }
-
-            public TcpChat(int receiverid, string message, User sender = null)
-            {
-                Header = "chat";
-                Data.Add("sender", sender);
-                Data.Add("receiver", receiverid);
-                Data.Add("message", message);
-            }
-
-            public TcpChat(int receiverid, string message, int senderid)
-            {
-                Header = "chat";
-                Data.Add("sender", senderid);
-                Data.Add("receiver", receiverid);
                 Data.Add("message", message);
             }
 

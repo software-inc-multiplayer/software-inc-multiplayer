@@ -234,20 +234,19 @@ namespace Multiplayer.Networking
 
         private static void OnUserChat(int connectionid, Helpers.TcpChat chat)
         {
-            if (chat.Data.GetValue("receiver") == null)
+            if ((Helpers.User)chat.Data.GetValue("receiver") != null)
             {
-                //Send to all connected users
-                Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
-                foreach (Helpers.User u in Users)
-                    if (u.ID != connectionid)
-                        server.Send(u.ID, chat.Serialize());
-            }
-            else
-            {
+                Helpers.User user = GetUser(((Helpers.User)chat.Data.GetValue("receiver")).Username);
                 //Send to a receiver
-                Logging.Info($"[Server] User {connectionid} sends a chat to {(int)chat.Data.GetValue("receiver")}");
-                server.Send((int)chat.Data.GetValue("receiver"), chat.Serialize());
+                Logging.Info($"[Server] User {((Helpers.User)chat.Data.GetValue("sender")).Username} sends a chat to {user.Username}");
+                server.Send(user.ID, chat.Serialize());
+                return;
             }
+            //Send to all connected users
+            Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
+            foreach (Helpers.User u in Users)
+                if (u.ID != connectionid)
+                    server.Send(u.ID, chat.Serialize());
         }
 
         private static void OnRequestGameWorld(int connectionid)

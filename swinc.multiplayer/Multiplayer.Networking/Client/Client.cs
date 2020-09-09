@@ -11,8 +11,6 @@ namespace Multiplayer.Networking
         public static Telepathy.Client client = new Telepathy.Client();
         public static string Username = "Player";
         public static string ServerPassword = "";
-
-
         public static async void Connect(string ip, ushort port)
         {
             if (client.Connecting)
@@ -21,8 +19,8 @@ namespace Multiplayer.Networking
                 return;
             }
             // create and connect the client
-            chatMessages = new List<string>();
-            chatLogMessages = new List<string>();
+            ChatMessages = new List<string>();
+            ChatLogMessages = new List<string>();
             try
             {
                 Username = Steamworks.SteamFriends.GetPersonaName();
@@ -168,26 +166,7 @@ namespace Multiplayer.Networking
         {
             Logging.Info("[Client] Sending login message");
             client.Send(login.Serialize());
-        }
-
-
-
-        public static void Send(Helpers.TcpChat chatmsg)
-        {
-            if (string.IsNullOrEmpty((string)chatmsg.Data.GetValue("message")))
-            {
-                Logging.Warn("[Message] Your chat message can't be empty!");
-                WindowManager.SpawnDialog("Your chat message can't be empty!", true, DialogWindow.DialogType.Warning);
-                return;
-            }
-            Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
-            client.Send(chatmsg.Serialize());
-            if (chatMessages.Count == 18)
-                chatMessages.RemoveAt(0);
-            chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}");
-            chatWindow.text = string.Join("\n", chatMessages);
-        }
-
+        }       
         public static void Send(Helpers.TcpRequest request)
         {
             Logging.Info("[Client] Sending request");
@@ -214,7 +193,7 @@ namespace Multiplayer.Networking
                 Logging.Warn("[Client] You can't disconnect a client that isn't connected...");
                 return;
             }
-            if (!chatMessages.Contains($"<color=orange>The server has been stopped and you have been disconnected from it.</color>"))
+            if (!ChatMessages.Contains($"<color=orange>The server has been stopped and you have been disconnected from it.</color>"))
             {
                 OnServerChatRecieved(new Helpers.TcpServerChat("You've disconnected from the server. Probably because the server stopped.", Helpers.TcpServerChatType.Error));
             }

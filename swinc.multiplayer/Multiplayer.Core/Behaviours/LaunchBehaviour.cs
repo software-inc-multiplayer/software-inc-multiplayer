@@ -1,5 +1,6 @@
 ﻿using Multiplayer.Debugging;
 using Multiplayer.Extensions;
+using Multiplayer.Networking;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -79,9 +80,9 @@ namespace Multiplayer.Core
             {
                 ActiveObjects.Remove(copye);
             }
-            if (Networking.Client.client.Connected)
+            if (Client.client.Connected)
             {
-                Networking.Client.Disconnect();
+                Client.Disconnect();
             }
             if (Networking.Server.IsRunning)
             {

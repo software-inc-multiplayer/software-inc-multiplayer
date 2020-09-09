@@ -22,18 +22,38 @@ namespace Multiplayer.Networking
                 return path;
             }
         }
-        public static Text chatWindow { get; set; }
-        public static List<string> chatMessages { get; set; }
-        public static List<string> chatLogMessages { get; set; }
+        public static Text ChatWindow { get; set; }
+        public static List<string> ChatMessages { get; set; }
+        public static List<string> ChatLogMessages { get; set; }
         private static void CreateChatLogFile()
         {
             string path = Path.Combine(LogFilesPath, $"chat-{DateTime.Now.ToString().MakeSafe()}.log");
-            File.WriteAllText(path, string.Join("\n", chatLogMessages));
+            File.WriteAllText(path, string.Join("\n", ChatLogMessages));
         }
-        private static void OnServerChatRecieved(Helpers.TcpServerChat tcpServerChat)
+        public static void Send(Helpers.TcpChat chatmsg)
         {
-            if (chatMessages.Count == 18)
-                chatMessages.RemoveAt(0);
+            if (string.IsNullOrEmpty((string)chatmsg.Data.GetValue("message")))
+            {
+                Logging.Warn("[Message] Your chat message can't be empty!");
+                WindowManager.SpawnDialog("Your chat message can't be empty!", true, DialogWindow.DialogType.Warning);
+                return;
+            }
+            Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
+            client.Send(chatmsg.Serialize());
+            if ((Helpers.User)chatmsg.Data.GetValue("reciever") != null)
+            {
+                OnServerChatRecieved(new Helpers.TcpServerChat($"Sent private message to {((Helpers.User)chatmsg.Data.GetValue("reciever")).Username}: {(string)chatmsg.Data.GetValue("message")}", Helpers.TcpServerChatType.Info));
+                return;
+            }
+            if (ChatMessages.Count == 18)
+                ChatMessages.RemoveAt(0);
+            ChatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}");
+            ChatWindow.text = string.Join("\n", ChatMessages);
+        }
+        public static void OnServerChatRecieved(Helpers.TcpServerChat tcpServerChat)
+        {
+            if (ChatMessages.Count == 18)
+                ChatMessages.RemoveAt(0);
             string color = "";
             switch ((Helpers.TcpServerChatType)tcpServerChat.Data.GetValue("type"))
             {
@@ -47,22 +67,32 @@ namespace Multiplayer.Networking
                     color = "orange";
                     break;
             }
-            chatMessages.Add($"<color={color}>{(string)tcpServerChat.Data.GetValue("message")}</color>");
-            chatLogMessages.Add($"[Server] [{DateTime.Now.ToString()}] [{Enum.GetName(typeof(Helpers.TcpServerChatType), (Helpers.TcpServerChatType)tcpServerChat.Data.GetValue("type"))}] {(string)tcpServerChat.Data.GetValue("message")}");
-            chatWindow.text = string.Join("\n", chatMessages);
+
+            ChatMessages.Add($"<color={color}>{(string)tcpServerChat.Data.GetValue("message")}</color>");
+            ChatLogMessages.Add($"[Server] [{DateTime.Now.ToString()}] [{Enum.GetName(typeof(Helpers.TcpServerChatType), (Helpers.TcpServerChatType)tcpServerChat.Data.GetValue("type"))}] {(string)tcpServerChat.Data.GetValue("message")}");
+            ChatWindow.text = string.Join("\n", ChatMessages);
         }
 
         private static void OnChatReceived(Helpers.TcpChat chat)
         {
             Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
+            Helpers.User reciever = (Helpers.User)chat.Data.GetValue("receiver");
+            if (chat.Data.GetValue("isPrivate") != null)
+            {
+                OnPrivateChatRecieved(chat);
+                return;
+            }
             if (sender == null)
-                sender = new Helpers.User() { Username = "Server" };
+            {
+                sender = new Helpers.User() { Username = "Unknown User" };
+            }
+
             Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
-            if (chatMessages.Count == 18)
-                chatMessages.RemoveAt(0);
-            chatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}");
-            chatLogMessages.Add($"[{sender.Username}] [{DateTime.Now.ToString()}] {(string)chat.Data.GetValue("message")}");
-            chatWindow.text = string.Join("\n", chatMessages);
+            if (ChatMessages.Count == 18)
+                ChatMessages.RemoveAt(0);
+            ChatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}");
+            ChatLogMessages.Add($"[{sender.Username}] [{DateTime.Now.ToString()}] {(string)chat.Data.GetValue("message")}");
+            ChatWindow.text = string.Join("\n", ChatMessages);
         }
     }
 }
