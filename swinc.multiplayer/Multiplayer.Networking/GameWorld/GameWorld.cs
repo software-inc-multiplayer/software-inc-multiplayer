@@ -45,6 +45,7 @@ namespace Multiplayer.Networking
                         foreach (SoftwareProduct s in content.SoftwareProducts)
                             SoftwareProducts.RemoveAll(x => x.Name == s.Name);
                     }
+                    RefreshData();
                 }
                 catch (Exception ex)
                 {
@@ -61,9 +62,8 @@ namespace Multiplayer.Networking
             {
                 Logging.Info("[GameWorld] Refreshing data");
                 Logging.Info($"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
-                //Clear all stuff from the client first
+                //Clear all stuff from the client first.
                 GameSettings.Instance.StockMarkets.Clear();
-                //MarketSimulation.Active.Companies.Clear();
                 List<Company> tmpcompanies = new List<Company>();
                 tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
                 foreach (Company c in tmpcompanies)
@@ -72,8 +72,8 @@ namespace Multiplayer.Networking
 
                 GameSettings.Instance.StockMarkets.AddRange(StockMarkets); //Add stockmarkets
                 MarketSimulation.Active.FixStocks();
-                //foreach (Company c in AICompanies)
-                //MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
+                foreach (Company c in AICompanies)
+                    MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
                 foreach (Helpers.UserCompany c in UserCompanies)
                     if (!c.Player)
                         MarketSimulation.Active.AddCompany(c.OwnerCompany, true); //Add User Companies

@@ -16,8 +16,8 @@ namespace Multiplayer.Networking
         public static bool hasAI = false;
         public static Telepathy.Server server = new Telepathy.Server();
         public static ServerData Serverdata { get; set; }
-        public static bool isRunning = false;
-        public static bool Runs { get { return isRunning; } }
+        public static bool IsRunning = false;
+        public static bool Runs { get { return IsRunning; } }
 
         //gets fired if the server wants to save data.
         public static EventHandler OnSavingServer;
@@ -40,7 +40,7 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Start listening on Port " + port);
             server.MaxMessageSize = int.MaxValue;
             server.Start(port);
-            isRunning = true;
+            IsRunning = true;
             Serverdata.UpdateServer();
             Read();
         }
@@ -53,7 +53,7 @@ namespace Multiplayer.Networking
             Logging.Info("[Server] Start reading messages");
             await Task.Run(() =>
             {
-                while (isRunning)
+                while (IsRunning)
                 {
                     // grab all new messages. do this in your Update loop.
                     Telepathy.Message msg;
@@ -284,14 +284,14 @@ namespace Multiplayer.Networking
         /// </summary>
         public static async void Stop()
         {
-            if (!isRunning)
+            if (!IsRunning)
             {
                 Logging.Warn("[Server] Can't stop a Server that isn't running...");
                 return;
             }
             await Task.Run(() => Send(new Helpers.TcpServerChat($"The server has been stopped and you have been disconnected from it.", Helpers.TcpServerChatType.Warn)));
             Logging.Info("[Server] Stop listening");
-            isRunning = false;
+            IsRunning = false;
             Serverdata.SaveData(null, null);
             server.Stop();
             Users.Clear();
