@@ -15,6 +15,13 @@ namespace Multiplayer.Networking
             public List<StockMarket> StockMarkets = new List<StockMarket>();
             public List<SoftwareProduct> SoftwareProducts = new List<SoftwareProduct>();
 
+            public void ForceUpdate(World content)
+            {
+                UserCompanies = content.UserCompanies;
+                AICompanies = content.AICompanies;
+                StockMarkets = content.StockMarkets;
+                SoftwareProducts = content.SoftwareProducts;
+            }
             public void UpdateData(World content, bool addition)
             {
                 Logging.Info($"[GameWorld] UpdateData({addition})");
@@ -53,7 +60,7 @@ namespace Multiplayer.Networking
             public void RefreshData()
             {
                 Logging.Info("[GameWorld] Refreshing data");
-                Logging.Info($"[GameWorld]", $"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
+                Logging.Info($"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
                 //Clear all stuff from the client first
                 GameSettings.Instance.StockMarkets.Clear();
                 //MarketSimulation.Active.Companies.Clear();
@@ -65,8 +72,8 @@ namespace Multiplayer.Networking
 
                 GameSettings.Instance.StockMarkets.AddRange(StockMarkets); //Add stockmarkets
                 MarketSimulation.Active.FixStocks();
-                foreach (Company c in AICompanies)
-                    MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
+                //foreach (Company c in AICompanies)
+                //MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
                 foreach (Helpers.UserCompany c in UserCompanies)
                     if (!c.Player)
                         MarketSimulation.Active.AddCompany(c.OwnerCompany, true); //Add User Companies

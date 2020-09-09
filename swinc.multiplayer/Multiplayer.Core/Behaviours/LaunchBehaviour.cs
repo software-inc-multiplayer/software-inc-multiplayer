@@ -79,11 +79,11 @@ namespace Multiplayer.Core
             {
                 ActiveObjects.Remove(copye);
             }
-            if (Networking.Client.Connected)
+            if (Networking.Client.client.Connected)
             {
                 Networking.Client.Disconnect();
             }
-            if (Networking.Server.isRunning)
+            if (Networking.Server.IsRunning)
             {
                 Networking.Server.Stop();
             }

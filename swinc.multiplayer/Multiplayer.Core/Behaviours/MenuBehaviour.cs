@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Multiplayer.Core
@@ -30,7 +29,6 @@ namespace Multiplayer.Core
             OldText = Versioning.SimpleVersionString;
             string newText = "Multiplayer Mod v0.3.2-closed - " + OldText.Replace(",", "");
             WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = newText;
-            RectTransform tran = WindowManager.FindElementPath("MainPanel/Text[2]");
         }
 
         public override void OnDeactivate()

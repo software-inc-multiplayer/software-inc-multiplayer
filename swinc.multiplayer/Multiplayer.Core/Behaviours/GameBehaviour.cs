@@ -107,7 +107,7 @@ namespace Multiplayer.Core
                     }
                     else
                     {
-                        if (Client.Connected)
+                        if (Client.client.Connected)
                         {
                             // If user is already connected to a server.
                             GameObject diagObj = UnityEngine.Object.Instantiate(WindowManager.Instance.DialogPrefab);
@@ -180,7 +180,7 @@ namespace Multiplayer.Core
                         KeyValuePair<string, Action>[] action2s = new KeyValuePair<string, Action>[]
                         {
                                 new KeyValuePair<string, Action>("Yes".LocDef("Yes"), delegate {
-                                    if(Client.Connected) Client.Disconnect();
+                                    if(Client.client.Connected) Client.Disconnect();
                                     dia2g.Window.Close();
                                     try
                                     {
@@ -198,11 +198,11 @@ namespace Multiplayer.Core
                                     dia2g.Window.Close();
                                 }),
                         };
-                        if (Client.Connected)
+                        if (Client.client.Connected)
                         {
                             Client.Disconnect();
                         }
-                        if (Networking.Server.isRunning)
+                        if (Networking.Server.IsRunning)
                         {
                             // If user is already connected to a server.
                             DialogWindow diag = WindowManager.SpawnDialog();
@@ -249,7 +249,7 @@ namespace Multiplayer.Core
             Utils.Controls.Element.UITextbox chatBox = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", null, 15, false);
             Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(541, 390, 159, 45), () =>
             {
-                if (!Client.Connected)
+                if (!Client.client.Connected)
                 {
                     WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
                     return;

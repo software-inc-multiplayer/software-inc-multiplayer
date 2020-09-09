@@ -18,5 +18,10 @@ namespace Multiplayer.Networking
                 server.Send(user.ID, changes.Serialize());
             }
         }
+        public static void OnRecieveGameWorld(Helpers.TcpGameWorld world)
+        {
+            GameWorld.Server.Instance.UpdateWorld((GameWorld.World)world.Data.GetValue("changes"), (bool)world.Data.GetValue("addition"));
+            GameWorld.Server.Instance.UpdateLocalWorld((GameWorld.World)world.Data.GetValue("changes"), (bool)world.Data.GetValue("addition"));
+        }
     }
 }

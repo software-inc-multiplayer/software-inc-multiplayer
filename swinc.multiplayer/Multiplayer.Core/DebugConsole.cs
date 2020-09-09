@@ -54,6 +54,8 @@ namespace Multiplayer.Core
             DevConsole.Console.AddCommand(savegameworld);
             DevConsole.Command<int> setgamespeed = new DevConsole.Command<int>("MULTIPLAYER_SPEED", OnSetGameSpeed);
             DevConsole.Console.AddCommand(setgamespeed);
+            if (SceneManager.GetActiveScene().name == "MainScene")
+                inmain = true;
         }
 
         public void OnSetGameSpeed(int speed)
@@ -79,15 +81,14 @@ namespace Multiplayer.Core
 
         public void OnRequestGameWorld()
         {
-            if (!Networking.Client.Connected)
+            if (!Networking.Client.client.Connected)
                 Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
-
-            Networking.Client.Send(new Helpers.TcpRequest("gameworld"));
+            Networking.Client.Send(new Helpers.TcpGameWorld(Networking.GameWorld.Client.Instance.world, true));
         }
 
         public void OnRequestUserList()
         {
-            if (!Networking.Client.Connected)
+            if (!Networking.Client.client.Connected)
                 Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
 
             Networking.Client.Send(new Helpers.TcpRequest("userlist"));
@@ -125,7 +126,7 @@ namespace Multiplayer.Core
                 Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
                 return;
             }
-            if (Client.Connected)
+            if (Client.client.Connected)
             {
                 Logging.Warn("[DebugConsole] You're already connected to a Server, please disconnect first!");
                 WindowManager.SpawnDialog("You're already connected to a Server, please disconnect first!", true, DialogWindow.DialogType.Warning);
@@ -148,7 +149,7 @@ namespace Multiplayer.Core
 
         public void OnSendChat(string arg0)
         {
-            if (!inmain || !Networking.Client.Connected)
+            if (!inmain || !Networking.Client.client.Connected)
             {
                 Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
                 return;
