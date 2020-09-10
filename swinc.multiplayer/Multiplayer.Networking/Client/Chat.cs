@@ -29,7 +29,7 @@ namespace Multiplayer.Networking
         {
             string path = Path.Combine(LogFilesPath, $"chat-{DateTime.Now.ToString().MakeSafe()}.log");
             File.WriteAllText(path, string.Join("\n", ChatLogMessages));
-        }
+        }       
         public static void Send(Helpers.TcpChat chatmsg)
         {
             if (string.IsNullOrEmpty((string)chatmsg.Data.GetValue("message")))
@@ -72,16 +72,9 @@ namespace Multiplayer.Networking
             ChatLogMessages.Add($"[Server] [{DateTime.Now.ToString()}] [{Enum.GetName(typeof(Helpers.TcpServerChatType), (Helpers.TcpServerChatType)tcpServerChat.Data.GetValue("type"))}] {(string)tcpServerChat.Data.GetValue("message")}");
             ChatWindow.text = string.Join("\n", ChatMessages);
         }
-
         private static void OnChatReceived(Helpers.TcpChat chat)
         {
             Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
-            Helpers.User reciever = (Helpers.User)chat.Data.GetValue("receiver");
-            if (chat.Data.GetValue("isPrivate") != null)
-            {
-                OnPrivateChatRecieved(chat);
-                return;
-            }
             if (sender == null)
             {
                 sender = new Helpers.User() { Username = "Unknown User" };

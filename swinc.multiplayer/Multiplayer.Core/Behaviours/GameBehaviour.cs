@@ -24,23 +24,18 @@ namespace Multiplayer.Core
             {
                 CreateButton();
             }
-            ChatLoop();
         }
 
         public void ChatLoop()
         {
-            while(isActiveAndEnabled)
+            if (Client.ChatWindow || CommandTooltip == null) return;
+            if (ChatInput.obj.text.Trim()[0].Equals("/"))
             {
-                if (Client.ChatWindow || CommandTooltip == null) continue;
-                if(ChatInput.obj.text.Trim()[0].Equals("/"))
-                {
-                    if (CommandTooltip.text == "For a full list of commands, see the wiki.") continue;
-                    CommandTooltip.text = "For a full list of commands, see the wiki.";
-                } else
-                {
-                    if (CommandTooltip.text == "") continue;
-                    CommandTooltip.text = "";
-                }
+                CommandTooltip.text = "For a full list of commands, see the wiki.";
+            }
+            else
+            {
+                CommandTooltip.text = "";
             }
         }
 
@@ -268,6 +263,10 @@ namespace Multiplayer.Core
             MPWindow.AddElement(Client.ChatWindow.gameObject, new Rect(30, 75, 670, 255), Rect.zero);
             ChatInput = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", null, 15, false);
             CommandTooltip = WindowManager.SpawnLabel();
+            ChatInput.obj.onValueChanged.AddListener(delegate
+            {
+                ChatLoop();
+            });
             CommandTooltip.text = "";
             MPWindow.AddElement(CommandTooltip.gameObject, new Rect(30, 390 + 50, 471, 45), Rect.zero);
             Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(541, 390, 159, 45), () =>
@@ -277,13 +276,15 @@ namespace Multiplayer.Core
                     WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
                     return;
                 }
-                if(ChatInput.obj.text.StartsWith("/"))
+                if (ChatInput.obj.text.StartsWith("/"))
                 {
                     ParseChatCommand(ChatInput.obj.text);
                     return;
                 }
-                var tmpUser = new Helpers.User();
-                tmpUser.Username = Client.Username;
+                var tmpUser = new Helpers.User
+                {
+                    Username = Client.Username
+                };
                 Helpers.TcpChat chatClass = new Helpers.TcpChat(ChatInput.obj.text, tmpUser);
                 ChatInput.obj.text = "";
                 Client.Send(chatClass);
@@ -293,27 +294,24 @@ namespace Multiplayer.Core
 
         private void ParseChatCommand(string text)
         {
-            if(text.StartsWith("/msg"))
+            if (text.StartsWith("/msg"))
             {
                 try
                 {
                     List<string> args = text.Split(" ".ToCharArray()).ToList();
                     args.Remove("/msg");
-                    string username = args[0];                 
-                    args.Remove(username);                  
+                    string username = args[0];
+                    args.Remove(username);
                     string message = string.Join(" ", args.ToArray());
-                    Helpers.User rec = new Helpers.User()
-                    {
-                        Username = username
-                    };
-                    Helpers.User sender = new Helpers.User()
+                    Helpers.User sender = new Helpers.User
                     {
                         Username = Client.Username
                     };
-                    Client.Send(new Helpers.TcpChat(message, rec, sender));
-                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"Sent private message to: {rec.Username}", Helpers.TcpServerChatType.Info));
-                    Logging.Info("[Commands] used /msg: " + message, rec.Username, sender.Username);
-                } catch (Exception e)
+                    Client.Send(new Helpers.TcpPrivateChat(sender, username, message));
+                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"Sent private message to: {username}", Helpers.TcpServerChatType.Info));
+                    Logging.Info("[Commands] used /msg: " + message, username, sender.Username);
+                }
+                catch (Exception e)
                 {
                     Client.OnServerChatRecieved(new Helpers.TcpServerChat($"There was an error running the chat command: {text}{$"\nAre you sure you typed the command in correctly?\n\n{e}"}", Helpers.TcpServerChatType.Error));
                 }

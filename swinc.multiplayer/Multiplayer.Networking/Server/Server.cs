@@ -177,7 +177,10 @@ namespace Multiplayer.Networking
             Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(msg.data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnUserChat(msg.connectionId, tcpchat);
-
+            //HandleTcpPrivateChat 
+            Helpers.TcpPrivateChat tcpPrivateChat = Helpers.TcpPrivateChat.Deserialize(msg.data);
+            if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
+                OnPrivateChat(tcpPrivateChat);
             //Handle TCPRequests
             //Helpers.TcpRequest tcprequest = XML.From<Helpers.TcpRequest>(datastr);
             Helpers.TcpRequest tcprequest = Helpers.TcpRequest.Deserialize(msg.data);

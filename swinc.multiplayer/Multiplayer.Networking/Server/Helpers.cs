@@ -120,6 +120,10 @@ namespace Multiplayer.Networking
             {
                 Usercompany = new UserCompany(this);
             }
+            public User(bool placebo)
+            {
+
+            }
         }
 
         [Serializable]
@@ -295,19 +299,39 @@ namespace Multiplayer.Networking
                 return Helpers.Deserialize<TcpServerChat>(array);
             }
         }
+        [Serializable]
+        public class TcpPrivateChat : TcpMessage
+        {
+            public TcpPrivateChat(Helpers.User sender, string reciever, string message)
+            {
+                Header = "pm";
+                Data.Add("sender", sender);
+                Data.Add("reciever", reciever);
+                Data.Add("message", message);
+            }
+            public override byte[] Serialize()
+            {
+                return Helpers.Serialize(this);
+            }
+
+            new public static TcpPrivateChat Deserialize(byte[] array)
+            {
+                return Helpers.Deserialize<TcpPrivateChat>(array);
+            }
+        }
 
         [Serializable]
         public class TcpChat : TcpMessage
         {
             public TcpChat() { }
-            public TcpChat(string message, User receiver, User sender)
+            /**public TcpChat(string message, User receiver, User sender)
             {
                 Header = "chat";
                 Data.Add("isPrivate", true);
                 Data.Add("sender", sender);
                 Data.Add("receiver", receiver);
                 Data.Add("message", message);
-            }
+            }**/
             public TcpChat(string message, User sender = null)
             {
                 Header = "chat";

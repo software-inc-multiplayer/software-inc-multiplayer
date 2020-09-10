@@ -97,6 +97,10 @@ namespace Multiplayer.Networking
             if (tcpServerChat != null && tcpServerChat.Header == "serverchat")
                 OnServerChatRecieved(tcpServerChat);
 
+            Helpers.TcpPrivateChat tcpPrivateChat = Helpers.TcpPrivateChat.Deserialize(data);
+            if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
+                OnPrivateChatRecieved(tcpPrivateChat);
+
             //Handle TcpChat
             Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
             if (tcpchat != null && tcpchat.Header == "chat")
@@ -195,10 +199,11 @@ namespace Multiplayer.Networking
             }
             if (!ChatMessages.Contains($"<color=orange>The server has been stopped and you have been disconnected from it.</color>"))
             {
-                OnServerChatRecieved(new Helpers.TcpServerChat("You've disconnected from the server. Probably because the server stopped.", Helpers.TcpServerChatType.Error));
+                ChatMessages.Add($"<color=orange>The server has been stopped and you have been disconnected from it.</color>");
             }
-            CreateChatLogFile();
             client.Disconnect();
+            CreateChatLogFile();
+            CreatePChatLogFile();
         }
     }
 }
