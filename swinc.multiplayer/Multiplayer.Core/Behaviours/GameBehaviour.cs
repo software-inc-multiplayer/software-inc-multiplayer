@@ -261,7 +261,13 @@ namespace Multiplayer.Core
             Client.ChatWindow = WindowManager.SpawnLabel();
             Client.ChatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
             MPWindow.AddElement(Client.ChatWindow.gameObject, new Rect(30, 75, 670, 255), Rect.zero);
-            ChatInput = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", null, 15, false);
+            ChatInput = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", (value) => { 
+                if(value.StartsWith("/"))
+                {
+                    CommandTooltip.gameObject.SetActive(true);
+                }
+                CommandTooltip.gameObject.SetActive(true);
+            }, 15, false);
             CommandTooltip = WindowManager.SpawnLabel();
             ChatInput.obj.onValueChanged.AddListener(delegate
             {
@@ -276,15 +282,13 @@ namespace Multiplayer.Core
                     WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
                     return;
                 }
-                if (ChatInput.obj.text.StartsWith("/"))
+                if (ChatInput.obj.text.Trim().StartsWith("/"))
                 {
                     ParseChatCommand(ChatInput.obj.text);
                     return;
                 }
-                var tmpUser = new Helpers.User
-                {
-                    Username = Client.Username
-                };
+                var tmpUser = new Helpers.User();
+                tmpUser.Username = Client.Username;
                 Helpers.TcpChat chatClass = new Helpers.TcpChat(ChatInput.obj.text, tmpUser);
                 ChatInput.obj.text = "";
                 Client.Send(chatClass);
@@ -303,7 +307,7 @@ namespace Multiplayer.Core
                     string username = args[0];
                     args.Remove(username);
                     string message = string.Join(" ", args.ToArray());
-                    Helpers.User sender = new Helpers.User
+                    Helpers.User sender = new Helpers.User()
                     {
                         Username = Client.Username
                     };

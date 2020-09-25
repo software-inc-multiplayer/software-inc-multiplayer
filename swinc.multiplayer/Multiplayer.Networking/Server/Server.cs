@@ -8,7 +8,7 @@ namespace Multiplayer.Networking
     public static partial class Server
     {
         public static List<Helpers.User> Users = new List<Helpers.User>();
-        public static string ServerName = "My Server";
+        public static string ServerName = "";
         public static string Password = "";
         public static ushort MaxPlayers = 10;
         public static ushort Port;
@@ -28,6 +28,7 @@ namespace Multiplayer.Networking
         /// <param name="port">The port the server will listening on</param>
         public static void Start(ushort port)
         {
+            ServerName = port.ToString();
             if (server.Active)
             {
                 Logging.Warn("[Server] You can't start the server because its already active!");
@@ -173,14 +174,16 @@ namespace Multiplayer.Networking
                 OnUserLogin(msg.connectionId, tcplogin);
 
             //Handle TCPChat
+            Helpers.TcpPrivateChat tcpPrivateChat = Helpers.TcpPrivateChat.Deserialize(msg.data);
+            if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
+                OnPrivateChat(tcpPrivateChat);
             //Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
             Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(msg.data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnUserChat(msg.connectionId, tcpchat);
             //HandleTcpPrivateChat 
-            Helpers.TcpPrivateChat tcpPrivateChat = Helpers.TcpPrivateChat.Deserialize(msg.data);
-            if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
-                OnPrivateChat(tcpPrivateChat);
+            
+
             //Handle TCPRequests
             //Helpers.TcpRequest tcprequest = XML.From<Helpers.TcpRequest>(datastr);
             Helpers.TcpRequest tcprequest = Helpers.TcpRequest.Deserialize(msg.data);

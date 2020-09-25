@@ -316,7 +316,7 @@ namespace Multiplayer.Networking
 
             new public static TcpPrivateChat Deserialize(byte[] array)
             {
-                return Helpers.Deserialize<TcpPrivateChat>(array);
+                return Deserialize<TcpPrivateChat>(array);
             }
         }
 
@@ -336,7 +336,6 @@ namespace Multiplayer.Networking
             {
                 Header = "chat";
                 Data.Add("sender", sender);
-                Data.Add("receiver", null);
                 Data.Add("message", message);
             }
 
