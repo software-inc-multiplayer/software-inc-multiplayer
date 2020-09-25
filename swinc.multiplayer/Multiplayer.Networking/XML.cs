@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using Multiplayer.Debugging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using Multiplayer.Debugging;
 
 namespace RoWa
 {
@@ -17,42 +16,42 @@ namespace RoWa
         /// A Dictionary that can be saved to an XML file/string
         /// </summary>
         public class XMLDictionary
-		{
+        {
             [XmlElement]
             public List<XMLDictionaryPair> Pairs = new List<XMLDictionaryPair>();
             public XMLDictionary() { }
             public XMLDictionary(Dictionary<object, object> dict)
-			{
-                foreach(KeyValuePair<object, object> kvp in dict)
+            {
+                foreach (KeyValuePair<object, object> kvp in dict)
                     Pairs.Add(new XMLDictionaryPair(kvp.Key, kvp.Value));
-			}
+            }
             public XMLDictionary(params XMLDictionaryPair[] pairs)
-			{
+            {
                 Pairs.AddRange(pairs);
-			}
+            }
 
             public bool Contains(object key)
-			{
+            {
                 if (Pairs.Find(x => x.Key == key) != null)
                     return true;
                 else
                     return false;
-			}
+            }
 
             public object GetValue(object key)
-			{
+            {
                 XMLDictionaryPair p = Pairs.Find(x => x.Key == key);
-                if(p == null)
-				{
+                if (p == null)
+                {
                     Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs! <= Can be ignored if mod doesn't crash afterwards");
                     return null;
-				}
+                }
                 object value = p.Value;
                 return value;
-			}
+            }
 
             public object GetValue(string key)
-			{
+            {
                 XMLDictionaryPair p = Pairs.Find(x => (string)x.Key == key);
                 if (p == null)
                 {
@@ -63,29 +62,29 @@ namespace RoWa
             }
 
             public void Add(XMLDictionaryPair pair)
-			{
+            {
                 Pairs.Add(pair);
-			}
+            }
 
             public void Add(object key, object value)
-			{
+            {
                 Add(new XMLDictionaryPair(key, value));
-			}
-		}
+            }
+        }
 
         [Serializable]
         /// <summary>
         /// A keyvaluepair of a XMLDictionary
         /// </summary>
         public class XMLDictionaryPair
-		{
+        {
             [XmlElement]
             public object Key;
             [XmlElement]
             public object Value;
             public XMLDictionaryPair() { }
             public XMLDictionaryPair(object key, object value) { Key = key; Value = value; }
-		}
+        }
 
         [Obsolete]
         /// <summary>
@@ -95,7 +94,7 @@ namespace RoWa
         /// <param name="obj">The object</param>
         /// <returns>An XML representation fo the string</returns>
         public static string To<T>(T obj)
-		{
+        {
             using (MemoryStream ms = new MemoryStream())
             {
                 XmlSerializer serializer = new XmlSerializer(obj.GetType());
@@ -119,9 +118,9 @@ namespace RoWa
         /// <param name="xml">The XML string</param>
         /// <returns>The Object of type T from the XML string</returns>
         public static T From<T>(string xml)
-		{
-			try
-			{
+        {
+            try
+            {
                 using (MemoryStream ms = new MemoryStream(1024))
                 {
                     ms.Write(Encoding.UTF8.GetBytes(xml), 0, Encoding.UTF8.GetBytes(xml).Length);
@@ -138,11 +137,11 @@ namespace RoWa
                     }
                 }
             }
-            catch(Exception ex)
-			{
+            catch (Exception ex)
+            {
                 Logging.Warn("[XML] " + ex.Message);
                 return default(T);
-			}          
+            }
         }
-	}
+    }
 }

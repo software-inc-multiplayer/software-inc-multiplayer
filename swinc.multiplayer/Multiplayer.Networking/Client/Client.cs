@@ -1,37 +1,39 @@
 ﻿using Multiplayer.Debugging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine.UI;
 
 namespace Multiplayer.Networking
 {
-	public static class Client
-	{
+    public static partial class Client
+    {
         public static bool Connected { get { return client.Connected; } }
         public static Telepathy.Client client = new Telepathy.Client();
         public static string Username = "Player";
         public static string ServerPassword = "";
-        public static Text chatWindow { get; set; }
-        public static List<string> chatMessages { get; set; }
-        
         public static async void Connect(string ip, ushort port)
         {
+            if (client.Connecting)
+            {
+                Logging.Warn("[Client] You're already connecting to a server!");
+                return;
+            }
             // create and connect the client
-            chatMessages = new List<string>();
-			try
-			{
+            ChatMessages = new List<string>();
+            ChatLogMessages = new List<string>();
+            try
+            {
                 Username = Steamworks.SteamFriends.GetPersonaName();
             }
-            catch(Exception ex)
-			{
+            catch (Exception ex)
+            {
                 Logging.Warn("[Client] Couldn't fetch username from Steam! If you've a DRM-Free version thats why. => " + ex.Message);
-			}
+            }
             client.MaxMessageSize = int.MaxValue;
             client.Connect(ip, port);
             Logging.Info("[Client] Trying to connect!");
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 while (client.Connecting)
                 {
 
@@ -39,20 +41,24 @@ namespace Multiplayer.Networking
                 if (client.Connected)
                 {
                     Logging.Info("[Client] Connected to the Server!");
+                    OnServerChatRecieved(new Helpers.TcpServerChat($"Connected to the server.", Helpers.TcpServerChatType.Info));
                     Read();
-                    GameWorld.Client client = new GameWorld.Client();                 
+                    GameWorld.Client client = new GameWorld.Client();
                 }
             });
-            if(!client.Connected)
+            if (!client.Connected)
             {
+                //WindowManager.SpawnDialog("Couldn't connect to the Server!", true, DialogWindow.DialogType.Warning);
+                //Logging.Warn("[Client] Couldn't connect to the Server!");
                 throw new Exception("[Client] Couldn't connect to the Server");
             }
         }
 
-        static async void Read()
-		{
+        private static async void Read()
+        {
             Logging.Info("[Client] Starts reading");
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 while (Connected)
                 {
                     Telepathy.Message msg;
@@ -62,6 +68,7 @@ namespace Multiplayer.Networking
                         {
                             case Telepathy.EventType.Connected:
                                 Logging.Info("[Client] Connected");
+
                                 break;
                             case Telepathy.EventType.Data:
                                 Receive(msg.data);
@@ -76,14 +83,23 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Ends reading");
         }
 
-        static void Receive(byte[] data)
-		{
+        private static void Receive(byte[] data)
+        {
             Logging.Info("[Client] Data from Server: " + data.Length + " bytes");
 
             //Handle TcpResponse
             Helpers.TcpResponse tcpresponse = Helpers.TcpResponse.Deserialize(data);
             if (tcpresponse != null && tcpresponse.Header == "response")
                 OnServerResponse(tcpresponse);
+
+            //Handle TcpServerChat
+            Helpers.TcpServerChat tcpServerChat = Helpers.TcpServerChat.Deserialize(data);
+            if (tcpServerChat != null && tcpServerChat.Header == "serverchat")
+                OnServerChatRecieved(tcpServerChat);
+
+            Helpers.TcpPrivateChat tcpPrivateChat = Helpers.TcpPrivateChat.Deserialize(data);
+            if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
+                OnPrivateChatRecieved(tcpPrivateChat);
 
             //Handle TcpChat
             Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
@@ -100,125 +116,94 @@ namespace Multiplayer.Networking
             if (tcpspeed != null && tcpspeed.Header == "gamespeed")
                 OnGamespeedChange(tcpspeed);
         }
-
-		private static void OnGamespeedChange(Helpers.TcpGamespeed tcpspeed)
-		{
+        private static void OnGamespeedChange(Helpers.TcpGamespeed tcpspeed)
+        {
             Logging.Info("gamespeedchange...");
             int type = (int)tcpspeed.Data.GetValue("type");
             int speed = (int)tcpspeed.Data.GetValue("speed");
-            if(type == 0)
-			{
-				HUD.Instance.GameSpeed = (int)speed;
-			}
+            if (type == 0)
+            {
+                GameSettings.GameSpeed = speed;
+                //HUD.Instance.GameSpeed = (int)speed;
+            }
+            OnServerChatRecieved(new Helpers.TcpServerChat($"The gamespeed has been changed to {speed}", Helpers.TcpServerChatType.Info));
         }
 
-		static void OnServerResponse(Helpers.TcpResponse response)
-		{
+        private static void OnServerResponse(Helpers.TcpResponse response)
+        {
             object type = response.Data.GetValue("type");
-            if(type == null)
-			{
+            if (type == null)
+            {
                 Logging.Warn("[Client] Type is null!");
                 return;
-			}
-            if((string)type == "login_request")
-			{
+            }
+            if ((string)type == "login_request")
+            {
                 Send(new Helpers.TcpLogin(Username, ServerPassword));
-			}
-            else if((string)type == "login_response")
-			{
+            }
+            else if ((string)type == "login_response")
+            {
                 string res = (string)response.Data.GetValue("data");
-                if(res == "ok")
-				{
+                if (res == "ok")
+                {
                     //Login ok
                     Logging.Info("[Client] You're logged in now!");
                     //Send request to get GameWorld
                     Send(new Helpers.TcpRequest("gameworld"));
 
                 }
-                else if(res == "max_players")
-				{
+                else if (res == "max_players")
+                {
                     //Server full
                     Logging.Warn("[Client] The server is full");
-				}
-                else if(res == "wrong_password")
-				{
+                }
+                else if (res == "wrong_password")
+                {
                     //Wrong password
                     Logging.Warn("[Client] You did enter the wrong password");
-				}
-			}
-		}
-
-        static void OnChatReceived(Helpers.TcpChat chat)
-		{
-            Helpers.User sender = (Helpers.User)chat.Data.GetValue("sender");
-            if (sender == null)
-                sender = new Helpers.User() { Username = "Server" };
-            Logging.Info($"[Message] {sender.Username}: {(string)chat.Data.GetValue("message")}");
-            if (chatMessages.Count == 6)
-                chatMessages.RemoveAt(0);
-            chatMessages.Add($"{sender.Username}: {(string)chat.Data.GetValue("message")}\n");
-            chatWindow.text = string.Join("\n", chatMessages);
+                }
+            }
         }
 
-        static void OnGameWorldReceived(Helpers.TcpGameWorld world)
-		{
-            GameWorld.World changes = (GameWorld.World)world.Data.GetValue("changes");
-            bool addition = (bool)world.Data.GetValue("addition");
-            Logging.Info($"[Client] Updating GameWorld => " + addition);
-            GameWorld.Client.Instance.UpdateLocalWorld(changes, addition);
-        }
-
-		#region Messages
-		public static void Send(Helpers.TcpLogin login)
-		{
+        #region Messages
+        public static void Send(Helpers.TcpLogin login)
+        {
             Logging.Info("[Client] Sending login message");
             client.Send(login.Serialize());
-		}
-
-        public static void Send(Helpers.TcpGameWorld changes)
-		{
-            Logging.Info("[Client] Sending gameworld update");
-            client.Send(changes.Serialize());
-		}
-
-        public static void Send(Helpers.TcpChat chatmsg)
-		{
-            Logging.Info($"[Message] {((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: " + (string)chatmsg.Data.GetValue("message"));
-            client.Send(chatmsg.Serialize());
-            if (chatMessages.Count == 6)
-                chatMessages.RemoveAt(0);
-            chatMessages.Add($"{((Helpers.User)chatmsg.Data.GetValue("sender")).Username}: {(string)chatmsg.Data.GetValue("message")}\n");
-            chatWindow.text = string.Join("\n", chatMessages);
-        }
-
+        }       
         public static void Send(Helpers.TcpRequest request)
-		{
+        {
             Logging.Info("[Client] Sending request");
             client.Send(request.Serialize());
-		}
+        }
 
         public static void Send(Helpers.TcpResponse response)
-		{
+        {
             Logging.Info("[Client] Sending response");
             client.Send(response.Serialize());
-		}
+        }
 
         public static void Send(Helpers.TcpGamespeed speed)
-		{
+        {
             Logging.Info("[Client] Sending gamespeed");
             client.Send(speed.Serialize());
-		}
+        }
+        #endregion
 
-		#endregion
-
-		public static void Disconnect()
-		{
+        public static void Disconnect()
+        {
             if (!Connected)
             {
                 Logging.Warn("[Client] You can't disconnect a client that isn't connected...");
                 return;
-			}
+            }
+            if (!ChatMessages.Contains($"<color=orange>The server has been stopped and you have been disconnected from it.</color>"))
+            {
+                ChatMessages.Add($"<color=orange>The server has been stopped and you have been disconnected from it.</color>");
+            }
             client.Disconnect();
-		}
-	}
+            CreateChatLogFile();
+            CreatePChatLogFile();
+        }
+    }
 }

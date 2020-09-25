@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 using UnityEngine;
 
@@ -31,12 +28,13 @@ namespace Multiplayer.Core
                 writer.Write(Encoding.UTF8.GetBytes(PlayerPrefs.GetString(key)), 0, Encoding.UTF8.GetBytes(PlayerPrefs.GetString(key)).Length);
                 result = (T)x.Deserialize(writer);
                 return true;
-            } catch
+            }
+            catch
             {
                 result = default;
                 return false;
             }
-              
+
         }
     }
 }

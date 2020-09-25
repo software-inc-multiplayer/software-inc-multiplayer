@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Multiplayer.Core
@@ -15,7 +9,7 @@ namespace Multiplayer.Core
         public override void OnActivate()
         {
             SceneManager.sceneLoaded += OnScene;
-            if(SceneManager.GetActiveScene().name == "MainMenu")
+            if (SceneManager.GetActiveScene().name == "MainMenu")
             {
                 ModifyText();
             }
@@ -33,10 +27,8 @@ namespace Multiplayer.Core
         private void ModifyText()
         {
             OldText = Versioning.SimpleVersionString;
-            string newText = "Multiplayer Mod v0.3.1-closed - " + OldText.Replace(",", "");
+            string newText = "Multiplayer Mod v0.3.2-closed - " + OldText.Replace(",", "");
             WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = newText;
-            RectTransform tran = WindowManager.FindElementPath("MainPanel/Text[2]");
-            tran.localPosition += Vector3.left;
         }
 
         public override void OnDeactivate()

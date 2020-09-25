@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using System.Collections;
+﻿using System.Collections;
 using System.Text.RegularExpressions;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Multiplayer.Core.Utils
 {
@@ -16,25 +16,34 @@ namespace Multiplayer.Core.Utils
 
         // optional scroll rect parent (manually linked)
         public ScrollRect scrollRect;
-        RectTransform scrollRectTransform;
-        RectTransform ScrollRectTransform { get { if (scrollRect && !scrollRectTransform) scrollRectTransform = scrollRect.GetComponent<RectTransform>(); return scrollRectTransform; } }
+        private RectTransform scrollRectTransform;
+
+        private RectTransform ScrollRectTransform { get { if (scrollRect && !scrollRectTransform) scrollRectTransform = scrollRect.GetComponent<RectTransform>(); return scrollRectTransform; } }
 
         // parent gameobjects
-        CanvasScaler scaler;
-        float ScaleFactor { get { if (!scaler) scaler = GetComponentInParent<CanvasScaler>(); return scaler ? scaler.scaleFactor : 1; } }
-        HorizontalOrVerticalLayoutGroup parentLayout;
-        HorizontalOrVerticalLayoutGroup ParentLayout { get { parentLayout = transform.parent.GetComponent<HorizontalOrVerticalLayoutGroup>(); return parentLayout; } }
+        private CanvasScaler scaler;
+
+        private float ScaleFactor { get { if (!scaler) scaler = GetComponentInParent<CanvasScaler>(); return scaler ? scaler.scaleFactor : 1; } }
+
+        private HorizontalOrVerticalLayoutGroup parentLayout;
+
+        private HorizontalOrVerticalLayoutGroup ParentLayout { get { parentLayout = transform.parent.GetComponent<HorizontalOrVerticalLayoutGroup>(); return parentLayout; } }
 
         // current gameobject components
-        LayoutElement inputElement;
-        LayoutElement InputElement { get { if (!inputElement) inputElement = GetComponent<LayoutElement>(); return inputElement; } }
-        InputField inputField;
-        InputField InputField { get { if (!inputField) inputField = GetComponent<InputField>(); return inputField; } }
-        RectTransform rect;
-        RectTransform Rect { get { if (!rect) rect = GetComponent<RectTransform>(); return rect; } }
+        private LayoutElement inputElement;
+
+        private LayoutElement InputElement { get { if (!inputElement) inputElement = GetComponent<LayoutElement>(); return inputElement; } }
+
+        private InputField inputField;
+
+        private InputField InputField { get { if (!inputField) inputField = GetComponent<InputField>(); return inputField; } }
+
+        private RectTransform rect;
+
+        private RectTransform Rect { get { if (!rect) rect = GetComponent<RectTransform>(); return rect; } }
 
         // child gameobjects
-        CanvasRenderer caret;
+        private CanvasRenderer caret;
 
         // string replacers
         private Regex colorTags = new Regex("<[^>]*>");
@@ -58,7 +67,7 @@ namespace Multiplayer.Core.Utils
     Vector2 scrollSize;
 #endif
 
-        void Update()
+        private void Update()
         {
 #if UNITY_EDITOR
         //(editor only) size adjustment if values have changed
@@ -118,16 +127,16 @@ namespace Multiplayer.Core.Utils
         }
 
         // get text padding (min max vertical offset for size calculation)
-        float VerticalOffset { get { return InputField.placeholder.rectTransform.offsetMin.y - InputField.placeholder.rectTransform.offsetMax.y; } }
+        private float VerticalOffset { get { return InputField.placeholder.rectTransform.offsetMin.y - InputField.placeholder.rectTransform.offsetMax.y; } }
 
 
         // resize input field recttransform
-        void ResizeInput()
+        private void ResizeInput()
         {
             ResizeInput(InputField.text);
         }
 
-        void ResizeInput(string text)
+        private void ResizeInput(string text)
         {
             // current text settings
             TextGenerationSettings settings = InputField.textComponent.GetGenerationSettings(InputField.textComponent.rectTransform.rect.size);
@@ -185,7 +194,7 @@ namespace Multiplayer.Core.Utils
         }
 
         // update scroll rect position (after Layout was rebuilt)
-        IEnumerator ScrollMax()
+        private IEnumerator ScrollMax()
         {
             yield return new WaitForEndOfFrame();
             if (scrollRect != null) scrollRect.verticalNormalizedPosition = 0;

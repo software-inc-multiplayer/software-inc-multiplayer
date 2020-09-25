@@ -4,7 +4,7 @@ const Electron = require('electron').remote
 const request = require('request');
 async function getReleases() {
     let releases = [];
-    await fetch('https://api.github.com/repos/cal3432/software-inc-multiplayer/releases').then(response => response.json()).then(res => {
+    await fetch('https://api.github.com/repos/software-inc-multiplayer/software-inc-multiplayer/releases').then(response => response.json()).then(res => {
         const data = res;
         data.forEach(release => {
             let hasBinaries = false;
