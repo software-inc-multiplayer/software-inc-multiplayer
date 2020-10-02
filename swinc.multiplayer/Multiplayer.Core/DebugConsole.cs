@@ -54,6 +54,8 @@ namespace Multiplayer.Core
             DevConsole.Console.AddCommand(savegameworld);
             DevConsole.Command<int> setgamespeed = new DevConsole.Command<int>("MULTIPLAYER_SPEED", OnSetGameSpeed);
             DevConsole.Console.AddCommand(setgamespeed);
+            DevConsole.Command<string, string> pchatcommand = new DevConsole.Command<string, string>("MULTIPLAYER_PCHAT",OnPrivateMessage);
+            DevConsole.Console.AddCommand(pchatcommand);
             if (SceneManager.GetActiveScene().name == "MainScene")
                 inmain = true;
         }
@@ -78,7 +80,14 @@ namespace Multiplayer.Core
             }
             Networking.Server.Save();
         }
-
+        public void OnPrivateMessage(string username, string message)
+        {
+            if (!Networking.Client.client.Connected)
+                Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
+            var tmpUser = new Helpers.User();
+            tmpUser.Username = Client.Username;
+            Client.Send(new Helpers.TcpPrivateChat(tmpUser, username, message));
+        }
         public void OnRequestGameWorld()
         {
             if (!Networking.Client.client.Connected)
@@ -193,6 +202,7 @@ namespace Multiplayer.Core
             DevConsole.Console.RemoveCommand("MULTIPLAYER_SAVE");
             DevConsole.Console.RemoveCommand("MULTIPLAYER_SPEED");
             DevConsole.Console.RemoveCommand("MULTIPLAYER_CHAT_CLEAR");
+            DevConsole.Console.RemoveCommand("MULTIPLAYER_PCHAT");
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
     }
