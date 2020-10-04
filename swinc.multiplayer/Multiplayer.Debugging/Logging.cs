@@ -1,16 +1,31 @@
-﻿using System;
+﻿using Multiplayer.Extensions;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
 
 namespace Multiplayer.Debugging
 {
-    public class Logging
+    public class Logging : MonoBehaviour
     {
         public static Logging instance;
+        public static List<string> LogLines = new List<string>();
         public enum LogType
         {
             Info = 0,
             Debug = 2,
             Warn = 3,
             Error = 4
+        }
+        public void Start()
+        {
+            File.Create(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"));
+            File.Create(Path.Combine(Application.dataPath, "Multiplayer", "Logs", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"));
+        }
+        public void OnDisable()
+        {
+            File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"), LogLines.ToArray());
+            File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", "Logs", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"), LogLines.ToArray());
         }
 
         public class LogObject
@@ -39,6 +54,7 @@ namespace Multiplayer.Debugging
                         break;
                 }
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
+                LogLines.Add(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [{logType}] {e}");
             }
         }
         public static void Log(params LogObject[] obj)
@@ -61,7 +77,9 @@ namespace Multiplayer.Debugging
                         break;
                 }
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {f.Object}");
+                LogLines.Add(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [{f.LogType}] {f.Object}");
             }
+
         }
         public static void Debug(params object[] obj)
         {
@@ -69,6 +87,7 @@ namespace Multiplayer.Debugging
             {
                 DevConsole.Console.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
+                LogLines.Add(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Debug] {e}");
             }
         }
         public static void Info(params object[] obj)
@@ -77,6 +96,7 @@ namespace Multiplayer.Debugging
             {
                 DevConsole.Console.LogInfo(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
+                LogLines.Add(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Info] {e}");
             }
         }
         public static void Warn(params object[] obj)
@@ -85,6 +105,7 @@ namespace Multiplayer.Debugging
             {
                 DevConsole.Console.LogWarning(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
+                LogLines.Add(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Warn] {e}");
             }
         }
         public static void Error(params object[] obj)
@@ -93,6 +114,7 @@ namespace Multiplayer.Debugging
             {
                 DevConsole.Console.LogError(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
                 UnityEngine.Debug.Log(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Multiplayer] {e}");
+                LogLines.Add(DateTime.Now.ToString("HH:mm:ss:ffff") + $" [Error] {e}");
             }
         }
     }

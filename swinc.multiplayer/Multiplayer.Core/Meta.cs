@@ -25,6 +25,7 @@ namespace Multiplayer.Core
 
         public override void Initialize(ModController.DLLMod parentMod)
         {
+            ModController.Instance.gameObject.AddComponent<Logging>();
             ThisMod = parentMod;
             Application.runInBackground = true;
             base.Initialize(parentMod);
