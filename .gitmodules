@@ -1,3 +1,0 @@
-[submodule "Multiplayer.Core"]
-	path = ./Multiplayer.Core
-	url = git://github.com/software-inc-multiplayer/Multiplayer.Core.git
