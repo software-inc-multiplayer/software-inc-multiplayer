@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Extensions", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Networking", "Multiplayer.Networking\Multiplayer.Networking.csproj", "{19CD273F-A601-45ED-AB6D-6E61F47A074C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Settings", "Multiplayer.Settings\Multiplayer.Settings.csproj", "{EBE0B054-99C1-4CC2-B5B0-A4F441FD980B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBE0B054-99C1-4CC2-B5B0-A4F441FD980B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBE0B054-99C1-4CC2-B5B0-A4F441FD980B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBE0B054-99C1-4CC2-B5B0-A4F441FD980B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBE0B054-99C1-4CC2-B5B0-A4F441FD980B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

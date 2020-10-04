@@ -1,4 +1,5 @@
-﻿using UnityEngine.SceneManagement;
+﻿using Multiplayer.Debugging;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Multiplayer.Core
@@ -38,6 +39,7 @@ namespace Multiplayer.Core
             {
                 WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = OldText;
             }
+            Logging.OnDisable();
         }
     }
 }

@@ -22,10 +22,9 @@ namespace Multiplayer.Core
         {
             Logging.Error("Test");
         }
-
         public override void Initialize(ModController.DLLMod parentMod)
         {
-            ModController.Instance.gameObject.AddComponent<Logging>();
+            Logging.Start();
             ThisMod = parentMod;
             Application.runInBackground = true;
             base.Initialize(parentMod);

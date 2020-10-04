@@ -11,7 +11,6 @@ namespace RoWa
     public static class XML
     {
         [Serializable]
-        [Obsolete]
         /// <summary>
         /// A Dictionary that can be saved to an XML file/string
         /// </summary>

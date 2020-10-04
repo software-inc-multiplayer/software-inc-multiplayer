@@ -6,9 +6,8 @@ using UnityEngine;
 
 namespace Multiplayer.Debugging
 {
-    public class Logging : MonoBehaviour
+    public class Logging
     {
-        public static Logging instance;
         public static List<string> LogLines = new List<string>();
         public enum LogType
         {
@@ -17,12 +16,12 @@ namespace Multiplayer.Debugging
             Warn = 3,
             Error = 4
         }
-        public void Start()
+        public static void Start()
         {
             File.Create(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"));
             File.Create(Path.Combine(Application.dataPath, "Multiplayer", "Logs", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"));
         }
-        public void OnDisable()
+        public static void OnDisable()
         {
             File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"), LogLines.ToArray());
             File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", "Logs", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"), LogLines.ToArray());
