@@ -11,7 +11,17 @@ using System.Xml.Serialization;
 namespace Multiplayer.Networking
 {
     public static class Helpers
-    {    
+    {
+
+        public static byte[] Serialize<T>(T obj)
+        {
+            return null;
+        }
+
+        public static T Deserialize<T>(byte[] obj)
+        {
+            return default(T);
+        }
 
         [Serializable]
         public class User
@@ -78,7 +88,7 @@ namespace Multiplayer.Networking
         /// <summary>
         /// Base message to send over the network. DO NOT USE!
         /// </summary>
-        public class TcpMessage
+        public abstract class TcpMessage
         {
             public string Header = "";
             [XmlElement]
@@ -116,7 +126,7 @@ namespace Multiplayer.Networking
                 Header = "login";
                 Data.Add("username", username);
                 Data.Add("password", password);
-                Data.Add("uniqueid", GetUniqueID());
+                //Data.Add("uniqueid", GetUniqueID());
             }
 
             public override byte[] Serialize()
@@ -285,12 +295,14 @@ namespace Multiplayer.Networking
 
             public override byte[] Serialize()
             {
-                return Helpers.Serialize(this);
+                //return Helpers.Serialize(this);
+                return null;
             }
 
             new public static TcpRequest Deserialize(byte[] array)
             {
-                return Helpers.Deserialize<TcpRequest>(array);
+                //return Helpers.Deserialize<TcpRequest>(array);
+                return null;
             }
         }
 

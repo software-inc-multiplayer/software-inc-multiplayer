@@ -42,7 +42,7 @@ namespace RoWa
                 XMLDictionaryPair p = Pairs.Find(x => x.Key == key);
                 if (p == null)
                 {
-                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs! <= Can be ignored if mod doesn't crash afterwards");
+                    //UnityLogger.Warn($"[XML] Couldn't find object with key {key} inside Pairs! <= Can be ignored if mod doesn't crash afterwards");
                     return null;
                 }
                 object value = p.Value;
@@ -54,7 +54,7 @@ namespace RoWa
                 XMLDictionaryPair p = Pairs.Find(x => (string)x.Key == key);
                 if (p == null)
                 {
-                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs!");
+                    //UnityLogger.Warn($"[XML] Couldn't find object with key {key} inside Pairs!");
                     return null;
                 }
                 return p.Value;
@@ -138,7 +138,7 @@ namespace RoWa
             }
             catch (Exception ex)
             {
-                Logging.Warn("[XML] " + ex.Message);
+                //UnityLogger.Warn("[XML] " + ex.Message);
                 return default(T);
             }
         }

@@ -8,7 +8,7 @@ using Telepathy;
 
 namespace Multiplayer.Networking
 {
-    public partial class ServerClass
+    public partial class Server
     {
         public void SendLoginRequest(int ConnectionID)
         {
@@ -16,8 +16,7 @@ namespace Multiplayer.Networking
         }
         public void OnClientConnect(Message data)
         {
-            Logging.Info("[Server] New Client Connected", $"[Server] Client's ID - {data.connectionId}");
-            
+            //UnityLogger.Info("[Server] New Client Connected", $"[Server] Client's ID - {data.connectionId}");
         }
     }
 }

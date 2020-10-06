@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}</ProjectGuid>
+    <ProjectGuid>{9DF5CA61-BCA1-47A5-A99F-559F91458F10}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Multiplayer.Debugging</RootNamespace>
-    <AssemblyName>Multiplayer.Debugging</AssemblyName>
+    <RootNamespace>Multiplayer.Shared</RootNamespace>
+    <AssemblyName>Multiplayer.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -230,18 +230,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnityLogger.cs" />
+    <Compile Include="ILogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Multiplayer.Extensions\Multiplayer.Extensions.csproj">
-      <Project>{816fe3f3-50ef-44a7-a54a-f2ee0346e9f8}</Project>
-      <Name>Multiplayer.Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Multiplayer.Shared\Multiplayer.Shared.csproj">
-      <Project>{9df5ca61-bca1-47a5-a99f-559f91458f10}</Project>
-      <Name>Multiplayer.Shared</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

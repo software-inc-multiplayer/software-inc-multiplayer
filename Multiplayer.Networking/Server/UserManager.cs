@@ -19,7 +19,8 @@ namespace Multiplayer.Networking
     {
         Admin,
         Host,
-        Player
+        Player,
+        Guest
     }
 
     [Serializable]
@@ -54,7 +55,7 @@ namespace Multiplayer.Networking
                 IsLoggedIn = true;
             } catch(Exception e)
             {
-                Logging.Warn("Had trouble parsing account.json:", e.ToString());
+                //UnityLogger.Warn("Had trouble parsing account.json:", e.ToString());
                 IsLoggedIn = false;
             }
         }

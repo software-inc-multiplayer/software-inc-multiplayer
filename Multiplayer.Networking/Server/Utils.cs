@@ -45,7 +45,7 @@ namespace Multiplayer.Networking
             public TCPLoginResponse()
             {
                 Header = "LoginResponse";
-                Data.Add("User", ClientClass.MyUser);
+                //Data.Add("User", Client.MyUser);
             }
             public static TCPLoginResponse Deserialize(byte[] bytes)
             {
@@ -99,14 +99,14 @@ namespace Multiplayer.Networking
             }
             catch (SerializationException ex)
             {
-                Logging.Warn("[Helpers] SerializationException thrown while deserializing, probably harmless... => " + ex.Message);
+                //UnityLogger.Warn("[Helpers] SerializationException thrown while deserializing, probably harmless... => " + ex.Message);
                 return null;
             }
             catch (Exception ex)
             {
                 //Workaround, will maybe break the whole thing ^^
-                if (ex.HResult != -2147467262)
-                    Logging.Error("[Helpers] Unknown exception while deserializing the array! => " + ex.Message);
+                /*if (ex.HResult != -2147467262)
+                    UnityLogger.Error("[Helpers] Unknown exception while deserializing the array! => " + ex.Message);*/
                 return null;
             }
 

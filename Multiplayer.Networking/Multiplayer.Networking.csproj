@@ -30,6 +30,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UNIT_TEST|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\UNIT_TEST\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;TEST</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\References\Assembly-CSharp.dll</HintPath>
@@ -278,6 +288,10 @@
     <ProjectReference Include="..\Multiplayer.Extensions\Multiplayer.Extensions.csproj">
       <Project>{816FE3F3-50EF-44A7-A54A-F2EE0346E9F8}</Project>
       <Name>Multiplayer.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Multiplayer.Shared\Multiplayer.Shared.csproj">
+      <Project>{9df5ca61-bca1-47a5-a99f-559f91458f10}</Project>
+      <Name>Multiplayer.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
