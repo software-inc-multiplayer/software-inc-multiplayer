@@ -25,6 +25,13 @@ namespace Multiplayer.Core
 
         public override void Initialize(ModController.DLLMod parentMod)
         {
+            bool hasInternet = InternetTools.CheckInternetConnection();
+            if(!hasInternet)
+            {
+                WindowManager.SpawnDialog("NoInternetDialog".Loc("You aren't connected to the internet or your internet is not fast enough to use the Multiplayer Mod!\n\nThe multiplayer mod will now unload to save peformance."), true, DialogWindow.DialogType.Error);
+                ModController.Instance.UnloadMod(parentMod, false);
+                return;
+            }
             ThisMod = parentMod;
             Application.runInBackground = true;
             base.Initialize(parentMod);

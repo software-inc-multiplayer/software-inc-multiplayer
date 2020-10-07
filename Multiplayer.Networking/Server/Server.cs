@@ -6,27 +6,22 @@ using System.Threading.Tasks;
 namespace Multiplayer.Networking
 {
     public static partial class Server
-    {
-        public static List<Helpers.User> Users = new List<Helpers.User>();
-        public static string ServerName = "My Server";
+    {       
+        public static string ServerName = "";
         public static string Password = "";
         public static ushort MaxPlayers = 10;
         public static ushort Port;
         public static int Difficulty;
         public static bool hasAI = false;
-        public static Telepathy.Server server = new Telepathy.Server();
-        public static ServerData Serverdata { get; set; }
         public static bool IsRunning = false;
-        public static bool Runs { get { return IsRunning; } }
 
-        //gets fired if the server wants to save data.
-        public static EventHandler OnSavingServer;
-
+        public static Telepathy.Server server = new Telepathy.Server();     
+            
         /// <summary>
         /// Starts the server, use Server.Stop() to stop it.
         /// </summary>
         /// <param name="port">The port the server will listening on</param>
-        public static void Start(ushort port)
+        public static void Start(ushort port, string password = "")
         {
             if (server.Active)
             {
@@ -36,6 +31,7 @@ namespace Multiplayer.Networking
             }
             Serverdata = new ServerData(port.ToString());
             Port = port;
+            Password = password;
             Difficulty = GameSettings.Instance.Difficulty;
             Logging.Info("[Server] Start listening on Port " + port);
             server.MaxMessageSize = int.MaxValue;
@@ -56,8 +52,7 @@ namespace Multiplayer.Networking
                 while (IsRunning)
                 {
                     // grab all new messages. do this in your Update loop.
-                    Telepathy.Message msg;
-                    while (server.GetNextMessage(out msg))
+                    while (server.GetNextMessage(out Telepathy.Message msg))
                     {
                         switch (msg.eventType)
                         {
@@ -75,41 +70,10 @@ namespace Multiplayer.Networking
                 }
             });
             Logging.Info("[Server] End reading messages");
-        }
-
-        /// <summary>
-        /// Gets called whenever an user connects to the server
-        /// </summary>
-        /// <param name="msg">The Telepathy.Message sent by the server.getNextMessage() function</param>
-        private static void OnUserConnect(Telepathy.Message msg)
-        {
-            Logging.Info("[Server] " + msg.connectionId + " Connected");
-
-            //Send a ServerResponse to the user to login
-            Send(msg.connectionId, new Helpers.TcpResponse("login_request", ""));
-        }
-
-        /// <summary>
-        /// Gets called whenever an user disconnects to the server
-        /// </summary>
-        /// <param name="msg">The Telepathy.Message sent by the server.getNextMessage() function</param>
-        private static void OnUserDisconnect(Telepathy.Message msg)
-        {
-            Logging.Info("[Server] " + msg.connectionId + " Disconnected");
-
-            //Check if the user with the connectionid exists and if so delete him from the database
-            Helpers.User user = Users.Find(x => x.ID == msg.connectionId);
-            if (user == null)
-                Logging.Warn($"[Server] User with the Id {msg.connectionId} did disconnect but no User object was found for him!");
-            else
-            {
-                Logging.Info($"[Server] User {user.Username} did disconnect from the Server!");
-                Users.Remove(user);
-            }
-        }
+        }   
 
         #region Messages
-        public static void Send(Helpers.TcpServerChat tcpServerChat)
+        public static void Send(TcpServerChat tcpServerChat)
         {
             Logging.Info("[Server] Sending server wide message: " + (string)tcpServerChat.Data.GetValue("message"));
             foreach (Helpers.User user in Users)
@@ -118,35 +82,35 @@ namespace Multiplayer.Networking
             }
         }
 
-        public static void Send(int clientid, Helpers.TcpRequest request)
+        public static void Send(int clientid, TcpRequest request)
         {
             Logging.Info("[Server] Sending request to client " + clientid);
             //server.Send(clientid, request.ToArray());
             server.Send(clientid, request.Serialize());
         }
 
-        public static void Send(int clientid, Helpers.TcpResponse response)
+        public static void Send(int clientid, TcpResponse response)
         {
             Logging.Info("[Server] Sending response to client " + clientid);
             //server.Send(clientid, response.ToArray());
             server.Send(clientid, response.Serialize());
         }
 
-        public static void Send(int clientid, Helpers.TcpChat message)
+        public static void Send(int clientid, TcpChat message)
         {
             int receiver = (int)message.Data.GetValue("receiver");
             string msg = (string)message.Data.GetValue("message");
             Logging.Info("[Server] Redirecting Chat message from " + clientid + " to " + receiver);
-            server.Send(receiver, new Helpers.TcpChat(msg, GetUser(clientid)).Serialize());
+            server.Send(receiver, new TcpChat(msg, GetUser(clientid)).Serialize());
         }
 
-        public static void Send(int clientid, Helpers.TcpGamespeed speed)
+        public static void Send(int clientid, TcpGamespeed speed)
         {
             Logging.Info("[Server] Sending GameSpeed to client " + clientid);
             server.Send(clientid, speed.Serialize());
         }
 
-        public static void Send(Helpers.TcpGamespeed speed)
+        public static void Send(TcpGamespeed speed)
         {
             Logging.Info("[Server] Sending GameSpeed to all clients");
             foreach (Helpers.User user in Users)
@@ -167,75 +131,50 @@ namespace Multiplayer.Networking
             Logging.Info($"[Server] Data from Connection {msg.connectionId}: {msg.data.Length} bytes");
 
             //Handle TCPLogin
-            //Helpers.TcpLogin tcplogin = XML.From<Helpers.TcpLogin>(datastr);
-            Helpers.TcpLogin tcplogin = Helpers.TcpLogin.Deserialize(msg.data);
+            //TcpLogin tcplogin = XML.From<TcpLogin>(datastr);
+            TcpLogin tcplogin = TcpLogin.Deserialize(msg.data);
             if (tcplogin != null && tcplogin.Header == "login")
+            {
                 OnUserLogin(msg.connectionId, tcplogin);
+            }
 
             //Handle TCPChat
-            //Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
-            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(msg.data);
+            //TcpChat tcpchat = XML.From<TcpChat>(datastr);
+            TcpChat tcpchat = TcpChat.Deserialize(msg.data);
             if (tcpchat != null && tcpchat.Header == "chat")
+            {
                 OnUserChat(msg.connectionId, tcpchat);
+            }
             //HandleTcpPrivateChat 
-            Helpers.TcpPrivateChat tcpPrivateChat = Helpers.TcpPrivateChat.Deserialize(msg.data);
+            TcpPrivateChat tcpPrivateChat = TcpPrivateChat.Deserialize(msg.data);
             if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
+            {
                 OnPrivateChat(tcpPrivateChat);
+            }
             //Handle TCPRequests
-            //Helpers.TcpRequest tcprequest = XML.From<Helpers.TcpRequest>(datastr);
-            Helpers.TcpRequest tcprequest = Helpers.TcpRequest.Deserialize(msg.data);
+            //TcpRequest tcprequest = XML.From<TcpRequest>(datastr);
+            TcpRequest tcprequest = TcpRequest.Deserialize(msg.data);
             if (tcprequest != null && tcprequest.Header == "request")
             {
                 string req = (string)tcprequest.Data.GetValue("request");
                 if (req == "gameworld")
-                    OnRequestGameWorld(msg.connectionId);
-                else if (req == "userlist")
-                    OnRequestUserList(msg.connectionId);
-            }
-
-            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(msg.data);
-            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
-                OnGamespeedChange(msg.connectionId, tcpspeed);
-        }
-
-        /// <summary>
-        /// Gets called when the Header of Receive is "login"
-        /// </summary>
-        /// <param name="connectionid">The connection id of the Telepathy.Message</param>
-        /// <param name="login">The Helpers.TcpLogin</param>
-        private static void OnUserLogin(int connectionid, Helpers.TcpLogin login)
-        {
-            Logging.Info($"[Server] User {login.Data.GetValue("username")} ({connectionid}) tries to login to the server");
-            if (Users.Count >= MaxPlayers)
-            {
-                Logging.Info($"[Server] User {connectionid} tries login but max users reached");
-                Send(connectionid, new Helpers.TcpResponse("login_response", "max_players"));
-            }
-            else if (Password != (string)login.Data.GetValue("password"))
-            {
-                Logging.Info($"[Server] User {connectionid} tries login with password {(string)login.Data.GetValue("password")} but pass is {Password}");
-                Send(connectionid, new Helpers.TcpResponse("login_response", "wrong_password"));
-            }
-            else if (Users.Count < MaxPlayers && Password == (string)login.Data.GetValue("password"))
-            {
-                Send(connectionid, new Helpers.TcpResponse("login_response", "ok"));
-                Users.Add(new Helpers.User()
                 {
-                    ID = connectionid,
-                    Role = Users.Count < 1 ? Helpers.UserRole.Host : Helpers.UserRole.Client,
-                    UniqueID = (string)login.Data.GetValue("uniqueid"),
-                    Username = (string)login.Data.GetValue("username")
-                });
-                Logging.Info($"[Server] User {(string)login.Data.GetValue("username")} logged in!");
-                Send(new Helpers.TcpServerChat($"{(string)login.Data.GetValue("username")} has joined the server.", Helpers.TcpServerChatType.Info));
-                return;
+                    OnRequestGameWorld(msg.connectionId);
+                }
+                else if (req == "userlist")
+                {
+                    OnRequestUserList(msg.connectionId);
+                }
             }
-            else
-                Logging.Warn($"[Server] Invalid TcpLogin data!");
-            Logging.Warn("[Server] User didn't login, check client for details");
+
+            TcpGamespeed tcpspeed = TcpGamespeed.Deserialize(msg.data);
+            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
+            {
+                OnGamespeedChange(msg.connectionId, tcpspeed);
+            }
         }
 
-        private static void OnUserChat(int connectionid, Helpers.TcpChat chat)
+        private static void OnUserChat(int connectionid, TcpChat chat)
         {
             if ((Helpers.User)chat.Data.GetValue("receiver") != null)
             {
@@ -248,8 +187,12 @@ namespace Multiplayer.Networking
             //Send to all connected users
             Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
             foreach (Helpers.User u in Users)
+            {
                 if (u.ID != connectionid)
+                {
                     server.Send(u.ID, chat.Serialize());
+                }
+            }
         }
 
         private static void OnRequestGameWorld(int connectionid)
@@ -262,11 +205,11 @@ namespace Multiplayer.Networking
         {
             Logging.Info("[Server] Sending Userlist to user " + connectionid);
             Logging.Warn("[Server] Can't send Userlist because there is an exception, this problem is known!");
-            //Helpers.TcpResponse response = new Helpers.TcpResponse("userlist", new XML.XMLDictionary(new XML.XMLDictionaryPair("users", Users.ToArray())));
+            //TcpResponse response = new TcpResponse("userlist", new XML.XMLDictionary(new XML.XMLDictionaryPair("users", Users.ToArray())));
             //server.Send(connectionid, response.ToArray());
         }
 
-        private static void OnGamespeedChange(int connectionid, Helpers.TcpGamespeed speed)
+        private static void OnGamespeedChange(int connectionid, TcpGamespeed speed)
         {
             if ((int)speed.Data.GetValue("type") == 0)
             {
@@ -278,7 +221,9 @@ namespace Multiplayer.Networking
                 }
             }
             else
+            {
                 Logging.Warn($"[Server] User {connectionid} can't change gamespeed if type is 1 (vote) because votes aren't included yet");
+            }
         }
 
         /// <summary>
@@ -291,7 +236,7 @@ namespace Multiplayer.Networking
                 Logging.Warn("[Server] Can't stop a Server that isn't running...");
                 return;
             }
-            await Task.Run(() => Send(new Helpers.TcpServerChat($"The server has been stopped and you have been disconnected from it.", Helpers.TcpServerChatType.Warn)));
+            await Task.Run(() => Send(new TcpServerChat($"The server has been stopped and you have been disconnected from it.", TcpServerChatType.Warn)));
             Logging.Info("[Server] Stop listening");
             IsRunning = false;
             Serverdata.SaveData(null, null);
@@ -299,43 +244,6 @@ namespace Multiplayer.Networking
             Users.Clear();
         }
 
-        /// <summary>
-        /// Saves the server by firing the OnSavingServer event
-        /// </summary>
-        public static void Save()
-        {
-            OnSavingServer?.Invoke(null, null);
-            Send(new Helpers.TcpServerChat($"Saved server.", Helpers.TcpServerChatType.Info));
-        }
-
-        /// <summary>
-        /// Returns the user with the ID id
-        /// </summary>
-        /// <param name="id">The 'connectionId' of the user</param>
-        /// <returns>A Helpers.User object representing an user or null</returns>
-        public static Helpers.User GetUser(int id)
-        {
-            return Users.Find(x => x.ID == id);
-        }
-
-        /// <summary>
-        /// Returns the user with the Unique ID
-        /// </summary>
-        /// <param name="uniqueid">The User.UniqueId generated by GetUniqueID</param>
-        /// <returns>A Helpers.user object representing an user or null</returns>
-        public static Helpers.User GetUserByUnique(string uniqueid)
-        {
-            return Users.Find(x => x.UniqueID == uniqueid);
-        }
-
-        /// <summary>
-        /// Returns the user with the username
-        /// </summary>
-        /// <param name="username">The username of the user</param>
-        /// <returns>A Helpers.User object representing an user or null</returns>
-        public static Helpers.User GetUser(string username)
-        {
-            return Users.Find(x => x.Username == username);
-        }
+           
     }
 }

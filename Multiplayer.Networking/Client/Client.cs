@@ -41,7 +41,7 @@ namespace Multiplayer.Networking
                 if (client.Connected)
                 {
                     Logging.Info("[Client] Connected to the Server!");
-                    OnServerChatRecieved(new Helpers.TcpServerChat($"Connected to the server.", Helpers.TcpServerChatType.Info));
+                    OnServerChatRecieved(new TcpServerChat($"Connected to the server.", TcpServerChatType.Info));
                     Read();
                     GameWorld.Client client = new GameWorld.Client();
                 }
@@ -61,8 +61,7 @@ namespace Multiplayer.Networking
             {
                 while (Connected)
                 {
-                    Telepathy.Message msg;
-                    while (client.GetNextMessage(out msg))
+                    while (client.GetNextMessage(out Telepathy.Message msg))
                     {
                         switch (msg.eventType)
                         {
@@ -88,35 +87,47 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Data from Server: " + data.Length + " bytes");
 
             //Handle TcpResponse
-            Helpers.TcpResponse tcpresponse = Helpers.TcpResponse.Deserialize(data);
+            TcpResponse tcpresponse = TcpResponse.Deserialize(data);
             if (tcpresponse != null && tcpresponse.Header == "response")
+            {
                 OnServerResponse(tcpresponse);
+            }
 
             //Handle TcpServerChat
-            Helpers.TcpServerChat tcpServerChat = Helpers.TcpServerChat.Deserialize(data);
+            TcpServerChat tcpServerChat = TcpServerChat.Deserialize(data);
             if (tcpServerChat != null && tcpServerChat.Header == "serverchat")
+            {
                 OnServerChatRecieved(tcpServerChat);
+            }
 
-            Helpers.TcpPrivateChat tcpPrivateChat = Helpers.TcpPrivateChat.Deserialize(data);
+            TcpPrivateChat tcpPrivateChat = TcpPrivateChat.Deserialize(data);
             if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
+            {
                 OnPrivateChatRecieved(tcpPrivateChat);
+            }
 
             //Handle TcpChat
-            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
+            TcpChat tcpchat = TcpChat.Deserialize(data);
             if (tcpchat != null && tcpchat.Header == "chat")
+            {
                 OnChatReceived(tcpchat);
+            }
 
             //Handle GameWorld
-            Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
+            TcpGameWorld tcpworld = TcpGameWorld.Deserialize(data);
             if (tcpworld != null && tcpworld.Header == "gameworld")
+            {
                 OnGameWorldReceived(tcpworld);
+            }
 
             //Handle Gamespeed
-            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(data);
+            TcpGamespeed tcpspeed = TcpGamespeed.Deserialize(data);
             if (tcpspeed != null && tcpspeed.Header == "gamespeed")
+            {
                 OnGamespeedChange(tcpspeed);
+            }
         }
-        private static void OnGamespeedChange(Helpers.TcpGamespeed tcpspeed)
+        private static void OnGamespeedChange(TcpGamespeed tcpspeed)
         {
             Logging.Info("gamespeedchange...");
             int type = (int)tcpspeed.Data.GetValue("type");
@@ -126,10 +137,10 @@ namespace Multiplayer.Networking
                 GameSettings.GameSpeed = speed;
                 //HUD.Instance.GameSpeed = (int)speed;
             }
-            OnServerChatRecieved(new Helpers.TcpServerChat($"The gamespeed has been changed to {speed}", Helpers.TcpServerChatType.Info));
+            OnServerChatRecieved(new TcpServerChat($"The gamespeed has been changed to {speed}", TcpServerChatType.Info));
         }
 
-        private static void OnServerResponse(Helpers.TcpResponse response)
+        private static void OnServerResponse(TcpResponse response)
         {
             object type = response.Data.GetValue("type");
             if (type == null)
@@ -139,7 +150,7 @@ namespace Multiplayer.Networking
             }
             if ((string)type == "login_request")
             {
-                Send(new Helpers.TcpLogin(Username, ServerPassword));
+                Send(new TcpLogin(Username, ServerPassword));
             }
             else if ((string)type == "login_response")
             {
@@ -149,7 +160,7 @@ namespace Multiplayer.Networking
                     //Login ok
                     Logging.Info("[Client] You're logged in now!");
                     //Send request to get GameWorld
-                    Send(new Helpers.TcpRequest("gameworld"));
+                    Send(new TcpRequest("gameworld"));
 
                 }
                 else if (res == "max_players")
@@ -166,24 +177,24 @@ namespace Multiplayer.Networking
         }
 
         #region Messages
-        public static void Send(Helpers.TcpLogin login)
+        public static void Send(TcpLogin login)
         {
             Logging.Info("[Client] Sending login message");
             client.Send(login.Serialize());
-        }       
-        public static void Send(Helpers.TcpRequest request)
+        }
+        public static void Send(TcpRequest request)
         {
             Logging.Info("[Client] Sending request");
             client.Send(request.Serialize());
         }
 
-        public static void Send(Helpers.TcpResponse response)
+        public static void Send(TcpResponse response)
         {
             Logging.Info("[Client] Sending response");
             client.Send(response.Serialize());
         }
 
-        public static void Send(Helpers.TcpGamespeed speed)
+        public static void Send(TcpGamespeed speed)
         {
             Logging.Info("[Client] Sending gamespeed");
             client.Send(speed.Serialize());

@@ -11,7 +11,6 @@ namespace RoWa
     public static class XML
     {
         [Serializable]
-        [Obsolete]
         /// <summary>
         /// A Dictionary that can be saved to an XML file/string
         /// </summary>
@@ -23,7 +22,9 @@ namespace RoWa
             public XMLDictionary(Dictionary<object, object> dict)
             {
                 foreach (KeyValuePair<object, object> kvp in dict)
+                {
                     Pairs.Add(new XMLDictionaryPair(kvp.Key, kvp.Value));
+                }
             }
             public XMLDictionary(params XMLDictionaryPair[] pairs)
             {
@@ -33,9 +34,13 @@ namespace RoWa
             public bool Contains(object key)
             {
                 if (Pairs.Find(x => x.Key == key) != null)
+                {
                     return true;
+                }
                 else
+                {
                     return false;
+                }
             }
 
             public object GetValue(object key)
@@ -140,7 +145,7 @@ namespace RoWa
             catch (Exception ex)
             {
                 Logging.Warn("[XML] " + ex.Message);
-                return default(T);
+                return default;
             }
         }
     }

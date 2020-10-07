@@ -17,7 +17,11 @@ namespace Multiplayer.Core
 
         private void OnScene(Scene arg0, LoadSceneMode arg1)
         {
-            if (!isActiveAndEnabled) return;
+            if (!isActiveAndEnabled)
+            {
+                return;
+            }
+
             if (arg0.name == "MainMenu")
             {
                 ModifyText();

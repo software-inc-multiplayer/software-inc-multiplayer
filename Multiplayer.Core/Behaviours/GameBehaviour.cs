@@ -28,7 +28,11 @@ namespace Multiplayer.Core
 
         public void ChatLoop()
         {
-            if (Client.ChatWindow || CommandTooltip == null) return;
+            if (Client.ChatWindow || CommandTooltip == null)
+            {
+                return;
+            }
+
             if (ChatInput.obj.text.Trim()[0].Equals("/"))
             {
                 CommandTooltip.text = "For a full list of commands, see the wiki.";
@@ -41,7 +45,11 @@ namespace Multiplayer.Core
 
         private void OnScene(Scene arg0, LoadSceneMode arg1)
         {
-            if (!isActiveAndEnabled) return;
+            if (!isActiveAndEnabled)
+            {
+                return;
+            }
+
             if (arg0.name == "MainScene")
             {
                 //HUD.Instance.AddPopupMessage("Thanks for using the Multiplayer mod.\nJoin the discord: discord.io/multiplayer-mod", "Smiley", PopupManager.NotificationSound.Good, 1);
@@ -195,8 +203,7 @@ namespace Multiplayer.Core
                         KeyValuePair<string, Action>[] action2s = new KeyValuePair<string, Action>[]
                         {
                                 new KeyValuePair<string, Action>("Yes".LocDef("Yes"), delegate {
-                                    if(Client.client.Connected) Client.Disconnect();
-                                    dia2g.Window.Close();
+                                    if(Client.client.Connected) { Client.Disconnect(); } dia2g.Window.Close();
                                     try
                                     {
                                         Client.Connect("127.0.0.1", ushort.Parse(PortTextBox.obj.text));
@@ -285,7 +292,7 @@ namespace Multiplayer.Core
                 {
                     Username = Client.Username
                 };
-                Helpers.TcpChat chatClass = new Helpers.TcpChat(ChatInput.obj.text, tmpUser);
+                TcpChat chatClass = new TcpChat(ChatInput.obj.text, tmpUser);
                 ChatInput.obj.text = "";
                 Client.Send(chatClass);
             }, MPWindow.MainPanel);
@@ -307,13 +314,13 @@ namespace Multiplayer.Core
                     {
                         Username = Client.Username
                     };
-                    Client.Send(new Helpers.TcpPrivateChat(sender, username, message));
-                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"Sent private message to: {username}", Helpers.TcpServerChatType.Info));
+                    Client.Send(new TcpPrivateChat(sender, username, message));
+                    Client.OnServerChatRecieved(new TcpServerChat($"Sent private message to: {username}", TcpServerChatType.Info));
                     Logging.Info("[Commands] used /msg: " + message, username, sender.Username);
                 }
                 catch (Exception e)
                 {
-                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"There was an error running the chat command: {text}{$"\nAre you sure you typed the command in correctly?\n\n{e}"}", Helpers.TcpServerChatType.Error));
+                    Client.OnServerChatRecieved(new TcpServerChat($"There was an error running the chat command: {text}{$"\nAre you sure you typed the command in correctly?\n\n{e}"}", TcpServerChatType.Error));
                 }
 
             }
@@ -323,7 +330,10 @@ namespace Multiplayer.Core
         {
             SceneManager.sceneLoaded -= OnScene;
             if (MPButton != null)
+            {
                 MPButton.gameObject.SetActive(false);
+            }
+
             Logging.Info("Destroyed multiplayer button in MainScene");
         }
     }

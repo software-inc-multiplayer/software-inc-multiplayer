@@ -5,6 +5,19 @@ using System.IO;
 
 namespace Multiplayer.Networking
 {
+    public static partial class Server
+    {
+        public static ServerData Serverdata { get; set; }
+
+        /// <summary>
+        /// Saves the server by firing the OnSavingServer event
+        /// </summary>
+        public static void Save()
+        {
+            OnSavingServer?.Invoke(null, null);
+            Send(new TcpServerChat($"Saved server.", TcpServerChatType.Info));
+        }
+    }
     [Serializable]
     public class ServerData
     {
@@ -16,7 +29,7 @@ namespace Multiplayer.Networking
         public int Difficulty;
         public GameWorld.Server Gameworld;
         public GameTime Gametime;
-        private string serverpath;
+        private readonly string serverpath;
 
         /// <summary>
         /// Creates a new ServerData based on the ServerClass.Instance

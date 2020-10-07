@@ -65,14 +65,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\Client.cs" />
-    <Compile Include="Client\Chat.cs" />
-    <Compile Include="Client\PrivateMessages.cs" />
+    <Compile Include="Chat\Chat.cs" />
+    <Compile Include="Chat\PrivateMessages.cs" />
     <Compile Include="GameWorld\GameTime.cs" />
     <Compile Include="GameWorld\GameWorld.cs" />
-    <Compile Include="Server\Helpers.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\Server.cs" />
     <Compile Include="Server\ServerData.cs" />
+    <Compile Include="Server\Events.cs" />
+    <Compile Include="TCPMessages.cs" />
+    <Compile Include="Server\UserManagement.cs" />
     <Compile Include="XML.cs" />
   </ItemGroup>
   <ItemGroup>

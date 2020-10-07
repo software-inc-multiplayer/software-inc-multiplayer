@@ -10,12 +10,15 @@ namespace Multiplayer.Core
 {
     internal class DebugConsole : ModBehaviour
     {
-        public static DebugConsole instance;
         private bool inmain = false;
         public bool Rrinuse { get; set; }
         public void PlayRR()
         {
-            if (Rrinuse) return;
+            if (Rrinuse)
+            {
+                return;
+            }
+
             Rrinuse = true;
             string[] lines = File.ReadAllLines(Path.Combine(Meta.ThisMod.ModPath, "Assets", "rr.txt"));
             StartCoroutine(ReadLines(lines));
@@ -55,7 +58,9 @@ namespace Multiplayer.Core
             DevConsole.Command<int> setgamespeed = new DevConsole.Command<int>("MULTIPLAYER_SPEED", OnSetGameSpeed);
             DevConsole.Console.AddCommand(setgamespeed);
             if (SceneManager.GetActiveScene().name == "MainScene")
+            {
                 inmain = true;
+            }
         }
 
         public void OnSetGameSpeed(int speed)
@@ -66,12 +71,12 @@ namespace Multiplayer.Core
                 return;
             }
             Logging.Info("[DebugConsole] Set gamespeed");
-            Client.Send(new Helpers.TcpGamespeed(speed, 0));
+            Client.Send(new TcpGamespeed(speed, 0));
         }
 
         public void OnSaveGameWorld()
         {
-            if (!Networking.Server.Runs)
+            if (!Networking.Server.IsRunning)
             {
                 Logging.Warn("You need to have a Server running to use this command!");
                 return;
@@ -82,16 +87,21 @@ namespace Multiplayer.Core
         public void OnRequestGameWorld()
         {
             if (!Networking.Client.client.Connected)
+            {
                 Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
-            Networking.Client.Send(new Helpers.TcpGameWorld(Networking.GameWorld.Client.Instance.world, true));
+            }
+
+            Networking.Client.Send(new TcpGameWorld(Networking.GameWorld.Client.Instance.world, true));
         }
 
         public void OnRequestUserList()
         {
             if (!Networking.Client.client.Connected)
+            {
                 Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
+            }
 
-            Networking.Client.Send(new Helpers.TcpRequest("userlist"));
+            Networking.Client.Send(new TcpRequest("userlist"));
         }
 
         public void OnServerStop()
@@ -134,7 +144,9 @@ namespace Multiplayer.Core
             }
             //DEBUG
             if (ip == ".")
+            {
                 ip = "127.0.0.1";
+            }
             //DEBUG END
             try
             {
@@ -154,9 +166,11 @@ namespace Multiplayer.Core
                 Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
                 return;
             }
-            var tmpUser = new Helpers.User();
-            tmpUser.Username = Client.Username;
-            Helpers.TcpChat chatClass = new Helpers.TcpChat(arg0, tmpUser);
+            var tmpUser = new Helpers.User
+            {
+                Username = Client.Username
+            };
+            TcpChat chatClass = new TcpChat(arg0, tmpUser);
             Networking.Client.Send(chatClass);
         }
 
