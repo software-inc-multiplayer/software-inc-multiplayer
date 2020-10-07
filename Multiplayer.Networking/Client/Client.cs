@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MessagePack;
+using Multiplayer.Networking.Packet;
+using Multiplayer.Networking.Utility;
 using Multiplayer.Shared;
 using Telepathy;
 
@@ -16,10 +20,12 @@ namespace Multiplayer.Networking
         #endregion
 
         private readonly ILogger logger;
+        private readonly PacketSerializer packetSerializer;
 
-        public Client(ILogger logger)
+        public Client(ILogger logger, PacketSerializer packetSerializer)
         {
             this.logger = logger;
+            this.packetSerializer = packetSerializer;
             this.RawClient = new Telepathy.Client();
         }
         
@@ -27,14 +33,24 @@ namespace Multiplayer.Networking
         
         public Telepathy.Client RawClient { get; set; }
 
-        public void HandleMessages()
+        public bool HandleMessages()
         {
+            var hadMessage = false;
+
             while (this.RawClient.GetNextMessage(out Message msg))
             {
+                hadMessage = true;
                 switch (msg.eventType)
                 {
                     case EventType.Connected:
                         this.ClientConnected?.Invoke(this, new ClientConnectedEventArgs(msg.connectionId));
+
+                        var handshakePacket = new Handshake() { };
+                        if(!this.RawClient.Send(this.packetSerializer.SerializePacket(handshakePacket)))
+                        {
+                            this.logger.Error("could not send handshake packet");
+                        }
+
                         break;
                     case EventType.Data:
 
@@ -44,6 +60,7 @@ namespace Multiplayer.Networking
                         break;
                 }
             }
+            return hadMessage;
         }
 
         public void Connect(string ip, int port)

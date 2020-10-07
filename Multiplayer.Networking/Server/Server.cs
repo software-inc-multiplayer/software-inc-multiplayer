@@ -5,16 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Telepathy;
+using MessagePack;
+
 using Multiplayer.Debugging;
 using Multiplayer.Networking;
 using Multiplayer.Extensions;
 using Multiplayer.Shared;
+using Multiplayer.Networking.Utility;
 
 namespace Multiplayer.Networking
 {
-    public partial class Server
+    public partial class Server : IDisposable
     {
         private readonly ILogger logger;
+        private readonly PacketSerializer packetSerializer;
         #region Events
         // for future reference https://itchyowl.com/events-in-unity/ maybe use unityevent some time
         public event EventHandler ServerStarted;
@@ -30,14 +34,26 @@ namespace Multiplayer.Networking
 
         public List<int> ConnectedClients { get; set; } = new List<int>();
 
-        public Server(ILogger logger)
+        public Server(ILogger logger, PacketSerializer packetSerializer)
         {
             this.logger = logger;
+            this.packetSerializer = packetSerializer;
+            this.RawServer = new Telepathy.Server();
+        }
+
+        public void Dispose()
+        {
+            // stop the server
+            this.RawServer.Stop();
+            // clear all events
+            this.ServerStarted = null;
+            this.ServerStopped = null;
+            this.ClientConnected = null;
+            this.ClientDisconnected = null;
         }
 
         public void Start(int port, string password = "")
         {
-            this.RawServer = new Telepathy.Server();
             this.ServerInfomation = new ServerInfo()
                 {
                     Port = port,
@@ -55,13 +71,14 @@ namespace Multiplayer.Networking
             this.ServerStopped?.Invoke(this, null);
         }
 
-        public void HandleMessages()
+        public bool HandleMessages()
         {
             if (!this.RawServer.Active)
-                return;
-
+                return false;
+            var hadMessage = false;
             while (this.RawServer.GetNextMessage(out Message msg))
             {
+                hadMessage = true;
                 switch (msg.eventType)
                 {
                     case EventType.Connected:
@@ -74,9 +91,12 @@ namespace Multiplayer.Networking
                             this.RawServer.Disconnect(msg.connectionId);
                             this.ConnectedClients.Remove(msg.connectionId);
                         }
-                        //OnClientConnect(data);
                         break;
                     case EventType.Data:
+                        if (msg.data == null || !msg.data.Any())
+                            break;
+
+                        var packet = this.packetSerializer.DeserializePacket(msg.data);
 
                         break;
                     case EventType.Disconnected:
@@ -85,6 +105,7 @@ namespace Multiplayer.Networking
                         break;
                 }
             }
+            return hadMessage;
         }
 
         public class ClientConnectedEventArgs : EventArgs
