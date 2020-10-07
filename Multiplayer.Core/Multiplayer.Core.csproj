@@ -270,4 +270,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>cd ../../../
+pwsh create-binaries.ps1</PostBuildEvent>
+  </PropertyGroup>
 </Project>
