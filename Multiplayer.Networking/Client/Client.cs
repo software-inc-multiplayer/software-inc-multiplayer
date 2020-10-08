@@ -12,7 +12,7 @@ using Telepathy;
 
 namespace Multiplayer.Networking
 {
-    public class Client
+    public class Client : IDisposable
     {
         #region Events
         public event EventHandler<ClientConnectedEventArgs> ClientConnected;
@@ -28,10 +28,28 @@ namespace Multiplayer.Networking
             this.packetSerializer = packetSerializer;
             this.RawClient = new Telepathy.Client();
         }
-        
+
+        public void Dispose()
+        {
+            // disconnect the client
+            this.Disconnect();
+            // clear all events
+            this.ClientConnected = null;
+            this.ClientDisconnected = null;
+        }
+
         public User MyUser { get; set; }
         
         public Telepathy.Client RawClient { get; set; }
+
+        protected void Send(IPacket packet)
+        {
+            // maybe add a check if we are still connected
+            if (!this.RawClient.Send(this.packetSerializer.SerializePacket(packet)))
+            {
+                this.logger.Error("could not send packet");
+            }
+        }
 
         public bool HandleMessages()
         {
@@ -45,14 +63,19 @@ namespace Multiplayer.Networking
                     case EventType.Connected:
                         this.ClientConnected?.Invoke(this, new ClientConnectedEventArgs(msg.connectionId));
 
-                        var handshakePacket = new Handshake() { };
-                        if(!this.RawClient.Send(this.packetSerializer.SerializePacket(handshakePacket)))
-                        {
-                            this.logger.Error("could not send handshake packet");
-                        }
+                        this.Send(new Handshake(this.MyUser.UniqueID));
 
                         break;
                     case EventType.Data:
+
+                        var genericPacket = this.packetSerializer.DeserializePacket(msg.data);
+                        if(genericPacket == null)
+                        {
+#if DEBUG
+                            // maybe add some more details
+                            this.logger.Warn("received unknown packet");
+#endif
+                        }
 
                         break;
                     case EventType.Disconnected:
@@ -71,8 +94,11 @@ namespace Multiplayer.Networking
 
         public void Disconnect()
         {
+            this.Send(new Disconnect("leaving"));
             this.RawClient.Disconnect();
         }
+
+        
 
         public class ClientConnectedEventArgs : EventArgs
         {
@@ -81,7 +107,6 @@ namespace Multiplayer.Networking
                 this.ConnectionId = connectionId;
             }
             public int ConnectionId { get; set; }
-            public bool Cancel { get; set; } = false;
         }
 
         public class ClientDisconnectedEventArgs : EventArgs

@@ -1,30 +1,28 @@
-using System;
 using Xunit;
-using Multiplayer.Networking;
+using System;
 using System.Threading;
+
+using Multiplayer.Networking;
 using Multiplayer.Networking.Utility;
-using System.Diagnostics;
-using Xunit.Abstractions;
+using Multiplayer.Networking.Packet;
 
 namespace Multiplayer.Networking.Test
 {
     public class ServerSidedTests : IDisposable
     {
         private static int _serverPort = 1400;
+        private readonly int serverPort;
+
         private readonly TestLogger logger;
         private readonly PacketSerializer packetSerializer;
         private readonly Server server;
-        private readonly int serverPort;
-        private readonly ITestOutputHelper output;
 
-        public ServerSidedTests(ITestOutputHelper output)
+        public ServerSidedTests()
         {
+            this.serverPort = Interlocked.Increment(ref _serverPort);
             this.logger = new TestLogger();
             this.packetSerializer = new PacketSerializer();
             this.server = new Server(this.logger, this.packetSerializer);
-            this.serverPort = Interlocked.Increment(ref _serverPort);
-            output.WriteLine($"Port: {serverPort}");
-            this.output = output;
         }
 
         public void Dispose()
@@ -73,16 +71,17 @@ namespace Multiplayer.Networking.Test
             var clientConnectedFired = false;
             var clientDisconnectedFired = false;
 
-            var connectionId = 0;
+            var connectionId = -1;
 
             server.ClientConnected += (sender, e) => {
                 clientConnectedFired = true;
+                Assert.NotEqual(-1, e.ConnectionId);
                 connectionId = e.ConnectionId;
                 Assert.False(e.Cancel);
             };
             server.ClientDisconnected += (sender, e) => {
                 clientDisconnectedFired = true;
-                Assert.NotEqual(0, connectionId);
+                Assert.NotEqual(-1, connectionId);
                 Assert.Equal(connectionId, e.ConnectionId);
             };
 
@@ -94,7 +93,7 @@ namespace Multiplayer.Networking.Test
             server.SafeHandleMessages();
 
             Assert.True(clientConnectedFired);
-            Assert.NotEqual(0, connectionId);
+            Assert.NotEqual(-1, connectionId);
             Assert.Contains(connectionId, server.ConnectedClients);
             Assert.Single(server.ConnectedClients);
 
@@ -103,7 +102,6 @@ namespace Multiplayer.Networking.Test
             client.Disconnect();
 
             server.SafeHandleMessages();
-            server.Stop();
 
             Assert.True(clientDisconnectedFired);
         }
@@ -114,17 +112,19 @@ namespace Multiplayer.Networking.Test
             var clientConnectedFired = false;
             var clientDisconnectedFired = false;
 
-            var server = new Server(this.logger, this.packetSerializer);
+            var connectionId = -1;
+
             server.ClientConnected += (sender, e) => {
                 clientConnectedFired = true;
-                output.WriteLine($"CC-Port: {serverPort}");
+                Assert.NotEqual(-1, e.ConnectionId);
+                connectionId = e.ConnectionId;
                 e.Cancel = true;
             };
             
             server.ClientDisconnected += (sender, e) => {
                 clientDisconnectedFired = true;
-                output.WriteLine($"CD-Port: {serverPort}");
-                //Assert.Equal(1, e.ConnectionId);
+                Assert.NotEqual(-1, connectionId);
+                Assert.Equal(connectionId, e.ConnectionId);
             };
 
             server.Start(serverPort);
@@ -140,8 +140,6 @@ namespace Multiplayer.Networking.Test
 
             server.SafeHandleMessages();
 
-            server.Stop();
-
             Assert.True(clientConnectedFired);
             Assert.True(clientDisconnectedFired);
         }
@@ -150,17 +148,21 @@ namespace Multiplayer.Networking.Test
         public void ClientHandshake()
         {
             var clientConnectedFired = false;
-            var clientDisconnectedFired = false;
+            var handshakeReceived = true;
 
-            var server = new Server(this.logger, this.packetSerializer);
+            var connectionId = -1;
+
             server.ClientConnected += (sender, e) => {
                 clientConnectedFired = true;
-                Assert.Equal(1, e.ConnectionId);
+                Assert.NotEqual(-1, e.ConnectionId);
+                connectionId = e.ConnectionId;
                 Assert.False(e.Cancel);
             };
-            server.ClientDisconnected += (sender, e) => {
-                clientDisconnectedFired = true;
-                Assert.Equal(1, e.ConnectionId);
+            server.ReceivedPacket += (sender, e) =>
+            {
+                if (e.Handled)
+                    return;
+                handshakeReceived = e.Handled = e.Packet is Handshake;
             };
 
             server.Start(serverPort);
@@ -172,17 +174,73 @@ namespace Multiplayer.Networking.Test
             client.SafeHandleMessages(); // trigger handshake
             server.SafeHandleMessages(); // handle client handshake
 
-            Assert.Contains(1, server.ConnectedClients);
+            Assert.True(handshakeReceived);
 
             Assert.True(client.RawClient.Connected);
 
             client.Disconnect();
 
-            server.SafeHandleMessages();
-            server.Stop();
-
             Assert.True(clientConnectedFired);
-            Assert.True(clientDisconnectedFired);
+        }
+
+        [Fact]
+        public void ClientDoubleHandshake()
+        {
+            server.ReceivedPacket += (sender, e) =>
+            {
+                if (e.Handled)
+                    return;
+                e.Handled |= e.Packet is Handshake;
+            };
+            server.Start(serverPort);
+
+            var client = new Client(this.logger, this.packetSerializer);
+            client.Connect("localhost", serverPort);
+
+            server.SafeHandleMessages(); // finish server connected
+            client.SafeHandleMessages(); // trigger handshake
+            server.SafeHandleMessages(); // handle client handshake
+
+            var handshake = new Handshake("invalid");
+            client.RawClient.Send(this.packetSerializer.SerializePacket(handshake));
+            server.SafeHandleMessages();
+            client.SafeHandleMessages();
+
+            // TODO dont know what to assert here as this is undefined behaviour so far
+        }
+
+        [Fact]
+        public void ClientHandshakeDisconnect()
+        {
+            var disconnectReceived = false;
+            server.ReceivedPacket += (sender, e) =>
+            {
+                if (e.Handled)
+                    return;
+                e.Handled |= e.Packet is Handshake;
+            };
+            server.ReceivedPacket += (sender, e) =>
+            {
+                if (e.Handled)
+                    return;
+                disconnectReceived = e.Packet is Disconnect;
+                e.Handled |= disconnectReceived;
+            };
+
+            server.Start(serverPort);
+
+            var client = new Client(this.logger, this.packetSerializer);
+            client.Connect("localhost", serverPort);
+
+            server.SafeHandleMessages(); // finish server connected
+            client.SafeHandleMessages(); // trigger handshake
+            server.SafeHandleMessages(); // handle client handshake
+
+            client.Disconnect();
+
+            server.SafeHandleMessages();
+
+            Assert.True(disconnectReceived);
         }
     }
 }

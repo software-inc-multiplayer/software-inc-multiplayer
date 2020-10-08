@@ -1,47 +1,67 @@
-using System;
 using Xunit;
-using Multiplayer.Networking;
-using Newtonsoft.Json.Serialization;
 using System.Threading;
+
+using Multiplayer.Networking;
 using Multiplayer.Networking.Utility;
+using System;
 
 namespace Multiplayer.Networking.Test
 {
-    public class ClientSidedTests
+    public class ClientSidedTests : IDisposable
     {
-        private static readonly int serverPort = 1337;
+        private static int _serverPort = 1300;
+        private readonly int serverPort;
+
         private readonly Server server;
         private readonly TestLogger logger;
         private readonly PacketSerializer packetSerializer;
 
+        private readonly Client client;
+
         public ClientSidedTests()
         {
+            this.serverPort = Interlocked.Increment(ref _serverPort);
             this.logger = new TestLogger();
             this.packetSerializer = new PacketSerializer();
             this.server = new Server(this.logger, this.packetSerializer);
             this.server.Start(serverPort);
+
+            this.client = new Client(this.logger, this.packetSerializer);
+        }
+
+        public void Dispose()
+        {
+            this.server.Dispose();
+            this.client.Dispose();
         }
 
 
         [Fact]
         public void Bootup()
         {
-            var client = new Client(this.logger, this.packetSerializer);
-            Assert.NotNull(client);
+            Assert.NotNull(client); // maybe expand on this :)
         }
 
         [Fact]
         public void ConnectAndDisconnectServer()
         {
-            var server = new Server(this.logger, this.packetSerializer);
-            server.Start(serverPort);
-
             var clientConnectedFired = false;
             var clientDisconnectedFired = false;
+            var connectionId = -1;
 
-            var client = new Client(this.logger, this.packetSerializer);
-            client.ClientConnected += (sender, e) => clientConnectedFired = true;
-            client.ClientDisconnected += (sender, e) => clientDisconnectedFired = true;
+            client.ClientConnected += (sender, e) => {
+                clientConnectedFired = true;
+                Assert.NotEqual(-1, e.ConnectionId);
+                connectionId = e.ConnectionId;
+            };
+            client.ClientDisconnected += (sender, e) => {
+                clientDisconnectedFired = true;
+                Assert.NotEqual(-1, connectionId);
+                Assert.Equal(connectionId, e.ConnectionId);
+            };
+
+            Assert.False(client.RawClient.Connecting);
+            Assert.False(client.RawClient.Connected);
 
             client.Connect("localhost", serverPort);
 

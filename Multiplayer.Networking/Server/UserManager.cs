@@ -39,7 +39,7 @@ namespace Multiplayer.Networking
         public bool IsLoggedIn { get; set; }
         public string UniqueID { get
             {
-                return Utils.GetUniqueID();
+                return Guid.NewGuid().ToString();
             } }
 
         public UserRole Role { get; set; }

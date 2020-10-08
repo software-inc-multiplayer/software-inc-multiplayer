@@ -1,7 +1,9 @@
 ﻿//#define PACKET_ID
+#define TEST
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using MessagePack;
 using Multiplayer.Networking.Packet;
@@ -13,7 +15,7 @@ namespace Multiplayer.Networking.Utility
         : IDisposable
 #endif
     {
-        private readonly MessagePackSerializerOptions options;
+        public MessagePackSerializerOptions Options { get; }
 
 #if PACKET_ID
         private MemoryStream packetStream = new MemoryStream();
@@ -34,8 +36,23 @@ namespace Multiplayer.Networking.Utility
         public PacketSerializer()
         {
             // see https://github.com/neuecc/MessagePack-CSharp#security
-            this.options = MessagePackSerializerOptions.Standard
+            var resolver = MessagePack.Resolvers.CompositeResolver.Create(
+                new[] { MessagePack.Formatters.TypelessFormatter.Instance },
+                new[] { MessagePack.Resolvers.StandardResolver.Instance });
+            this.Options = MessagePackSerializerOptions.Standard
+                .WithResolver(resolver)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
+
+
+            /*MessagePack.Formatters.TypelessFormatter.Instance = typeName =>
+            {
+                if (typeName.StartsWith("SomeNamespace"))
+                {
+                    typeName = typeName.Replace("SomeNamespace", "AnotherNamespace");
+                }
+
+                return Type.GetType(typeName, false);
+            };*/
         }
 
         public byte[] SerializePacket<TPacket>(TPacket packet)
@@ -55,7 +72,7 @@ namespace Multiplayer.Networking.Utility
 
             return serializedPacket;*/
 #else
-            return MessagePackSerializer.Typeless.Serialize(packet, this.options);
+            return MessagePackSerializer.Typeless.Serialize(packet, this.Options);
 #endif
         }
 
@@ -71,7 +88,7 @@ namespace Multiplayer.Networking.Utility
 
             return MessagePackSerializer.Deserialize(packetType, packetData, this.options) as IPacket;
 #else
-            return MessagePackSerializer.Typeless.Deserialize(buffer, this.options) as IPacket;
+            return MessagePackSerializer.Typeless.Deserialize(buffer, this.Options) as IPacket;
 #endif
         }
 
@@ -97,9 +114,41 @@ namespace Multiplayer.Networking.Packet
     public interface IPacket
     {
     }
+
+    [MessagePackObject]
+    public class TestPacket : IPacket
+    {
+        [Key(0)]
+        public string UserId { get; set; }
+    }
+
     [MessagePackObject]
     public class Handshake : IPacket
     {
+        [Key(0)]
+        public string UserId { get; set; }
+        [Key(1)]
+        public string Password { get; set; }
 
+        public Handshake(string userId, string password = null)
+        {
+            this.UserId = userId;
+            this.Password = password;
+        }
+    }
+
+    /// <summary>
+    /// this enforces a clean disconnect
+    /// </summary>
+    [MessagePackObject]
+    public class Disconnect : IPacket
+    {
+        [Key(0)]
+        public string Reason { get; }
+
+        public Disconnect(string reason)
+        {
+            this.Reason = reason;
+        }
     }
 }
