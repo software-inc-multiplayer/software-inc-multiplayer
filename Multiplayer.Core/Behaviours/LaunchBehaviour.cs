@@ -20,7 +20,7 @@ namespace Multiplayer.Core
             }
             catch (Exception ex)
             {
-                Logging.Warn("[Mod] Couldn't fetch username from Steam! If you've a DRM-Free version thats why. => " + ex.Message);
+                Meta.Logging.Warn("[Mod] Couldn't fetch username from Steam! If you've a DRM-Free version thats why. => " + ex.Message);
                 return "FirstTimeWindowDescription".LocDef("Thanks for participating in the Open Beta%steamusername%!\nCheckout the wiki on how to start a server, join or play with friends!").SetStringVariable("steamusername", "");
             }
         }
@@ -63,7 +63,7 @@ namespace Multiplayer.Core
             }
             catch (Exception ex)
             {
-                Logging.Warn("[Mod] Couldn't open webpage in steam overlay! Opening in web browser. If you've a DRM-Free version thats why. => " + ex.Message);
+                Meta.Logging.Warn("[Mod] Couldn't open webpage in steam overlay! Opening in web browser. If you've a DRM-Free version thats why. => " + ex.Message);
                 Process.Start("https://github.com/cal3432/software-inc-multiplayer/wiki");
             }
         }
@@ -80,13 +80,13 @@ namespace Multiplayer.Core
             {
                 ActiveObjects.Remove(copye);
             }
-            if (Client.client.Connected)
+            if (NetworkingManager.Client.RawClient.Connected)
             {
-                Client.Disconnect();
+                NetworkingManager.Client.Disconnect();
             }
-            if (Networking.Server.IsRunning)
+            if (NetworkingManager.Server.RawServer.Active)
             {
-                Networking.Server.Stop();
+                NetworkingManager.Server.Stop();
             }
         }
     }

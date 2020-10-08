@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{F6DAFE06-4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Networking.Test", "Multiplayer.Networking.Test\Multiplayer.Networking.Test.csproj", "{1B4A9A9F-00CD-4EEF-AC1A-09E0CD73B706}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{759A2496-5BF7-4FE1-B6EF-B13656B6E0F0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{759A2496-5BF7-4FE1-B6EF-B13656B6E0F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Shared", "Multiplayer.Shared\Multiplayer.Shared.csproj", "{9DF5CA61-BCA1-47A5-A99F-559F91458F10}"
 EndProject

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Telepathy;
-using MessagePack;
 
 using Multiplayer.Debugging;
 using Multiplayer.Networking;
@@ -71,6 +70,7 @@ namespace Multiplayer.Networking
         public void Stop()
         {
             // TODO maybe we should gracefully "remove" all clients
+            // ^ Telepathy does this automatically -cal
             this.RawServer.Stop();
             this.ServerStopped?.Invoke(this, null);
         }
@@ -106,7 +106,7 @@ namespace Multiplayer.Networking
                         this.ClientConnected?.Invoke(this, eventArgs);
                         if (eventArgs.Cancel)
                         {
-                            this.Send(sender, new Disconnect("invalid handshake"));
+                            this.Send(sender, new Disconnect(Constants.DisconnectReason.InvalidHandshake));
 
                             this.RawServer.Disconnect(sender);
                             this.ConnectedClients.Remove(sender);
@@ -121,8 +121,8 @@ namespace Multiplayer.Networking
                         if(packet == null)
                         {
 #if DEBUG
-                            // maybe add some logging here
-#endif
+                            logger.Warn($"Packet recieved from ConnectionID {msg.connectionId} is null! Ignoring packet for now.");
+#endif  
                             break;
                         }
 
@@ -133,7 +133,7 @@ namespace Multiplayer.Networking
                         {
                             // What shall we do here?
                             // for the start we enforce a disconnect
-                            this.Send(sender, new Disconnect("unhandled packet received"));
+                            this.Send(sender, new Disconnect(Constants.DisconnectReason.UnhandledPacket));
                             this.RawServer.Disconnect(sender);
                             this.ConnectedClients.Remove(sender);
 #if TEST

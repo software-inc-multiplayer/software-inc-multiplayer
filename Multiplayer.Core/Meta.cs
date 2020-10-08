@@ -7,6 +7,7 @@ namespace Multiplayer.Core
 {
     public class Meta : ModMeta
     {
+        public static UnityLogger Logging { get; set; }
         public static ModController.DLLMod ThisMod { get; set; }
         public static bool GiveMeFreedom = true;
         public override string Name => "Software Inc Multiplayer";
@@ -24,7 +25,8 @@ namespace Multiplayer.Core
         }
         public override void Initialize(ModController.DLLMod parentMod)
         {
-            Logging.Start();
+            Meta.Logging.Start();
+            Logging = new UnityLogger();
             ThisMod = parentMod;
             Application.runInBackground = true;
             base.Initialize(parentMod);

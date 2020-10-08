@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MessagePack;
 using Multiplayer.Networking.Packet;
 using Multiplayer.Networking.Utility;
 using Multiplayer.Shared;
@@ -94,7 +88,7 @@ namespace Multiplayer.Networking
 
         public void Disconnect()
         {
-            this.Send(new Disconnect("leaving"));
+            this.Send(new Disconnect(Constants.DisconnectReason.Leaving));
             this.RawClient.Disconnect();
         }
 

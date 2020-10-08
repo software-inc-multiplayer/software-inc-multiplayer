@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable IDE1006 // Naming Styles
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,9 @@ namespace Multiplayer.Networking
         {
             public class Stamps
             {
+
                 public int created { get; set; }
+
                 public int lastLogin { get; set; }
             }
             public class Account
@@ -29,3 +32,4 @@ namespace Multiplayer.Networking
         }
     }
 }
+#pragma warning restore IDE1006 // Naming Styles

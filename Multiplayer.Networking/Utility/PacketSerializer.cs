@@ -144,9 +144,9 @@ namespace Multiplayer.Networking.Packet
     public class Disconnect : IPacket
     {
         [Key(0)]
-        public string Reason { get; }
+        public Constants.DisconnectReason Reason { get; }
 
-        public Disconnect(string reason)
+        public Disconnect(Constants.DisconnectReason reason)
         {
             this.Reason = reason;
         }

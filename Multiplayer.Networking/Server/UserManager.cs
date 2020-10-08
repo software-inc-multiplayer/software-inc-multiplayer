@@ -55,7 +55,7 @@ namespace Multiplayer.Networking
                 IsLoggedIn = true;
             } catch(Exception e)
             {
-                //UnityLogger.Warn("Had trouble parsing account.json:", e.ToString());
+                Debug.Log("Had trouble parsing account.json: " + e.ToString());
                 IsLoggedIn = false;
             }
         }
@@ -64,15 +64,6 @@ namespace Multiplayer.Networking
     {
         public event EventHandler<User> UserAdded;
         public event EventHandler<User> UserRemoved;
-        public class UserSearchQuery
-        {
-            public string Username { get; set; }
-            public string UniqueID { get; set; }
-            public UserSearchQuery()
-            {
-
-            }
-        }
         public Dictionary<string, User> Users { get; set; }
         public int GuestCount = 0;
         public bool GetUser(string username, out User user)

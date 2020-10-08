@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace Multiplayer.Core
 {
-    internal class DebugConsole : ModBehaviour
+    /**internal class DebugConsole : ModBehaviour
     {
         public static DebugConsole instance;
         private bool inmain = false;
@@ -25,7 +25,7 @@ namespace Multiplayer.Core
         {
             foreach (string line in lines)
             {
-                Logging.Info(line);
+                Meta.Logging.Info(line);
                 yield return new WaitForSeconds(0.95f);
             }
             Rrinuse = false;
@@ -35,7 +35,7 @@ namespace Multiplayer.Core
         {
             Rrinuse = false;
             SceneManager.sceneLoaded += OnSceneLoaded;
-            Logging.Info("[DebugConsole] Adding console commands");
+            Meta.Logging.Info("[DebugConsole] Adding console commands");
             DevConsole.Command<ushort> startservercmd = new DevConsole.Command<ushort>("MULTIPLAYER_START", OnStartServer);
             DevConsole.Console.AddCommand(startservercmd);
             DevConsole.Command<string, ushort> connectclientcmd = new DevConsole.Command<string, ushort>("MULTIPLAYER_CONNECT", OnClientConnect);
@@ -64,10 +64,10 @@ namespace Multiplayer.Core
         {
             if (speed < 0 || speed > 4)
             {
-                Logging.Warn("[DebugConsole] Gamespeed can't be less than 0 or more than 4!");
+                Meta.Logging.Warn("[DebugConsole] Gamespeed can't be less than 0 or more than 4!");
                 return;
             }
-            Logging.Info("[DebugConsole] Set gamespeed");
+            Meta.Logging.Info("[DebugConsole] Set gamespeed");
             Client.Send(new Helpers.TcpGamespeed(speed, 0));
         }
 
@@ -75,30 +75,30 @@ namespace Multiplayer.Core
         {
             if (!Networking.Server.Runs)
             {
-                Logging.Warn("You need to have a Server running to use this command!");
+                Meta.Logging.Warn("You need to have a Server running to use this command!");
                 return;
             }
             Networking.Server.Save();
         }
         public void OnPrivateMessage(string username, string message)
         {
-            if (!Networking.Client.client.Connected)
-                Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
+            if (!Networking.NetworkingManager.Client.RawClient.Connected)
+                Meta.Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
             var tmpUser = new Helpers.User();
             tmpUser.Username = Client.Username;
             Client.Send(new Helpers.TcpPrivateChat(tmpUser, username, message));
         }
         public void OnRequestGameWorld()
         {
-            if (!Networking.Client.client.Connected)
-                Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
+            if (!Networking.NetworkingManager.Client.RawClient.Connected)
+                Meta.Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
             Networking.Client.Send(new Helpers.TcpGameWorld(Networking.GameWorld.Client.Instance.world, true));
         }
 
         public void OnRequestUserList()
         {
-            if (!Networking.Client.client.Connected)
-                Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
+            if (!Networking.NetworkingManager.Client.RawClient.Connected)
+                Meta.Logging.Warn("[DebugConsole] You need to be connected to a Server to use this command!");
 
             Networking.Client.Send(new Helpers.TcpRequest("userlist"));
         }
@@ -112,7 +112,7 @@ namespace Multiplayer.Core
             }
             catch (Exception e)
             {
-                Logging.Error(e.ToString());
+                Meta.Logging.Error(e.ToString());
             }
         }
 
@@ -132,12 +132,12 @@ namespace Multiplayer.Core
         {
             if (!inmain)
             {
-                Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
+                Meta.Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
                 return;
             }
-            if (Client.client.Connected)
+            if (NetworkingManager.Client.RawClient.Connected)
             {
-                Logging.Warn("[DebugConsole] You're already connected to a Server, please disconnect first!");
+                Meta.Logging.Warn("[DebugConsole] You're already connected to a Server, please disconnect first!");
                 WindowManager.SpawnDialog("You're already connected to a Server, please disconnect first!", true, DialogWindow.DialogType.Warning);
                 return;
             }
@@ -147,18 +147,18 @@ namespace Multiplayer.Core
             //DEBUG END
             try
             {
-                Networking.Client.Connect(ip, port);
+                NetworkingManager.Client.Connect(ip, port);
             }
             catch (Exception e)
             {
-                Logging.Error(e.ToString());
+                Meta.Logging.Error(e.ToString());
             }
 
         }
 
         public void OnSendChat(string arg0)
         {
-            if (!inmain || !Networking.Client.client.Connected)
+            if (!inmain || !NetworkingManager.Client.RawClient.Connected)
             {
                 Logging.Warn("[DebugConsole] You can't use this command outside of the MainScene!");
                 return;
@@ -205,5 +205,5 @@ namespace Multiplayer.Core
             DevConsole.Console.RemoveCommand("MULTIPLAYER_PCHAT");
             SceneManager.sceneLoaded -= OnSceneLoaded;
         }
-    }
+    }**/
 }

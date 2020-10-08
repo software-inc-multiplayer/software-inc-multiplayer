@@ -39,7 +39,7 @@ namespace Multiplayer.Core
             {
                 WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = OldText;
             }
-            Logging.OnDisable();
+            UnityLogger.OnDisable();
         }
     }
 }

@@ -55,16 +55,16 @@ namespace Multiplayer.Debugging
                 switch (logType)
                 {
                     case Shared.LogType.Debug:
-                        message = $"{DateTime.Now:HH:mm:ss:ffff} [Debug] {obj}";
+                        message = $"[{DateTime.Now:HH:mm:ss:ffff}] [Multiplayer] [Debug] {obj}";
                         break;
                     case Shared.LogType.Info:
-                        message = $"{DateTime.Now:HH:mm:ss:ffff} [Info] {obj}";
+                        message = $"[{DateTime.Now:HH:mm:ss:ffff}] [Multiplayer] [Info] {obj}";
                         break;
                     case Shared.LogType.Error:
-                        message = $"{DateTime.Now:HH:mm:ss:ffff} [Warn] {obj}";
+                        message = $"[{DateTime.Now:HH:mm:ss:ffff}] [Multiplayer] [Warn] {obj}";
                         break;
                     case Shared.LogType.Warn:
-                        message = $"{DateTime.Now:HH:mm:ss:ffff} [Error] {obj}";
+                        message = $"[{DateTime.Now:HH:mm:ss:ffff}] [Multiplayer] [Error] {obj}";
                         break;
                 }
                 this.LogInternal(logType, message);

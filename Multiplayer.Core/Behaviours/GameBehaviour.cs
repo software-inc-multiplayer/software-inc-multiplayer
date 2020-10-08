@@ -17,6 +17,8 @@ namespace Multiplayer.Core
         public GUIWindow MPWindow { get; set; }
         public Utils.Controls.Element.UITextbox ChatInput { get; set; }
         public Text CommandTooltip { get; set; }
+        public Text ChatWindow { get; private set; }
+
         public override void OnActivate()
         {
             SceneManager.sceneLoaded += OnScene;
@@ -25,20 +27,6 @@ namespace Multiplayer.Core
                 CreateButton();
             }
         }
-
-        public void ChatLoop()
-        {
-            if (Client.ChatWindow || CommandTooltip == null) return;
-            if (ChatInput.obj.text.Trim()[0].Equals("/"))
-            {
-                CommandTooltip.text = "For a full list of commands, see the wiki.";
-            }
-            else
-            {
-                CommandTooltip.text = "";
-            }
-        }
-
         private void OnScene(Scene arg0, LoadSceneMode arg1)
         {
             if (!isActiveAndEnabled) return;
@@ -56,12 +44,12 @@ namespace Multiplayer.Core
             MPButton.onClick.AddListener(CreateBaseMultiplayerWindow);
             MPButton.SetText("MultiplayerButton".LocDef("Multiplayer"));
             WindowManager.AddElementToElement(MPButton.gameObject, FanPanel, new Rect(274, 0, 100, 32), Rect.zero);
-            Logging.Info("Initalized multiplayer button in MainScene");
+            Meta.Logging.Info("Initalized multiplayer button in MainScene");
         }
 
         private void CreateBaseMultiplayerWindow()
         {
-            Logging.Info("Opened multiplayer window.");
+            Meta.Logging.Info("Opened multiplayer window.");
             if (MPWindow != null)
             {
                 MPWindow.Show();
@@ -122,7 +110,7 @@ namespace Multiplayer.Core
                     }
                     else
                     {
-                        if (Client.client.Connected)
+                        if (NetworkingManager.Client.RawClient.Connected)
                         {
                             // If user is already connected to a server.
                             GameObject diagObj = UnityEngine.Object.Instantiate(WindowManager.Instance.DialogPrefab);
@@ -131,7 +119,7 @@ namespace Multiplayer.Core
                             KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
                             {
                                 new KeyValuePair<string, Action>("DisconnnectButton".LocDef("Disconnect"), delegate {
-                                    Client.Disconnect();
+                                    NetworkingManager.Client.Disconnect();
                                 }),
                                 new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
                                     diag.Window.Close();
@@ -142,13 +130,13 @@ namespace Multiplayer.Core
                         }
                         try
                         {
-                            Client.Connect(IpTextBox.obj.text, ushort.Parse(PortTextBox.obj.text));
+                            NetworkingManager.Client.Connect(IpTextBox.obj.text, ushort.Parse(PortTextBox.obj.text));
                             WindowManager.SpawnDialog("SuccessfullyConnected".LocDef("Successfully connected to the server!"), true, DialogWindow.DialogType.Error);
                         }
                         catch (Exception e)
                         {
                             WindowManager.SpawnDialog($"There was an error trying to connect to {IpTextBox.obj.text}:{PortTextBox.obj.text}, see console for error.", true, DialogWindow.DialogType.Error);
-                            Logging.Error(e);
+                            Meta.Logging.Error(e);
                             return;
                         }
                     }
@@ -195,16 +183,16 @@ namespace Multiplayer.Core
                         KeyValuePair<string, Action>[] action2s = new KeyValuePair<string, Action>[]
                         {
                                 new KeyValuePair<string, Action>("Yes".LocDef("Yes"), delegate {
-                                    if(Client.client.Connected) Client.Disconnect();
+                                    if(NetworkingManager.Client.RawClient.Connected) NetworkingManager.Client.Disconnect();
                                     dia2g.Window.Close();
                                     try
                                     {
-                                        Client.Connect("127.0.0.1", ushort.Parse(PortTextBox.obj.text));
+                                        NetworkingManager.Client.Connect("127.0.0.1", ushort.Parse(PortTextBox.obj.text));
                                     }
                                     catch (Exception e)
                                     {
                                         WindowManager.SpawnDialog($"There was an error trying to connect to the server. See console for error.", true, DialogWindow.DialogType.Error);
-                                        Logging.Error(e);
+                                        Meta.Logging.Error(e);
                                         return;
                                     }
                                     WindowManager.SpawnDialog("SuccessfullyCreated".LocDef("Successfully created server!"), true, DialogWindow.DialogType.Information);
@@ -213,27 +201,27 @@ namespace Multiplayer.Core
                                     dia2g.Window.Close();
                                 }),
                         };
-                        if (Client.client.Connected)
+                        if (NetworkingManager.Client.RawClient.Connected)
                         {
-                            Client.Disconnect();
+                            NetworkingManager.Client.Disconnect();
                         }
-                        if (Networking.Server.IsRunning)
+                        if (NetworkingManager.Server.RawServer.Active)
                         {
                             // If user is already connected to a server.
                             DialogWindow diag = WindowManager.SpawnDialog();
                             KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
                             {
                                 new KeyValuePair<string, Action>("StopButtonText".LocDef("Stop Server"), delegate {
-                                    Networking.Server.Stop();
+                                    NetworkingManager.Server.Stop();
                                     diag.Window.Close();
                                     try
                                     {
-                                        Networking.Server.Start(ushort.Parse(PortTextBox.obj.text));
+                                        NetworkingManager.Server.Start(ushort.Parse(PortTextBox.obj.text));
                                     }
                                     catch (Exception e)
                                     {
                                         WindowManager.SpawnDialog($"There was an error trying to create a server at port {PortTextBox.obj.text}, see console for error.", true, DialogWindow.DialogType.Error);
-                                        Logging.Error(e);
+                                        Meta.Logging.Error(e);
                                         return;
                                     }
                                     dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
@@ -245,7 +233,7 @@ namespace Multiplayer.Core
                             diag.Show("AlreadyServer".LocDef("You already have a server started, would you like to stop it?"), !true, DialogWindow.DialogType.Warning, actions);
                             return;
                         }
-                        Networking.Server.Start(ushort.Parse(PortTextBox.obj.text));
+                        NetworkingManager.Server.Start(ushort.Parse(PortTextBox.obj.text));
                         dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
                     }
                     connectWindow.gameObject.SetActive(false);
@@ -258,9 +246,9 @@ namespace Multiplayer.Core
                 WindowManager.SpawnDialog("ComingSoon".LocDef("Coming soon!"), true, DialogWindow.DialogType.Error);
             }, MPWindow.MainPanel);
 
-            Client.ChatWindow = WindowManager.SpawnLabel();
-            Client.ChatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
-            MPWindow.AddElement(Client.ChatWindow.gameObject, new Rect(30, 75, 670, 255), Rect.zero);
+            ChatWindow = WindowManager.SpawnLabel();
+            ChatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
+            MPWindow.AddElement(ChatWindow.gameObject, new Rect(30, 75, 670, 255), Rect.zero);
             ChatInput = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MPWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", (value) => { 
                 if(value.StartsWith("/"))
                 {
@@ -269,66 +257,29 @@ namespace Multiplayer.Core
                 CommandTooltip.gameObject.SetActive(true);
             }, 15, false);
             CommandTooltip = WindowManager.SpawnLabel();
-            ChatInput.obj.onValueChanged.AddListener(delegate
-            {
-                ChatLoop();
-            });
             CommandTooltip.text = "";
             MPWindow.AddElement(CommandTooltip.gameObject, new Rect(30, 390 + 50, 471, 45), Rect.zero);
             Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(541, 390, 159, 45), () =>
             {
-                if (!Client.client.Connected)
+                if (!NetworkingManager.Client.RawClient.Connected)
                 {
                     WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
                     return;
                 }
-                if (ChatInput.obj.text.Trim().StartsWith("/"))
-                {
-                    ParseChatCommand(ChatInput.obj.text);
-                    return;
-                }
                 var tmpUser = new Helpers.User();
-                tmpUser.Username = Client.Username;
+                /**tmpUser.Username = Client.Username;
                 Helpers.TcpChat chatClass = new Helpers.TcpChat(ChatInput.obj.text, tmpUser);
                 ChatInput.obj.text = "";
-                Client.Send(chatClass);
+                Client.Send(chatClass);**/
             }, MPWindow.MainPanel);
             MPWindow.Show();
         }
-
-        private void ParseChatCommand(string text)
-        {
-            if (text.StartsWith("/msg"))
-            {
-                try
-                {
-                    List<string> args = text.Split(" ".ToCharArray()).ToList();
-                    args.Remove("/msg");
-                    string username = args[0];
-                    args.Remove(username);
-                    string message = string.Join(" ", args.ToArray());
-                    Helpers.User sender = new Helpers.User()
-                    {
-                        Username = Client.Username
-                    };
-                    Client.Send(new Helpers.TcpPrivateChat(sender, username, message));
-                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"Sent private message to: {username}", Helpers.TcpServerChatType.Info));
-                    Logging.Info("[Commands] used /msg: " + message, username, sender.Username);
-                }
-                catch (Exception e)
-                {
-                    Client.OnServerChatRecieved(new Helpers.TcpServerChat($"There was an error running the chat command: {text}{$"\nAre you sure you typed the command in correctly?\n\n{e}"}", Helpers.TcpServerChatType.Error));
-                }
-
-            }
-        }
-
         public override void OnDeactivate()
         {
             SceneManager.sceneLoaded -= OnScene;
             if (MPButton != null)
                 MPButton.gameObject.SetActive(false);
-            Logging.Info("Destroyed multiplayer button in MainScene");
+            Meta.Logging.Info("Destroyed multiplayer button in MainScene");
         }
     }
 }
