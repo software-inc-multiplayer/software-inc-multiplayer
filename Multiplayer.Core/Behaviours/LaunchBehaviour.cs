@@ -27,10 +27,6 @@ namespace Multiplayer.Core
         public static List<GameObject> ActiveObjects = new List<GameObject>() { };
         public override void OnActivate()
         {
-            if(!Meta.HasInternet)
-            {
-                ModController.Instance.UnloadMod(Meta.ThisMod, false);
-            }
             bool firstTimeLaunch = !SettingsHandler.Has("firstTimeLaunch");
             if (firstTimeLaunch)
             //if (true)

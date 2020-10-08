@@ -1,13 +1,59 @@
 ﻿using Multiplayer.Debugging;
+using RoWa;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 
 namespace Multiplayer.Networking
 {
-    public static class Helpers
+    public class TCPDatas
+    {
+        /// <summary>
+        /// Never use.
+        /// </summary>
+        [Serializable]
+        public class TCPMessage
+        {
+            public string Header { get; set; }
+            [XmlElement]
+            public XML.XMLDictionary Data = new XML.XMLDictionary();
+            public byte[] Serialize()
+            {
+                return Utils.Serialize(this);
+            }
+        }
+        public class TCPLoginRequest : TCPMessage
+        {
+            public TCPLoginRequest(bool PasswordEnabled)
+            {
+                Header = "LoginRequest";
+                Data.Add("HasPassword", PasswordEnabled);
+            }
+            public static TCPLoginRequest Deserialize(byte[] bytes)
+            {
+                return Utils.Deserialize<TCPLoginRequest>(bytes);
+            }
+        }
+        /// <summary>
+        /// Client Only
+        /// </summary>
+        [Serializable]
+        public class TCPLoginResponse : TCPMessage
+        {
+            public TCPLoginResponse()
+            {
+                Header = "LoginResponse";
+                //Data.Add("User", Client.MyUser);
+            }
+            public static TCPLoginResponse Deserialize(byte[] bytes)
+            {
+                return Utils.Deserialize<TCPLoginResponse>(bytes);
+            }
+        }
+    }
+    public static class Utils
     {
         /// <summary>
         /// Serialize an object to a byte array
@@ -53,17 +99,14 @@ namespace Multiplayer.Networking
             }
             catch (SerializationException ex)
             {
-                Logging.Warn("[Helpers] SerializationException thrown while deserializing, probably harmless... => " + ex.Message);
+                //UnityLogger.Warn("[Helpers] SerializationException thrown while deserializing, probably harmless... => " + ex.Message);
                 return null;
             }
             catch (Exception ex)
             {
                 //Workaround, will maybe break the whole thing ^^
-                if (ex.HResult != -2147467262)
-                {
-                    Logging.Error("[Helpers] Unknown exception while deserializing the array! => " + ex.Message);
-                }
-
+                /*if (ex.HResult != -2147467262)
+                    UnityLogger.Error("[Helpers] Unknown exception while deserializing the array! => " + ex.Message);*/
                 return null;
             }
 
@@ -89,78 +132,6 @@ namespace Multiplayer.Networking
                 File.WriteAllText(path, uid);
             }
             return uid;
-        }
-
-        [Serializable]
-        public class User
-        {
-            /// <summary>
-            /// The ID of the User inside the server
-            /// </summary>
-            public int ID { get; set; }
-            /// <summary>
-            /// The (Steam) username of the User
-            /// </summary>
-            public string Username { get; set; }
-            /// <summary>
-            /// The UserRole of the user (Host or Client)
-            /// </summary>
-            public UserRole Role { get; set; }
-            /// <summary>
-            /// The Unique User ID
-            /// </summary>
-            public string UniqueID { get; set; }
-
-            /// <summary>
-            /// The UserCompany of the User, will be set with the User() function
-            /// </summary>
-            public UserCompany Usercompany { get; set; }
-
-            public User()
-            {
-                Usercompany = new UserCompany(this);
-            }
-#pragma warning disable IDE0060 // Remove unused parameter
-            public User(bool placebo)
-#pragma warning restore IDE0060 // Remove unused parameter
-            {
-
-            }
-        }
-
-        [Serializable]
-        public class UserCompany : Company
-        {
-            /// <summary>
-            /// The player who owns the company
-            /// </summary>
-            public User Owner { get; private set; }
-
-            public UserCompany() { }
-
-            public UserCompany(User owner)
-            {
-                Owner = owner;
-                FetchEmployees();
-            }
-
-            /// <summary>
-            /// Fetches the employees from the company the User (owner) owns
-            /// </summary>
-            public List<Employee> FetchEmployees()
-            {
-                //TODO: Fetch the employees from the users company
-                return null;
-            }
-        }
-
-
-        [Serializable]
-        public enum UserRole
-        {
-            Host,
-            Admin,
-            Client
         }
     }
 }

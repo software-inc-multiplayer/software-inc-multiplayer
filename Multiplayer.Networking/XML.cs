@@ -22,9 +22,7 @@ namespace RoWa
             public XMLDictionary(Dictionary<object, object> dict)
             {
                 foreach (KeyValuePair<object, object> kvp in dict)
-                {
                     Pairs.Add(new XMLDictionaryPair(kvp.Key, kvp.Value));
-                }
             }
             public XMLDictionary(params XMLDictionaryPair[] pairs)
             {
@@ -34,13 +32,9 @@ namespace RoWa
             public bool Contains(object key)
             {
                 if (Pairs.Find(x => x.Key == key) != null)
-                {
                     return true;
-                }
                 else
-                {
                     return false;
-                }
             }
 
             public object GetValue(object key)
@@ -48,7 +42,7 @@ namespace RoWa
                 XMLDictionaryPair p = Pairs.Find(x => x.Key == key);
                 if (p == null)
                 {
-                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs! <= Can be ignored if mod doesn't crash afterwards");
+                    //UnityLogger.Warn($"[XML] Couldn't find object with key {key} inside Pairs! <= Can be ignored if mod doesn't crash afterwards");
                     return null;
                 }
                 object value = p.Value;
@@ -60,7 +54,7 @@ namespace RoWa
                 XMLDictionaryPair p = Pairs.Find(x => (string)x.Key == key);
                 if (p == null)
                 {
-                    Logging.Warn($"[XML] Couldn't find object with key {key} inside Pairs!");
+                    //UnityLogger.Warn($"[XML] Couldn't find object with key {key} inside Pairs!");
                     return null;
                 }
                 return p.Value;
@@ -144,8 +138,8 @@ namespace RoWa
             }
             catch (Exception ex)
             {
-                Logging.Warn("[XML] " + ex.Message);
-                return default;
+                //UnityLogger.Warn("[XML] " + ex.Message);
+                return default(T);
             }
         }
     }

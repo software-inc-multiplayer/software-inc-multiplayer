@@ -1,249 +1,185 @@
-﻿using Multiplayer.Debugging;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+
+using Telepathy;
+using MessagePack;
+
+using Multiplayer.Debugging;
+using Multiplayer.Networking;
+using Multiplayer.Extensions;
+using Multiplayer.Shared;
+using Multiplayer.Networking.Utility;
+using Multiplayer.Networking.Packet;
 
 namespace Multiplayer.Networking
 {
-    public static partial class Server
-    {       
-        public static string ServerName = "";
-        public static string Password = "";
-        public static ushort MaxPlayers = 10;
-        public static ushort Port;
-        public static int Difficulty;
-        public static bool hasAI = false;
-        public static bool IsRunning = false;
+    public partial class Server : IDisposable
+    {
+        private readonly ILogger logger;
+        private readonly PacketSerializer packetSerializer;
+        #region Events
+        // for future reference https://itchyowl.com/events-in-unity/ maybe use unityevent some time
+        public event EventHandler ServerStarted;
+        public event EventHandler ServerStopped;
 
-        public static Telepathy.Server server = new Telepathy.Server();     
-            
-        /// <summary>
-        /// Starts the server, use Server.Stop() to stop it.
-        /// </summary>
-        /// <param name="port">The port the server will listening on</param>
-        public static void Start(ushort port, string password = "")
-        {
-            if (server.Active)
-            {
-                Logging.Warn("[Server] You can't start the server because its already active!");
-                //WindowManager.SpawnDialog("You can't start the server because its already active!", true, DialogWindow.DialogType.Warning);
-                return;
-            }
-            Serverdata = new ServerData(port.ToString());
-            Port = port;
-            Password = password;
-            Difficulty = GameSettings.Instance.Difficulty;
-            Logging.Info("[Server] Start listening on Port " + port);
-            server.MaxMessageSize = int.MaxValue;
-            server.Start(port);
-            IsRunning = true;
-            Serverdata.UpdateServer();
-            Read();
-        }
-
-        /// <summary>
-        /// Gets called after the server is started and stays in a loop until 'isRunning' is false (If you call Server.Stop() for example)
-        /// </summary>
-        private static async void Read()
-        {
-            Logging.Info("[Server] Start reading messages");
-            await Task.Run(() =>
-            {
-                while (IsRunning)
-                {
-                    // grab all new messages. do this in your Update loop.
-                    while (server.GetNextMessage(out Telepathy.Message msg))
-                    {
-                        switch (msg.eventType)
-                        {
-                            case Telepathy.EventType.Connected:
-                                OnUserConnect(msg);
-                                break;
-                            case Telepathy.EventType.Data:
-                                Receive(msg);
-                                break;
-                            case Telepathy.EventType.Disconnected:
-                                OnUserDisconnect(msg);
-                                break;
-                        }
-                    }
-                }
-            });
-            Logging.Info("[Server] End reading messages");
-        }   
-
-        #region Messages
-        public static void Send(TcpServerChat tcpServerChat)
-        {
-            Logging.Info("[Server] Sending server wide message: " + (string)tcpServerChat.Data.GetValue("message"));
-            foreach (Helpers.User user in Users)
-            {
-                server.Send(user.ID, tcpServerChat.Serialize());
-            }
-        }
-
-        public static void Send(int clientid, TcpRequest request)
-        {
-            Logging.Info("[Server] Sending request to client " + clientid);
-            //server.Send(clientid, request.ToArray());
-            server.Send(clientid, request.Serialize());
-        }
-
-        public static void Send(int clientid, TcpResponse response)
-        {
-            Logging.Info("[Server] Sending response to client " + clientid);
-            //server.Send(clientid, response.ToArray());
-            server.Send(clientid, response.Serialize());
-        }
-
-        public static void Send(int clientid, TcpChat message)
-        {
-            int receiver = (int)message.Data.GetValue("receiver");
-            string msg = (string)message.Data.GetValue("message");
-            Logging.Info("[Server] Redirecting Chat message from " + clientid + " to " + receiver);
-            server.Send(receiver, new TcpChat(msg, GetUser(clientid)).Serialize());
-        }
-
-        public static void Send(int clientid, TcpGamespeed speed)
-        {
-            Logging.Info("[Server] Sending GameSpeed to client " + clientid);
-            server.Send(clientid, speed.Serialize());
-        }
-
-        public static void Send(TcpGamespeed speed)
-        {
-            Logging.Info("[Server] Sending GameSpeed to all clients");
-            foreach (Helpers.User user in Users)
-            {
-                server.Send(user.ID, speed.Serialize());
-            }
-        }
+        public event EventHandler<ClientConnectedEventArgs> ClientConnected;
+        public event EventHandler<ClientDisconnectedEventArgs> ClientDisconnected;
+        // this WAS a nice idea but triggers ALL handlers for EVERY packet
+        // should be some kind of dictionary lookup per defined type and some kind of packet handler with filter options
+        public event EventHandler<ReceivedPacketEventArgs> ReceivedPacket;
         #endregion
 
-        /// <summary>
-        /// Gets called whenever a message (other than connect or disconnect) gets received
-        /// </summary>
-        /// <param name="msg">The Telepathy.Message sent by the server.getNextMessage() function</param>
-        private static void Receive(Telepathy.Message msg)
+        public Telepathy.Server RawServer { get; set; }
+        public UserManager UserManager { get; set; }
+        public ServerInfo ServerInfomation { get; set; }
+
+        public List<int> ConnectedClients { get; set; } = new List<int>();
+
+        public Server(ILogger logger, PacketSerializer packetSerializer)
         {
-            //string datastr = Encoding.UTF8.GetString(msg.data);
-            //Logging.Info($"[Server] From Connection {msg.connectionId}: " + datastr);
-            Logging.Info($"[Server] Data from Connection {msg.connectionId}: {msg.data.Length} bytes");
+            this.logger = logger;
+            this.packetSerializer = packetSerializer;
+            this.RawServer = new Telepathy.Server();
+        }
 
-            //Handle TCPLogin
-            //TcpLogin tcplogin = XML.From<TcpLogin>(datastr);
-            TcpLogin tcplogin = TcpLogin.Deserialize(msg.data);
-            if (tcplogin != null && tcplogin.Header == "login")
-            {
-                OnUserLogin(msg.connectionId, tcplogin);
-            }
+        public void Dispose()
+        {
+            // stop the server
+            this.RawServer.Stop();
+            // clear all events
+            this.ServerStarted = null;
+            this.ServerStopped = null;
+            this.ClientConnected = null;
+            this.ClientDisconnected = null;
+        }
 
-            //Handle TCPChat
-            //TcpChat tcpchat = XML.From<TcpChat>(datastr);
-            TcpChat tcpchat = TcpChat.Deserialize(msg.data);
-            if (tcpchat != null && tcpchat.Header == "chat")
-            {
-                OnUserChat(msg.connectionId, tcpchat);
-            }
-            //HandleTcpPrivateChat 
-            TcpPrivateChat tcpPrivateChat = TcpPrivateChat.Deserialize(msg.data);
-            if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
-            {
-                OnPrivateChat(tcpPrivateChat);
-            }
-            //Handle TCPRequests
-            //TcpRequest tcprequest = XML.From<TcpRequest>(datastr);
-            TcpRequest tcprequest = TcpRequest.Deserialize(msg.data);
-            if (tcprequest != null && tcprequest.Header == "request")
-            {
-                string req = (string)tcprequest.Data.GetValue("request");
-                if (req == "gameworld")
+        public void Start(int port, string password = "")
+        {
+            this.ServerInfomation = new ServerInfo()
                 {
-                    OnRequestGameWorld(msg.connectionId);
-                }
-                else if (req == "userlist")
+                    Port = port,
+                    Password = password,
+                    Host = new User(),
+                };
+            this.RawServer.Start(port);
+            this.ServerStarted?.Invoke(this, null);
+        }
+
+        public void Stop()
+        {
+            // TODO maybe we should gracefully "remove" all clients
+            this.RawServer.Stop();
+            this.ServerStopped?.Invoke(this, null);
+        }
+
+        protected void Send(int connectionId, IPacket packet)
+        {
+            this.RawServer.Send(connectionId, this.packetSerializer.SerializePacket(packet));
+        }
+
+        protected void Broadcast(IPacket packet)
+        {
+            foreach (var connectionId in this.ConnectedClients)
+            {
+                this.RawServer.Send(connectionId, this.packetSerializer.SerializePacket(packet));
+            }
+        }
+
+        public bool HandleMessages()
+        {
+            if (!this.RawServer.Active)
+                return false;
+            var hadMessage = false;
+            while (this.RawServer.GetNextMessage(out Message msg))
+            {
+                hadMessage = true;
+                var sender = msg.connectionId;
+                switch (msg.eventType)
                 {
-                    OnRequestUserList(msg.connectionId);
+                    case EventType.Connected:
+                        this.ConnectedClients.Add(sender);
+
+                        var eventArgs = new ClientConnectedEventArgs(sender);
+                        this.ClientConnected?.Invoke(this, eventArgs);
+                        if (eventArgs.Cancel)
+                        {
+                            this.Send(sender, new Disconnect("invalid handshake"));
+
+                            this.RawServer.Disconnect(sender);
+                            this.ConnectedClients.Remove(sender);
+                        }
+                        break;
+                    case EventType.Data:
+                        if (msg.data == null || !msg.data.Any())
+                            break;
+
+                        var packet = this.packetSerializer.DeserializePacket(msg.data);
+
+                        if(packet == null)
+                        {
+#if DEBUG
+                            // maybe add some logging here
+#endif
+                            break;
+                        }
+
+                        var packetEventArgs = new ReceivedPacketEventArgs(sender, packet);
+                        this.ReceivedPacket?.Invoke(this, packetEventArgs);
+
+                        if(!packetEventArgs.Handled)
+                        {
+                            // What shall we do here?
+                            // for the start we enforce a disconnect
+                            this.Send(sender, new Disconnect("unhandled packet received"));
+                            this.RawServer.Disconnect(sender);
+                            this.ConnectedClients.Remove(sender);
+#if TEST
+                            throw new Exception($"unhandled packet {packet.GetType()}");
+#endif
+                        }
+                        break;
+                    case EventType.Disconnected:
+                        this.ConnectedClients.Remove(sender);
+                        this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(sender));
+                        break;
                 }
             }
-
-            TcpGamespeed tcpspeed = TcpGamespeed.Deserialize(msg.data);
-            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
-            {
-                OnGamespeedChange(msg.connectionId, tcpspeed);
-            }
+            return hadMessage;
         }
 
-        private static void OnUserChat(int connectionid, TcpChat chat)
+        public class ClientConnectedEventArgs : EventArgs
         {
-            if ((Helpers.User)chat.Data.GetValue("receiver") != null)
+            public int ConnectionId { get; }
+            public bool Cancel { get; set; } = false;
+            public ClientConnectedEventArgs(int connectionId)
             {
-                Helpers.User user = GetUser(((Helpers.User)chat.Data.GetValue("receiver")).Username);
-                //Send to a receiver
-                Logging.Info($"[Server] User {((Helpers.User)chat.Data.GetValue("sender")).Username} sends a chat to {user.Username}");
-                server.Send(user.ID, chat.Serialize());
-                return;
-            }
-            //Send to all connected users
-            Logging.Info($"[Server] User {connectionid} sends a chat to all connected users");
-            foreach (Helpers.User u in Users)
-            {
-                if (u.ID != connectionid)
-                {
-                    server.Send(u.ID, chat.Serialize());
-                }
+                this.ConnectionId = connectionId;
             }
         }
 
-        private static void OnRequestGameWorld(int connectionid)
+        public class ClientDisconnectedEventArgs : EventArgs
         {
-            Logging.Info("[Server] Sending GameWorld to user " + connectionid);
-            GameWorld.Server.Instance.UpdateClient(GetUser(connectionid));
-        }
-
-        private static void OnRequestUserList(int connectionid)
-        {
-            Logging.Info("[Server] Sending Userlist to user " + connectionid);
-            Logging.Warn("[Server] Can't send Userlist because there is an exception, this problem is known!");
-            //TcpResponse response = new TcpResponse("userlist", new XML.XMLDictionary(new XML.XMLDictionaryPair("users", Users.ToArray())));
-            //server.Send(connectionid, response.ToArray());
-        }
-
-        private static void OnGamespeedChange(int connectionid, TcpGamespeed speed)
-        {
-            if ((int)speed.Data.GetValue("type") == 0)
+            public int ConnectionId { get; }
+            public ClientDisconnectedEventArgs(int connectionId)
             {
-                Logging.Info($"[Server] Sending updated GameSpeed to all clients => {(int)speed.Data.GetValue("speed")} usercount: {Users.Count}");
-                foreach (Helpers.User u in Users)
-                {
-                    Logging.Info($"[Server] Sent GameSpeed to connection {u.ID}");
-                    Send(u.ID, speed);
-                }
-            }
-            else
-            {
-                Logging.Warn($"[Server] User {connectionid} can't change gamespeed if type is 1 (vote) because votes aren't included yet");
+                this.ConnectionId = connectionId;
             }
         }
 
-        /// <summary>
-        /// Stops the Server
-        /// </summary>
-        public static async void Stop()
+        public class ReceivedPacketEventArgs : EventArgs
         {
-            if (!IsRunning)
-            {
-                Logging.Warn("[Server] Can't stop a Server that isn't running...");
-                return;
-            }
-            await Task.Run(() => Send(new TcpServerChat($"The server has been stopped and you have been disconnected from it.", TcpServerChatType.Warn)));
-            Logging.Info("[Server] Stop listening");
-            IsRunning = false;
-            Serverdata.SaveData(null, null);
-            server.Stop();
-            Users.Clear();
-        }
+            public int ConnectionId { get; }
+            public IPacket Packet { get; }
+            public bool Handled { get; set; } = false;
 
-           
+            public ReceivedPacketEventArgs(int connectionId, IPacket packet)
+            {
+                this.ConnectionId = connectionId;
+                this.Packet = packet;
+            }
+        }
     }
 }

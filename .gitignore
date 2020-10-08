@@ -353,7 +353,4 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-
-# Powershell Script
-/installer-binaries
-installer-binaries.zip
+/swinc.multiplayer/Assets/mainMenuButton.png

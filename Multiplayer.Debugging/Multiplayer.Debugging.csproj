@@ -230,13 +230,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Logging.cs" />
+    <Compile Include="UnityLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Multiplayer.Extensions\Multiplayer.Extensions.csproj">
       <Project>{816fe3f3-50ef-44a7-a54a-f2ee0346e9f8}</Project>
       <Name>Multiplayer.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Multiplayer.Shared\Multiplayer.Shared.csproj">
+      <Project>{9df5ca61-bca1-47a5-a99f-559f91458f10}</Project>
+      <Name>Multiplayer.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

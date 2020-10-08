@@ -1,4 +1,5 @@
-﻿using UnityEngine.SceneManagement;
+﻿using Multiplayer.Debugging;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Multiplayer.Core
@@ -17,11 +18,7 @@ namespace Multiplayer.Core
 
         private void OnScene(Scene arg0, LoadSceneMode arg1)
         {
-            if (!isActiveAndEnabled)
-            {
-                return;
-            }
-
+            if (!isActiveAndEnabled) return;
             if (arg0.name == "MainMenu")
             {
                 ModifyText();
@@ -42,6 +39,7 @@ namespace Multiplayer.Core
             {
                 WindowManager.FindElementPath("MainPanel/Text[2]").GetComponent<Text>().text = OldText;
             }
+            Logging.OnDisable();
         }
     }
 }

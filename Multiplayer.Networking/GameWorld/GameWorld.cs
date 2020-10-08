@@ -24,7 +24,7 @@ namespace Multiplayer.Networking
             }
             public void UpdateData(World content, bool addition)
             {
-                Logging.Info($"[GameWorld] UpdateData({addition})");
+                //UnityLogger.Info($"[GameWorld] UpdateData({addition})");
                 try
                 {
                     if (addition)
@@ -37,33 +37,22 @@ namespace Multiplayer.Networking
                     else
                     {
                         foreach (Helpers.UserCompany c in content.UserCompanies)
-                        {
                             UserCompanies.RemoveAll(x => x.ID == c.ID);
-                        }
-
                         foreach (Company c in content.AICompanies)
-                        {
                             AICompanies.RemoveAll(x => x.ID == c.ID);
-                        }
-
                         foreach (StockMarket s in content.StockMarkets)
-                        {
                             StockMarkets.RemoveAll(x => x.Name == s.Name);
-                        }
-
                         foreach (SoftwareProduct s in content.SoftwareProducts)
-                        {
                             SoftwareProducts.RemoveAll(x => x.Name == s.Name);
-                        }
                     }
                     RefreshData();
                 }
                 catch (Exception ex)
                 {
-                    Logging.Error(ex.Message);
+                    //UnityLogger.Error(ex.Message);
                 }
 
-                Logging.Info($"[GameWorld] UpdateData() done");
+                //UnityLogger.Info($"[GameWorld] UpdateData() done");
             }
 
             /// <summary>
@@ -71,53 +60,42 @@ namespace Multiplayer.Networking
             /// </summary>
             public void RefreshData()
             {
-                Logging.Info("[GameWorld] Refreshing data");
-                Logging.Info($"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
+                //UnityLogger.Info("[GameWorld] Refreshing data");
+                //UnityLogger.Info($"AI Companies: {AICompanies.Count}", $"Player Companies: {UserCompanies.Count}", $"Stockmarkets: {StockMarkets.Count}");
                 //Clear all stuff from the client first.
                 GameSettings.Instance.StockMarkets.Clear();
                 List<Company> tmpcompanies = new List<Company>();
                 tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
                 foreach (Company c in tmpcompanies)
-                {
                     if (!c.Player)
-                    {
                         MarketSimulation.Active.RemoveCompany(c);
-                    }
-                }
 
                 GameSettings.Instance.StockMarkets.AddRange(StockMarkets); //Add stockmarkets
                 MarketSimulation.Active.FixStocks();
                 foreach (Company c in AICompanies)
-                {
                     MarketSimulation.Active.AddCompany(c, true); //Add AI Companies
-                }
-
                 foreach (Helpers.UserCompany c in UserCompanies)
-                {
                     if (!c.Player)
-                    {
                         MarketSimulation.Active.AddCompany(c.OwnerCompany, true); //Add User Companies
-                    }
-                }
             }
         }
 
         [Serializable]
-        public class Server : IDisposable
+        public class OldServer : IDisposable
         {
-            public static Server Instance;
+            public static OldServer Instance;
 
             public World world = new World();
             public World oldworld = new World(); //When the world is updated save the old world to see what did change and only send the changed stuff
             private bool disposedValue;
 
-            public Server()
+            public OldServer()
             {
                 Instance = this;
                 TimeOfDay.OnDayPassed += UpdateClients;
 
                 //Create World
-                if (Networking.Server.hasAI)
+                /*if (Networking.Server.hasAI)
                 {
                     Logging.Info("[GameWorld] Populate Gameworld with AI companies");
                     foreach (KeyValuePair<uint, SimulatedCompany> c in MarketSimulation.Active.Companies)
@@ -135,18 +113,14 @@ namespace Multiplayer.Networking
                     }
 
                 }
-                else
+                else*/
                 {
-                    Logging.Info("[GameWorld] Removing all AI companies");
+                    //UnityLogger.Info("[GameWorld] Removing all AI companies");
                     List<Company> tmpcompanies = new List<Company>();
                     tmpcompanies.AddRange(MarketSimulation.Active.GetAllCompanies());
                     foreach (Company c in tmpcompanies)
-                    {
                         if (!c.Player)
-                        {
                             MarketSimulation.Active.RemoveCompany(c);
-                        }
-                    }
                 }
             }
 
@@ -154,14 +128,14 @@ namespace Multiplayer.Networking
             {
                 if (oldworld != null)
                 {
-                    Logging.Info("[GameWorld] Updating GameWorld");
+                    //UnityLogger.Info("[GameWorld] Updating GameWorld");
                     SendGameWorldChanges();
                 }
                 else
                 {
-                    Logging.Info("[GameWorld] Sending GameWorld because oldworld is null!");
-                    TcpGameWorld gwm = new TcpGameWorld(world, true);
-                    Networking.Server.Send(gwm);
+                    //UnityLogger.Info("[GameWorld] Sending GameWorld because oldworld is null!");
+                    Helpers.TcpGameWorld gwm = new Helpers.TcpGameWorld(world, true);
+                    //Networking.Server.Send(gwm);
                 }
 
                 oldworld = world; //Set oldworld to world to see if anything did change
@@ -171,10 +145,10 @@ namespace Multiplayer.Networking
             {
                 if (user == null)
                 {
-                    Logging.Error("User is null =(");
+                    //UnityLogger.Error("User is null =(");
                     return;
                 }
-                Logging.Info("[GameWorld] Updating Client " + user.Username);
+                //UnityLogger.Info("[GameWorld] Updating Client " + user.Username);
                 SendGameWorldChanges(user);
             }
 
@@ -182,32 +156,32 @@ namespace Multiplayer.Networking
             {
                 try
                 {
-                    TcpGameWorld add = new TcpGameWorld(CompareWorlds(true), true);
-                    TcpGameWorld remove = new TcpGameWorld(CompareWorlds(false), false);
+                    Helpers.TcpGameWorld add = new Helpers.TcpGameWorld(CompareWorlds(true), true);
+                    Helpers.TcpGameWorld remove = new Helpers.TcpGameWorld(CompareWorlds(false), false);
 
-                    Logging.Info("[Debug] SendGameWorldChanges() => Add: " + add.Serialize().Length + " Remove: " + remove.Serialize().Length);
+                    //UnityLogger.Info("[Debug] SendGameWorldChanges() => Add: " + add.Serialize().Length + " Remove: " + remove.Serialize().Length);
 
                     if (users.Length < 1)
                     {
                         //If users aren't set, it will send it to all users connected to the server
-                        foreach (Helpers.User u in Networking.Server.Users.ToArray())
+                        /*foreach (Helpers.User u in Networking.Server.Users.ToArray())
                         {
-                            Networking.Server.Send(u.ID, add);
-                            Networking.Server.Send(u.ID, remove);
-                        }
+                            //Networking.Server.Send(u.ID, add);
+                            //Networking.Server.Send(u.ID, remove);
+                        }*/
                         return;
                     }
 
                     foreach (Helpers.User user in users)
                     {
-                        Networking.Server.Send(user.ID, add);
-                        Networking.Server.Send(user.ID, remove);
+                        //Networking.Server.Send(user.ID, add);
+                        //Networking.Server.Send(user.ID, remove);
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    Logging.Error(ex.Message, ex.StackTrace);
+                    //UnityLogger.Error(ex.Message, ex.StackTrace);
                 }
 
             }
@@ -224,7 +198,7 @@ namespace Multiplayer.Networking
 
                 if (oldworld == null)
                 {
-                    Logging.Warn("[GameWorld] oldworld is null but CompareWorlds() is called!");
+                    //UnityLogger.Warn("[GameWorld] oldworld is null but CompareWorlds() is called!");
                     return world;
                 }
 
@@ -237,63 +211,45 @@ namespace Multiplayer.Networking
                 //CHECK IF SOMETHING WAS REMOVED AND RETURN THE TMPWORLD WITH THE REMOVED CONTENT
                 if (!isAdded)
                 {
-                    Logging.Info("[GameWorld] Check if something was removed from servers gameworld");
+                    //UnityLogger.Info("[GameWorld] Check if something was removed from servers gameworld");
                     foreach (Helpers.UserCompany c in oldworld.UserCompanies)
-                    {
                         if (!world.UserCompanies.Contains(c))
-                        {
                             tmpworld.UserCompanies.Add(c);
-                        }
-                    }
 
                     foreach (Company c in oldworld.AICompanies)
-                    {
                         if (!world.AICompanies.Contains(c))
-                        {
                             tmpworld.AICompanies.Add(c);
-                        }
-                    }
 
                     foreach (StockMarket s in oldworld.StockMarkets)
-                    {
                         if (!world.StockMarkets.Contains(s))
-                        {
                             tmpworld.StockMarkets.Add(s);
-                        }
-                    }
 
-                    Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were removed");
+                    //UnityLogger.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were removed");
                     return tmpworld;
                 }
 
                 //ELSE CHECK IF SOMETHING WAS ADDED
-                Logging.Info("[GameWorld] Check if something was added to servers gameworld");
+                //UnityLogger.Info("[GameWorld] Check if something was added to servers gameworld");
 
                 //Compare UserCompanies
                 foreach (Helpers.UserCompany c in world.UserCompanies)
                 {
                     if (!oldworld.UserCompanies.Contains(c))
-                    {
                         tmpworld.UserCompanies.Add(c);
-                    }
                 }
                 //Compare AICompanies
                 foreach (Company c in world.AICompanies)
                 {
                     if (!oldworld.AICompanies.Contains(c))
-                    {
                         tmpworld.AICompanies.Add(c);
-                    }
                 }
                 //Compare Stocks
                 foreach (StockMarket s in world.StockMarkets)
                 {
                     if (!oldworld.StockMarkets.Contains(s))
-                    {
                         tmpworld.StockMarkets.Add(s);
-                    }
                 }
-                Logging.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were added");
+                //UnityLogger.Info($"[GameWorld] {tmpworld.UserCompanies.Count + tmpworld.AICompanies.Count + tmpworld.StockMarkets.Count} objects were added");
                 return tmpworld;
             }
 
@@ -301,15 +257,15 @@ namespace Multiplayer.Networking
             {
                 if (adds)
                 {
-                    Logging.Info("[GameWorld] Will add new content to the clients GameWorld");
-                    TcpGameWorld gwc = new TcpGameWorld(servercontent, true);
-                    Networking.Server.Send(gwc);
+                    //UnityLogger.Info("[GameWorld] Will add new content to the clients GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
+                    //Networking.Server.Send(gwc);
                 }
                 else
                 {
-                    Logging.Info("[GameWorld] Will remove content from the clients GameWorld");
-                    TcpGameWorld gwc = new TcpGameWorld(servercontent, false);
-                    Networking.Server.Send(gwc);
+                    //UnityLogger.Info("[GameWorld] Will remove content from the clients GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
+                    //Networking.Server.Send(gwc);
                 }
             }
 
@@ -317,13 +273,13 @@ namespace Multiplayer.Networking
             {
                 if (adds)
                 {
-                    Logging.Info("[GameWorld] Will add new content to the servers GameWorld");
+                    //UnityLogger.Info("[GameWorld] Will add new content to the servers GameWorld");
                     world.UpdateData(servercontent, adds);
                     world.RefreshData();
                 }
                 else
                 {
-                    Logging.Info("[GameWorld] Will remove content from the servers GameWorld");
+                    //UnityLogger.Info("[GameWorld] Will remove content from the servers GameWorld");
                     world.UpdateData(servercontent, adds);
                     world.RefreshData();
                 }
@@ -349,23 +305,19 @@ namespace Multiplayer.Networking
         }
 
         [Serializable]
-        public class Client : IDisposable
+        public class OldClient : IDisposable
         {
-            public static Client Instance;
+            public static OldClient Instance;
 
             public World world = new World();
             private bool disposedValue;
 
-            public Client(World gworld = null)
+            public OldClient(World gworld = null)
             {
                 if (gworld == null)
-                {
                     world = new World();
-                }
                 else
-                {
                     world = gworld;
-                }
 
                 Instance = this;
             }
@@ -374,15 +326,15 @@ namespace Multiplayer.Networking
             {
                 if (adds)
                 {
-                    Logging.Info("[GameWorld] Will add new content to the GameWorld");
-                    TcpGameWorld gwc = new TcpGameWorld(servercontent, true);
-                    Networking.Client.Send(gwc);
+                    //UnityLogger.Info("[GameWorld] Will add new content to the GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, true);
+                    //Networking.Client.Send(gwc);
                 }
                 else
                 {
-                    Logging.Info("[GameWorld] Will remove content from the GameWorld");
-                    TcpGameWorld gwc = new TcpGameWorld(servercontent, false);
-                    Networking.Client.Send(gwc);
+                    //UnityLogger.Info("[GameWorld] Will remove content from the GameWorld");
+                    Helpers.TcpGameWorld gwc = new Helpers.TcpGameWorld(servercontent, false);
+                    //Networking.Client.Send(gwc);
                 }
             }
 
@@ -390,13 +342,13 @@ namespace Multiplayer.Networking
             {
                 if (adds)
                 {
-                    Logging.Info("[GameWorld] Client will add new content to the local GameWorld");
+                    //UnityLogger.Info("[GameWorld] Client will add new content to the local GameWorld");
                     world.UpdateData(servercontent, adds);
                     world.RefreshData();
                 }
                 else
                 {
-                    Logging.Info("[GameWorld] Client will remove content from the local GameWorld");
+                    //UnityLogger.Info("[GameWorld] Client will remove content from the local GameWorld");
                     world.UpdateData(servercontent, adds);
                     world.RefreshData();
                 }

@@ -1,220 +1,121 @@
-﻿using Multiplayer.Debugging;
-using System;
+﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using MessagePack;
+using Multiplayer.Networking.Packet;
+using Multiplayer.Networking.Utility;
+using Multiplayer.Shared;
+using Telepathy;
 
 namespace Multiplayer.Networking
 {
-    public static partial class Client
+    public class Client : IDisposable
     {
-        public static bool Connected { get { return client.Connected; } }
-        public static Telepathy.Client client = new Telepathy.Client();
-        public static string Username = "Player";
-        public static string ServerPassword = "";
-        public static async void Connect(string ip, ushort port)
-        {
-            if (client.Connecting)
-            {
-                Logging.Warn("[Client] You're already connecting to a server!");
-                return;
-            }
-            // create and connect the client
-            ChatMessages = new List<string>();
-            ChatLogMessages = new List<string>();
-            try
-            {
-                Username = Steamworks.SteamFriends.GetPersonaName();
-            }
-            catch (Exception ex)
-            {
-                Logging.Warn("[Client] Couldn't fetch username from Steam! If you've a DRM-Free version thats why. => " + ex.Message);
-            }
-            client.MaxMessageSize = int.MaxValue;
-            client.Connect(ip, port);
-            Logging.Info("[Client] Trying to connect!");
-            await Task.Run(() =>
-            {
-                while (client.Connecting)
-                {
-
-                }
-                if (client.Connected)
-                {
-                    Logging.Info("[Client] Connected to the Server!");
-                    OnServerChatRecieved(new TcpServerChat($"Connected to the server.", TcpServerChatType.Info));
-                    Read();
-                    GameWorld.Client client = new GameWorld.Client();
-                }
-            });
-            if (!client.Connected)
-            {
-                //WindowManager.SpawnDialog("Couldn't connect to the Server!", true, DialogWindow.DialogType.Warning);
-                //Logging.Warn("[Client] Couldn't connect to the Server!");
-                throw new Exception("[Client] Couldn't connect to the Server");
-            }
-        }
-
-        private static async void Read()
-        {
-            Logging.Info("[Client] Starts reading");
-            await Task.Run(() =>
-            {
-                while (Connected)
-                {
-                    while (client.GetNextMessage(out Telepathy.Message msg))
-                    {
-                        switch (msg.eventType)
-                        {
-                            case Telepathy.EventType.Connected:
-                                Logging.Info("[Client] Connected");
-
-                                break;
-                            case Telepathy.EventType.Data:
-                                Receive(msg.data);
-                                break;
-                            case Telepathy.EventType.Disconnected:
-                                Logging.Info("[Client] Disconnected");
-                                break;
-                        }
-                    }
-                }
-            });
-            Logging.Info("[Client] Ends reading");
-        }
-
-        private static void Receive(byte[] data)
-        {
-            Logging.Info("[Client] Data from Server: " + data.Length + " bytes");
-
-            //Handle TcpResponse
-            TcpResponse tcpresponse = TcpResponse.Deserialize(data);
-            if (tcpresponse != null && tcpresponse.Header == "response")
-            {
-                OnServerResponse(tcpresponse);
-            }
-
-            //Handle TcpServerChat
-            TcpServerChat tcpServerChat = TcpServerChat.Deserialize(data);
-            if (tcpServerChat != null && tcpServerChat.Header == "serverchat")
-            {
-                OnServerChatRecieved(tcpServerChat);
-            }
-
-            TcpPrivateChat tcpPrivateChat = TcpPrivateChat.Deserialize(data);
-            if (tcpPrivateChat != null && tcpPrivateChat.Header == "pm")
-            {
-                OnPrivateChatRecieved(tcpPrivateChat);
-            }
-
-            //Handle TcpChat
-            TcpChat tcpchat = TcpChat.Deserialize(data);
-            if (tcpchat != null && tcpchat.Header == "chat")
-            {
-                OnChatReceived(tcpchat);
-            }
-
-            //Handle GameWorld
-            TcpGameWorld tcpworld = TcpGameWorld.Deserialize(data);
-            if (tcpworld != null && tcpworld.Header == "gameworld")
-            {
-                OnGameWorldReceived(tcpworld);
-            }
-
-            //Handle Gamespeed
-            TcpGamespeed tcpspeed = TcpGamespeed.Deserialize(data);
-            if (tcpspeed != null && tcpspeed.Header == "gamespeed")
-            {
-                OnGamespeedChange(tcpspeed);
-            }
-        }
-        private static void OnGamespeedChange(TcpGamespeed tcpspeed)
-        {
-            Logging.Info("gamespeedchange...");
-            int type = (int)tcpspeed.Data.GetValue("type");
-            int speed = (int)tcpspeed.Data.GetValue("speed");
-            if (type == 0)
-            {
-                GameSettings.GameSpeed = speed;
-                //HUD.Instance.GameSpeed = (int)speed;
-            }
-            OnServerChatRecieved(new TcpServerChat($"The gamespeed has been changed to {speed}", TcpServerChatType.Info));
-        }
-
-        private static void OnServerResponse(TcpResponse response)
-        {
-            object type = response.Data.GetValue("type");
-            if (type == null)
-            {
-                Logging.Warn("[Client] Type is null!");
-                return;
-            }
-            if ((string)type == "login_request")
-            {
-                Send(new TcpLogin(Username, ServerPassword));
-            }
-            else if ((string)type == "login_response")
-            {
-                string res = (string)response.Data.GetValue("data");
-                if (res == "ok")
-                {
-                    //Login ok
-                    Logging.Info("[Client] You're logged in now!");
-                    //Send request to get GameWorld
-                    Send(new TcpRequest("gameworld"));
-
-                }
-                else if (res == "max_players")
-                {
-                    //Server full
-                    Logging.Warn("[Client] The server is full");
-                }
-                else if (res == "wrong_password")
-                {
-                    //Wrong password
-                    Logging.Warn("[Client] You did enter the wrong password");
-                }
-            }
-        }
-
-        #region Messages
-        public static void Send(TcpLogin login)
-        {
-            Logging.Info("[Client] Sending login message");
-            client.Send(login.Serialize());
-        }
-        public static void Send(TcpRequest request)
-        {
-            Logging.Info("[Client] Sending request");
-            client.Send(request.Serialize());
-        }
-
-        public static void Send(TcpResponse response)
-        {
-            Logging.Info("[Client] Sending response");
-            client.Send(response.Serialize());
-        }
-
-        public static void Send(TcpGamespeed speed)
-        {
-            Logging.Info("[Client] Sending gamespeed");
-            client.Send(speed.Serialize());
-        }
+        #region Events
+        public event EventHandler<ClientConnectedEventArgs> ClientConnected;
+        public event EventHandler<ClientDisconnectedEventArgs> ClientDisconnected;
         #endregion
 
-        public static void Disconnect()
+        private readonly ILogger logger;
+        private readonly PacketSerializer packetSerializer;
+
+        public Client(ILogger logger, PacketSerializer packetSerializer)
         {
-            if (!Connected)
+            this.logger = logger;
+            this.packetSerializer = packetSerializer;
+            this.RawClient = new Telepathy.Client();
+        }
+
+        public void Dispose()
+        {
+            // disconnect the client
+            this.Disconnect();
+            // clear all events
+            this.ClientConnected = null;
+            this.ClientDisconnected = null;
+        }
+
+        public User MyUser { get; set; }
+        
+        public Telepathy.Client RawClient { get; set; }
+
+        protected void Send(IPacket packet)
+        {
+            // maybe add a check if we are still connected
+            if (!this.RawClient.Send(this.packetSerializer.SerializePacket(packet)))
             {
-                Logging.Warn("[Client] You can't disconnect a client that isn't connected...");
-                return;
+                this.logger.Error("could not send packet");
             }
-            if (!ChatMessages.Contains($"<color=orange>The server has been stopped and you have been disconnected from it.</color>"))
+        }
+
+        public bool HandleMessages()
+        {
+            var hadMessage = false;
+
+            while (this.RawClient.GetNextMessage(out Message msg))
             {
-                ChatMessages.Add($"<color=orange>The server has been stopped and you have been disconnected from it.</color>");
+                hadMessage = true;
+                switch (msg.eventType)
+                {
+                    case EventType.Connected:
+                        this.ClientConnected?.Invoke(this, new ClientConnectedEventArgs(msg.connectionId));
+
+                        this.Send(new Handshake(this.MyUser.UniqueID));
+
+                        break;
+                    case EventType.Data:
+
+                        var genericPacket = this.packetSerializer.DeserializePacket(msg.data);
+                        if(genericPacket == null)
+                        {
+#if DEBUG
+                            // maybe add some more details
+                            this.logger.Warn("received unknown packet");
+#endif
+                        }
+
+                        break;
+                    case EventType.Disconnected:
+                        this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(msg.connectionId));
+                        break;
+                }
             }
-            client.Disconnect();
-            CreateChatLogFile();
-            CreatePChatLogFile();
+            return hadMessage;
+        }
+
+        public void Connect(string ip, int port)
+        {
+            MyUser = new User();
+            this.RawClient.Connect(ip, port);
+        }
+
+        public void Disconnect()
+        {
+            this.Send(new Disconnect("leaving"));
+            this.RawClient.Disconnect();
+        }
+
+        
+
+        public class ClientConnectedEventArgs : EventArgs
+        {
+            public ClientConnectedEventArgs(int connectionId)
+            {
+                this.ConnectionId = connectionId;
+            }
+            public int ConnectionId { get; set; }
+        }
+
+        public class ClientDisconnectedEventArgs : EventArgs
+        {
+            public ClientDisconnectedEventArgs(int connectionId)
+            {
+                this.ConnectionId = connectionId;
+            }
+            public int ConnectionId { get; set; }
         }
     }
 }
