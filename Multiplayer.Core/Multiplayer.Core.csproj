@@ -82,7 +82,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Telepathy, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Telepathy, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\References\Telepathy.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\References\UnityEngine.dll</HintPath>
     </Reference>
@@ -243,6 +245,7 @@
   <ItemGroup>
     <Compile Include="DebugConsole.cs" />
     <Compile Include="Behaviours\GameBehaviour.cs" />
+    <Compile Include="NetworkingManager.cs" />
     <Compile Include="Utils\IPUtils.cs" />
     <Compile Include="Behaviours\LaunchBehaviour.cs" />
     <Compile Include="Behaviours\MenuBehaviour.cs" />
@@ -267,6 +270,10 @@
     <ProjectReference Include="..\Multiplayer.Networking\Multiplayer.Networking.csproj">
       <Project>{19cd273f-a601-45ed-ab6d-6e61f47a074c}</Project>
       <Name>Multiplayer.Networking</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Multiplayer.Shared\Multiplayer.Shared.csproj">
+      <Project>{9DF5CA61-BCA1-47A5-A99F-559F91458F10}</Project>
+      <Name>Multiplayer.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

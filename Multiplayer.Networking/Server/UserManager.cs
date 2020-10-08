@@ -24,10 +24,15 @@ namespace Multiplayer.Networking
     }
 
     [Serializable]
+    [MessagePack.MessagePackObject]
     public class User
     {
+        [MessagePack.Key(0)]
         public int ConnectionID { get; set; }
+        [MessagePack.Key(1)]
         public SIMM.Constants.Account SIMM_Account { get; }
+
+        [MessagePack.Key(2)]
         public string Username { get
             {
                 if(!IsLoggedIn)
@@ -36,12 +41,17 @@ namespace Multiplayer.Networking
                 }
                 return SIMM_Account.username;
             } }
+
+        [MessagePack.Key(3)]
         public bool IsLoggedIn { get; set; }
+
+        [MessagePack.Key(4)]
         public string UniqueID { get
             {
                 return Guid.NewGuid().ToString();
             } }
 
+        [MessagePack.Key(5)]
         public UserRole Role { get; set; }
         public User(bool DoNotFill)
         {
@@ -69,6 +79,10 @@ namespace Multiplayer.Networking
         public bool GetUser(string username, out User user)
         {
             return Users.TryGetValue(username, out user);
+        }
+        public void RemoveUser(int ID)
+        {
+
         }
         public void RemoveUser(string username)
         {

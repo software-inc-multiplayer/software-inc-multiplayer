@@ -35,7 +35,7 @@ namespace Multiplayer.Networking.Test
         [Fact()]
         public void HandshakePacket()
         {
-            var packet = new Handshake("test");
+            var packet = new Handshake(new User());
 
             var serializedPacket = this.packetSerializer.SerializePacket(packet);
             Assert.NotNull(serializedPacket);
@@ -46,13 +46,13 @@ namespace Multiplayer.Networking.Test
             Assert.NotNull(deserializedPacket);
             Assert.NotNull(deserializedTypedPacket);
 
-            Assert.Equal(packet.UserId, deserializedTypedPacket.UserId);
+            Assert.Equal(packet.User.UniqueID, deserializedTypedPacket.User.UniqueID);
         }
 
         [Fact()]
         public void TestPacket()
         {
-            var packet = new TestPacket() { UserId = "test" };
+            var packet = new TestPacket() { TestString = "test" };
 
             var serializedPacket = this.packetSerializer.SerializePacket(packet);
             output.WriteLine(MessagePackSerializer.ConvertToJson(serializedPacket));
@@ -64,7 +64,7 @@ namespace Multiplayer.Networking.Test
             Assert.NotNull(deserializedPacket);
             Assert.NotNull(deserializedTypedPacket);
 
-            Assert.Equal(packet.UserId, deserializedTypedPacket.UserId);
+            Assert.Equal(packet.TestString, deserializedTypedPacket.TestString);
         }
     }
 }

@@ -117,7 +117,9 @@ namespace Multiplayer.Networking
                             break;
 
                         var packet = this.packetSerializer.DeserializePacket(msg.data);
+                        if(packet.GetType() == typeof(Handshake)) {
 
+                        }
                         if(packet == null)
                         {
 #if DEBUG
@@ -133,6 +135,8 @@ namespace Multiplayer.Networking
                         {
                             // What shall we do here?
                             // for the start we enforce a disconnect
+                            // we could send a Desynced Packet to the connection id and when
+                            // the client gets this packet it shows a messagebox or warning. -cal
                             this.Send(sender, new Disconnect(Constants.DisconnectReason.UnhandledPacket));
                             this.RawServer.Disconnect(sender);
                             this.ConnectedClients.Remove(sender);
@@ -143,6 +147,7 @@ namespace Multiplayer.Networking
                         break;
                     case EventType.Disconnected:
                         this.ConnectedClients.Remove(sender);
+                        //UserManager.RemoveUser()
                         this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(sender));
                         break;
                 }

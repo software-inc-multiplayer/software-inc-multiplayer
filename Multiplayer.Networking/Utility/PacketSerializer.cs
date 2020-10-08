@@ -119,21 +119,39 @@ namespace Multiplayer.Networking.Packet
     public class TestPacket : IPacket
     {
         [Key(0)]
-        public string UserId { get; set; }
+        public string TestString { get; set; }
     }
 
     [MessagePackObject]
     public class Handshake : IPacket
     {
         [Key(0)]
-        public string UserId { get; set; }
+        public User User { get; set; }
         [Key(1)]
         public string Password { get; set; }
 
-        public Handshake(string userId, string password = null)
+        public Handshake(User userId, string password = null)
         {
-            this.UserId = userId;
+            this.User = userId;
             this.Password = password;
+        }
+    }
+    /// <summary>
+    /// A chat message.
+    /// </summary>
+    [MessagePackObject]
+    public class ChatMessage : IPacket
+    {
+        [Key(0)]
+        public User Sender { get; }
+
+        [Key(1)]
+        public string Message { get; }
+        [Key(3)]
+        public DateTime CreatedDate { get; }
+        public ChatMessage(User sender, string message)
+        {
+            this.Sender = sender; this.Message = message; this.CreatedDate = DateTime.Now;
         }
     }
 

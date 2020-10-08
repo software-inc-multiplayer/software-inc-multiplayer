@@ -201,7 +201,7 @@ namespace Multiplayer.Networking.Test
             client.SafeHandleMessages(); // trigger handshake
             server.SafeHandleMessages(); // handle client handshake
 
-            var handshake = new Handshake("invalid");
+            var handshake = new Handshake(new User(true));
             client.RawClient.Send(this.packetSerializer.SerializePacket(handshake));
             server.SafeHandleMessages();
             client.SafeHandleMessages();
