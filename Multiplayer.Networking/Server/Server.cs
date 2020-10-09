@@ -58,19 +58,19 @@ namespace Multiplayer.Networking
         public void Start(int port, string password = "")
         {
             this.ServerInfomation = new ServerInfo()
-                {
-                    Port = port,
-                    Password = password,
-                    Host = new User(),
-                };
+            {
+                Port = port,
+                Password = password,
+                Host = new User(),
+            };
             this.RawServer.Start(port);
             this.ServerStarted?.Invoke(this, null);
         }
 
         public void Stop()
         {
-            this.Broadcast(new Disconnect("server shutdown"));
-            foreach(var clientId in this.ConnectedClients)
+            this.Broadcast(new Disconnect(DisconnectReason.ServerStop));
+            foreach (var clientId in this.ConnectedClients)
             {
                 this.RawServer.Disconnect(clientId);
             }
@@ -96,7 +96,7 @@ namespace Multiplayer.Networking
         {
             foreach (var connectionId in this.ConnectedClients)
             {
-                if(connectionId != exceptConnectionId)
+                if (connectionId != exceptConnectionId)
                     this.RawServer.Send(connectionId, this.packetSerializer.SerializePacket(packet));
             }
         }
@@ -119,7 +119,7 @@ namespace Multiplayer.Networking
                         this.ClientConnected?.Invoke(this, eventArgs);
                         if (eventArgs.Cancel)
                         {
-                            this.Send(sender, new Disconnect(Constants.DisconnectReason.InvalidHandshake));
+                            this.Send(sender, new Disconnect(DisconnectReason.InvalidHandshake));
 
                             this.RawServer.Disconnect(sender);
                             this.ConnectedClients.Remove(sender);
@@ -130,10 +130,11 @@ namespace Multiplayer.Networking
                             break;
 
                         var packet = this.packetSerializer.DeserializePacket(msg.data);
-                        if(packet.GetType() == typeof(Handshake)) {
+                        if (packet.GetType() == typeof(Handshake))
+                        {
 
                         }
-                        if(packet == null)
+                        if (packet == null)
                         {
 #if DEBUG
                             logger.Warn($"Packet recieved from ConnectionID {msg.connectionId} is null! Ignoring packet for now.");
@@ -141,16 +142,21 @@ namespace Multiplayer.Networking
                             break;
                         }
 
+                        if(packet is Disconnect)
+                        {
+                            this.RawServer.Disconnect(sender);
+                        }
+
                         var packetEventArgs = new ReceivedPacketEventArgs(sender, packet);
                         this.ReceivedPacket?.Invoke(this, packetEventArgs);
 
-                        if(!packetEventArgs.Handled)
+                        if (!packetEventArgs.Handled)
                         {
                             // What shall we do here?
                             // for the start we enforce a disconnect
                             // we could send a Desynced Packet to the connection id and when
                             // the client gets this packet it shows a messagebox or warning. -cal
-                            this.Send(sender, new Disconnect(Constants.DisconnectReason.UnhandledPacket));
+                            this.Send(sender, new Disconnect(DisconnectReason.UnhandledPacket));
                             this.RawServer.Disconnect(sender);
                             this.ConnectedClients.Remove(sender);
 #if TEST

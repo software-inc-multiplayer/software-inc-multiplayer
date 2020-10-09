@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 namespace Multiplayer.Networking
 {
-    public static class Constants
+    public enum DisconnectReason
     {
-        public enum DisconnectReason
-        {
-            ServerStop,
-            Leaving,
-            Kicked,
-            Banned,
-            UnhandledPacket,
-            InvalidHandshake
-        }
+        ServerStop,
+        Leaving,
+        Kicked,
+        Banned,
+        UnhandledPacket,
+        InvalidHandshake
     }
 }

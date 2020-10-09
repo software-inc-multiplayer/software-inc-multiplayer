@@ -24,6 +24,13 @@ namespace Multiplayer.Networking.Test
             this.logger = new TestLogger();
             this.packetSerializer = new PacketSerializer();
             this.server = new Server(this.logger, this.packetSerializer);
+
+            this.server.ReceivedPacket += (sender, e) =>
+            {
+                // dummy server
+                e.Handled = true;
+            };
+
             this.server.Start(serverPort);
 
             this.client = new Client(this.logger, this.packetSerializer);
@@ -76,6 +83,8 @@ namespace Multiplayer.Networking.Test
             Assert.True(client.RawClient.Connected);
 
             client.Disconnect();
+
+            server.SafeHandleMessages();
 
             Assert.False(client.RawClient.Connecting);
             Assert.False(client.RawClient.Connected);

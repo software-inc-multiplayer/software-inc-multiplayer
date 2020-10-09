@@ -1,11 +1,12 @@
 ﻿//#define PACKET_ID
-#define TEST
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using MessagePack;
+using Multiplayer.Networking;
 using Packets;
 
 namespace Multiplayer.Networking.Utility
@@ -45,18 +46,6 @@ namespace Multiplayer.Networking.Utility
                 //.WithResolver(resolver)
                 //.WithCompression(MessagePackCompression.Lz4Block)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
-
-
-
-            /*MessagePack.Formatters.TypelessFormatter.Instance = typeName =>
-            {
-                if (typeName.StartsWith("SomeNamespace"))
-                {
-                    typeName = typeName.Replace("SomeNamespace", "AnotherNamespace");
-                }
-
-                return Type.GetType(typeName, false);
-            };*/
         }
 
         public byte[] SerializePacket<TPacket>(TPacket packet)
@@ -162,9 +151,9 @@ namespace Packets
     public class Disconnect : IPacket
     {
         [Key(0)]
-        public Constants.DisconnectReason Reason { get; }
+        public DisconnectReason Reason { get; }
 
-        public Disconnect(Constants.DisconnectReason reason)
+        public Disconnect(DisconnectReason reason)
         {
             this.Reason = reason;
         }

@@ -29,7 +29,8 @@ namespace Multiplayer.Networking
     {
         [MessagePack.Key(0)]
         public int ConnectionID { get; set; }
-        [MessagePack.Key(1)]
+        // we are not ready for this...
+        /*[MessagePack.Key(1)]
         public SIMM.Constants.Account SIMM_Account { get; }
 
         [MessagePack.Key(2)]
@@ -40,16 +41,13 @@ namespace Multiplayer.Networking
                     return "Guest";
                 }
                 return SIMM_Account.username;
-            } }
+            } }*/
 
         [MessagePack.Key(3)]
         public bool IsLoggedIn { get; set; }
 
         [MessagePack.Key(4)]
-        public string UniqueID { get
-            {
-                return Guid.NewGuid().ToString();
-            } }
+        public string UniqueID { get; set; }
 
         [MessagePack.Key(5)]
         public UserRole Role { get; set; }
@@ -61,11 +59,13 @@ namespace Multiplayer.Networking
         {
             try
             {
-                SIMM_Account = JsonUtility.FromJson<SIMM.Constants.Account>(File.ReadAllText(ModController.ModFolder + "/Multiplayer/account.json"));
+                UniqueID = Guid.NewGuid().ToString();
+                var SIMM_Account = JsonUtility.FromJson<SIMM.Constants.Account>(File.ReadAllText(ModController.ModFolder + "/Multiplayer/account.json"));
                 IsLoggedIn = true;
             } catch(Exception e)
             {
-                Debug.Log("Had trouble parsing account.json: " + e.ToString());
+                // no hard references to unity stuff please :(
+                //Debug.Log("Had trouble parsing account.json: " + e.ToString());
                 IsLoggedIn = false;
             }
         }
@@ -96,7 +96,8 @@ namespace Multiplayer.Networking
             if(!user.IsLoggedIn)
             {
                 GuestCount++;
-                username = $"{user.Username} + {GuestCount}";
+                // TODO fixme
+                //username = $"{user.Username} + {GuestCount}";
             }
             Users.Add(username, user);
             UserAdded.Invoke(this, user);

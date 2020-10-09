@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
@@ -9,6 +10,7 @@ namespace Multiplayer.Networking.Test
     {
         internal static int timeoutMillis = 1000;
 
+        [DebuggerStepThrough]
         public static void SafeTimeout(Func<bool> func)
         {
             var start = DateTime.Now;
@@ -22,11 +24,13 @@ namespace Multiplayer.Networking.Test
             }
         }
 
+        [DebuggerStepThrough]
         public static void SafeHandleMessages(this Client client)
         {
             SafeTimeout(() => client.HandleMessages());
         }
 
+        [DebuggerStepThrough]
         public static void SafeHandleMessages(this Server server)
         {
             SafeTimeout(() => server.HandleMessages());

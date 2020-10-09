@@ -84,6 +84,11 @@ namespace Multiplayer.Networking.Test
                 Assert.NotEqual(-1, connectionId);
                 Assert.Equal(connectionId, e.ConnectionId);
             };
+            server.ReceivedPacket += (sender, e) =>
+            {
+                if (e.Packet is Disconnect)
+                    e.Handled = true;
+            };
 
             server.Start(serverPort);
 
@@ -101,6 +106,8 @@ namespace Multiplayer.Networking.Test
 
             client.Disconnect();
 
+            server.SafeHandleMessages();
+            client.SafeHandleMessages();
             server.SafeHandleMessages();
 
             Assert.True(clientDisconnectedFired);
@@ -226,7 +233,7 @@ namespace Multiplayer.Networking.Test
                 if(e.Packet is Disconnect dc)
                 {
                     disconnectReceived = true;
-                    Assert.Equal("leaving", dc.Reason);
+                    Assert.Equal(DisconnectReason.Leaving, dc.Reason);
                 }
                 e.Handled |= disconnectReceived;
             };
@@ -243,6 +250,8 @@ namespace Multiplayer.Networking.Test
             client.Disconnect();
 
             server.SafeHandleMessages();
+            client.SafeHandleMessages();
+            //server.SafeHandleMessages();
 
             Assert.True(disconnectReceived);
         }
