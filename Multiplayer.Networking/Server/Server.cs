@@ -11,7 +11,7 @@ using Multiplayer.Networking;
 using Multiplayer.Extensions;
 using Multiplayer.Shared;
 using Multiplayer.Networking.Utility;
-using Multiplayer.Networking.Packet;
+using Packets;
 
 namespace Multiplayer.Networking
 {
@@ -69,8 +69,12 @@ namespace Multiplayer.Networking
 
         public void Stop()
         {
-            // TODO maybe we should gracefully "remove" all clients
-            // ^ Telepathy does this automatically -cal
+            this.Broadcast(new Disconnect("server shutdown"));
+            foreach(var clientId in this.ConnectedClients)
+            {
+                this.RawServer.Disconnect(clientId);
+            }
+
             this.RawServer.Stop();
             this.ServerStopped?.Invoke(this, null);
         }
@@ -85,6 +89,15 @@ namespace Multiplayer.Networking
             foreach (var connectionId in this.ConnectedClients)
             {
                 this.RawServer.Send(connectionId, this.packetSerializer.SerializePacket(packet));
+            }
+        }
+
+        protected void Multicast(int exceptConnectionId, IPacket packet)
+        {
+            foreach (var connectionId in this.ConnectedClients)
+            {
+                if(connectionId != exceptConnectionId)
+                    this.RawServer.Send(connectionId, this.packetSerializer.SerializePacket(packet));
             }
         }
 
@@ -124,7 +137,7 @@ namespace Multiplayer.Networking
                         {
 #if DEBUG
                             logger.Warn($"Packet recieved from ConnectionID {msg.connectionId} is null! Ignoring packet for now.");
-#endif  
+#endif
                             break;
                         }
 

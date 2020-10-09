@@ -6,7 +6,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using MessagePack;
-using Multiplayer.Networking.Packet;
+using Packets;
 
 namespace Multiplayer.Networking.Utility
 {
@@ -39,9 +39,13 @@ namespace Multiplayer.Networking.Utility
             var resolver = MessagePack.Resolvers.CompositeResolver.Create(
                 new[] { MessagePack.Formatters.TypelessFormatter.Instance },
                 new[] { MessagePack.Resolvers.StandardResolver.Instance });
-            this.Options = MessagePackSerializerOptions.Standard
-                .WithResolver(resolver)
+
+            this.Options = MessagePackSerializer.Typeless.DefaultOptions//MessagePackSerializerOptions.Standard
+                .WithOmitAssemblyVersion(true)
+                //.WithResolver(resolver)
+                //.WithCompression(MessagePackCompression.Lz4Block)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
+
 
 
             /*MessagePack.Formatters.TypelessFormatter.Instance = typeName =>
@@ -106,20 +110,16 @@ namespace Multiplayer.Networking.Utility
 #endif
     }
 
-    
+
 }
 
-namespace Multiplayer.Networking.Packet
+/// <summary>
+/// Keep this namespace SHORT as it is used in serialization
+/// </summary>
+namespace Packets
 {
     public interface IPacket
     {
-    }
-
-    [MessagePackObject]
-    public class TestPacket : IPacket
-    {
-        [Key(0)]
-        public string TestString { get; set; }
     }
 
     [MessagePackObject]

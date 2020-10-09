@@ -1,8 +1,10 @@
 ﻿using System;
-using Multiplayer.Networking.Packet;
+
 using Multiplayer.Networking.Utility;
 using Multiplayer.Shared;
 using Telepathy;
+using Packets;
+using System.Threading;
 
 namespace Multiplayer.Networking
 {
@@ -33,7 +35,7 @@ namespace Multiplayer.Networking
         }
 
         public User MyUser { get; set; }
-        
+
         public Telepathy.Client RawClient { get; set; }
 
         protected void Send(IPacket packet)
@@ -57,13 +59,13 @@ namespace Multiplayer.Networking
                     case EventType.Connected:
                         this.ClientConnected?.Invoke(this, new ClientConnectedEventArgs(msg.connectionId));
 
-                        this.Send(new Handshake(this.MyUser.UniqueID));
+                        this.Send(new Handshake(this.MyUser));
 
                         break;
                     case EventType.Data:
 
                         var genericPacket = this.packetSerializer.DeserializePacket(msg.data);
-                        if(genericPacket == null)
+                        if (genericPacket == null)
                         {
 #if DEBUG
                             // maybe add some more details
@@ -88,11 +90,11 @@ namespace Multiplayer.Networking
 
         public void Disconnect()
         {
-            this.Send(new Disconnect(Constants.DisconnectReason.Leaving));
-            this.RawClient.Disconnect();
+            // TODO this send does not really work as the disconnect kills the connection
+            this.Send(new Disconnect(DisconnectReason.Leaving));
+            //this.RawClient.Disconnect();
         }
 
-        
 
         public class ClientConnectedEventArgs : EventArgs
         {

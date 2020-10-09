@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using MessagePack;
-using Multiplayer.Networking.Packet;
+using Packets;
 using Multiplayer.Networking.Utility;
 using Xunit;
 using Xunit.Abstractions;
@@ -38,33 +38,21 @@ namespace Multiplayer.Networking.Test
             var packet = new Handshake(new User());
 
             var serializedPacket = this.packetSerializer.SerializePacket(packet);
+
+            Assert.NotNull(serializedPacket);
+            Assert.NotEmpty(serializedPacket);
+
+            output.WriteLine(MessagePackSerializer.ConvertToJson(serializedPacket));
+
             Assert.NotNull(serializedPacket);
             Assert.NotEmpty(serializedPacket);
 
             var deserializedPacket = this.packetSerializer.DeserializePacket(serializedPacket);
-            var deserializedTypedPacket = deserializedPacket as Handshake;
             Assert.NotNull(deserializedPacket);
+            var deserializedTypedPacket = deserializedPacket as Handshake;
             Assert.NotNull(deserializedTypedPacket);
 
             Assert.Equal(packet.User.UniqueID, deserializedTypedPacket.User.UniqueID);
-        }
-
-        [Fact()]
-        public void TestPacket()
-        {
-            var packet = new TestPacket() { TestString = "test" };
-
-            var serializedPacket = this.packetSerializer.SerializePacket(packet);
-            output.WriteLine(MessagePackSerializer.ConvertToJson(serializedPacket));
-            Assert.NotNull(serializedPacket);
-            Assert.NotEmpty(serializedPacket);
-
-            var deserializedPacket = this.packetSerializer.DeserializePacket(serializedPacket);
-            var deserializedTypedPacket = deserializedPacket as TestPacket;
-            Assert.NotNull(deserializedPacket);
-            Assert.NotNull(deserializedTypedPacket);
-
-            Assert.Equal(packet.TestString, deserializedTypedPacket.TestString);
         }
     }
 }

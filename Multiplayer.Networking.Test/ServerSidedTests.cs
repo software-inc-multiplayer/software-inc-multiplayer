@@ -4,7 +4,7 @@ using System.Threading;
 
 using Multiplayer.Networking;
 using Multiplayer.Networking.Utility;
-using Multiplayer.Networking.Packet;
+using Packets;
 
 namespace Multiplayer.Networking.Test
 {
@@ -183,7 +183,7 @@ namespace Multiplayer.Networking.Test
             Assert.True(clientConnectedFired);
         }
 
-        [Fact]
+        [Fact(Skip = "It's not ready yet")]
         public void ClientDoubleHandshake()
         {
             server.ReceivedPacket += (sender, e) =>
@@ -223,7 +223,11 @@ namespace Multiplayer.Networking.Test
             {
                 if (e.Handled)
                     return;
-                disconnectReceived = e.Packet is Disconnect;
+                if(e.Packet is Disconnect dc)
+                {
+                    disconnectReceived = true;
+                    Assert.Equal("leaving", dc.Reason);
+                }
                 e.Handled |= disconnectReceived;
             };
 
