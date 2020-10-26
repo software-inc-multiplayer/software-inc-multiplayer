@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
+using Multiplayer.Networking.Client;
+using Multiplayer.Networking.Server;
 
 namespace Multiplayer.Networking.Test
 {
@@ -25,13 +25,13 @@ namespace Multiplayer.Networking.Test
         }
 
         [DebuggerStepThrough]
-        public static void SafeHandleMessages(this Client client)
+        public static void SafeHandleMessages(this GameClient client)
         {
             SafeTimeout(() => client.HandleMessages());
         }
 
         [DebuggerStepThrough]
-        public static void SafeHandleMessages(this Server server)
+        public static void SafeHandleMessages(this GameServer server)
         {
             SafeTimeout(() => server.HandleMessages());
         }

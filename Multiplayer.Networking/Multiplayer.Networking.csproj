@@ -293,17 +293,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\Client.cs" />
+    <Compile Include="Client\ClientEvents.cs" />
+    <Compile Include="Client\GameClient.cs" />
+    <Compile Include="Client\Handlers\ChatHandler.cs" />
+    <Compile Include="Client\Handlers\ServerPacketHandler.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameWorld\GameTime.cs" />
     <Compile Include="GameWorld\GameWorld.cs" />
-    <Compile Include="Server\Handlers\Connection.cs" />
+    <Compile Include="Server\Handlers\BanHandler.cs" />
+    <Compile Include="Server\Handlers\ChatHandler.cs" />
+    <Compile Include="Shared\IPacketHandler.cs" />
     <Compile Include="Server\Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\Managers\BanManager.cs" />
+    <Compile Include="Server\ServerEvents.cs" />
     <Compile Include="Server\ServerInfo.cs" />
     <Compile Include="Server\Utils.cs" />
-    <Compile Include="Server\Server.cs" />
-    <Compile Include="Server\UserManager.cs" />
+    <Compile Include="Server\GameServer.cs" />
+    <Compile Include="Shared\GameUser.cs" />
+    <Compile Include="Shared\Managers\UserManager.cs" />
+    <Compile Include="Server\Handlers\ServerPacketHandler.cs" />
     <Compile Include="SIMM.cs" />
     <Compile Include="Utility\PacketSerializer.cs" />
     <Compile Include="XML.cs" />

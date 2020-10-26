@@ -37,9 +37,9 @@ namespace Multiplayer.Networking.Utility
         public PacketSerializer()
         {
             // see https://github.com/neuecc/MessagePack-CSharp#security
-            var resolver = MessagePack.Resolvers.CompositeResolver.Create(
+            /*var resolver = MessagePack.Resolvers.CompositeResolver.Create(
                 new[] { MessagePack.Formatters.TypelessFormatter.Instance },
-                new[] { MessagePack.Resolvers.StandardResolver.Instance });
+                new[] { MessagePack.Resolvers.StandardResolver.Instance });*/
 
             this.Options = MessagePackSerializer.Typeless.DefaultOptions//MessagePackSerializerOptions.Standard
                 .WithOmitAssemblyVersion(true)
@@ -109,40 +109,45 @@ namespace Packets
 {
     public interface IPacket
     {
+        string Sender { get; }
     }
 
     [MessagePackObject]
     public class Handshake : IPacket
     {
         [Key(0)]
-        public User User { get; set; }
+        public string Sender { get; }
         [Key(1)]
+        public string UserName { get; set; }
+        [Key(2)]
         public string Password { get; set; }
 
-        public Handshake(User userId, string password = null)
+        public Handshake(string userId, string userName, string password = null)
         {
-            this.User = userId;
+            this.Sender = userId;
+            this.UserName = userName;
             this.Password = password;
         }
+
+        // TODO in the future we need to use the steam networking library to verify the user identity via steam tokens
     }
-    /// <summary>
-    /// A chat message.
-    /// </summary>
+
     [MessagePackObject]
-    public class ChatMessage : IPacket
+    public class WelcomeUser : IPacket
     {
         [Key(0)]
-        public User Sender { get; }
-
+        public string Sender { get; }
         [Key(1)]
-        public string Message { get; }
-        [Key(3)]
-        public DateTime CreatedDate { get; }
-        public ChatMessage(User sender, string message)
+        public string UserName { get; set; }
+
+        public WelcomeUser(string userId, string userName)
         {
-            this.Sender = sender; this.Message = message; this.CreatedDate = DateTime.Now;
+            this.Sender = userId;
+            this.UserName = userName;
         }
     }
+
+
 
     /// <summary>
     /// this enforces a clean disconnect
@@ -151,11 +156,49 @@ namespace Packets
     public class Disconnect : IPacket
     {
         [Key(0)]
+        public string Sender { get; }
+        [Key(1)]
+        public string Target { get; }
+        [Key(2)]
         public DisconnectReason Reason { get; }
 
-        public Disconnect(DisconnectReason reason)
+        public Disconnect(string sender, DisconnectReason reason)
         {
+            this.Sender = sender;
             this.Reason = reason;
+        }
+    }
+
+    [MessagePackObject]
+    public class ChatMessage : IPacket
+    {
+        [Key(0)]
+        public string Sender { get; }
+        [Key(1)]
+        public string Message { get; }
+
+        public ChatMessage(string sender, string message)
+        {
+            this.Sender = sender;
+            this.Message = message;
+        }
+    }
+
+    [MessagePackObject]
+    public class PrivateChatMessage : IPacket
+    {
+        [Key(0)]
+        public string Sender { get; }
+        [Key(1)]
+        public string Receiver { get; }
+        [Key(2)]
+        public string Message { get; }
+
+        public PrivateChatMessage(string sender, string receiver, string message)
+        {
+            this.Sender = sender;
+            this.Receiver = receiver;
+            this.Message = message;
         }
     }
 }

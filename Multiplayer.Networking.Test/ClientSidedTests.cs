@@ -1,9 +1,10 @@
 using Xunit;
+using System;
 using System.Threading;
 
-using Multiplayer.Networking;
 using Multiplayer.Networking.Utility;
-using System;
+using Multiplayer.Networking.Server;
+using Multiplayer.Networking.Shared;
 
 namespace Multiplayer.Networking.Test
 {
@@ -12,28 +13,39 @@ namespace Multiplayer.Networking.Test
         private static int _serverPort = 1300;
         private readonly int serverPort;
 
-        private readonly Server server;
+        private readonly GameServer server;
         private readonly TestLogger logger;
         private readonly PacketSerializer packetSerializer;
 
         private readonly Client client;
+        private readonly GameUser testUser = new GameUser()
+        {
+            Id = "TestUser",
+            Name = "test-user",
+            Role = UserRole.Host
+        };
 
         public ClientSidedTests()
         {
             this.serverPort = Interlocked.Increment(ref _serverPort);
             this.logger = new TestLogger();
             this.packetSerializer = new PacketSerializer();
-            this.server = new Server(this.logger, this.packetSerializer);
+            this.server = new GameServer(this.logger, this.packetSerializer, new Shared.UserManager(), new Server.Managers.BanManager());
 
-            this.server.ReceivedPacket += (sender, e) =>
+            /*this.server.ReceivedPacket += (sender, e) =>
             {
                 // dummy server
                 e.Handled = true;
-            };
+            };*/
 
-            this.server.Start(serverPort);
+            this.server.Start(new ServerInfo()
+            {
+                Port = serverPort,
+                Name = "testserver",
+                DefaultRole = Shared.UserRole.Host
+            });
 
-            this.client = new Client(this.logger, this.packetSerializer);
+            this.client = new Client(this.logger, this.testUser, this.packetSerializer);
         }
 
         public void Dispose()
@@ -56,12 +68,14 @@ namespace Multiplayer.Networking.Test
             var clientDisconnectedFired = false;
             var connectionId = -1;
 
-            client.ClientConnected += (sender, e) => {
+            client.ClientConnected += (sender, e) =>
+            {
                 clientConnectedFired = true;
                 Assert.NotEqual(-1, e.ConnectionId);
                 connectionId = e.ConnectionId;
             };
-            client.ClientDisconnected += (sender, e) => {
+            client.ClientDisconnected += (sender, e) =>
+            {
                 clientDisconnectedFired = true;
                 Assert.NotEqual(-1, connectionId);
                 Assert.Equal(connectionId, e.ConnectionId);
