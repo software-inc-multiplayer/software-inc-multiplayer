@@ -78,7 +78,7 @@ namespace Multiplayer.Networking.Test.ServerHandlerTests
         {
             // TODO moq this server and check if chat handler does its stuff
             var chatHandler = new Server.Handlers.ChatHandler(this.server);
-            SetupServerAndClient(new[] { chatHandler });
+            SetupServerAndClient(new IPacketHandler[] { chatHandler });
 
             var testMessage = "test-message";
             this.client1.Send(new ChatMessage(this.testUser1.Id, testMessage));

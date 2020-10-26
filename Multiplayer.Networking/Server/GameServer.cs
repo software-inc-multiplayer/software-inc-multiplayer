@@ -172,10 +172,11 @@ namespace Multiplayer.Networking.Server
             this.connectionIdToUser.Add(sender, newUser);
             this.userIdToConnectionId.Add(newUser.Id, sender);
 
-            // TODO broadcast connection to all other users
+            var welcomePacket = new WelcomeUser(handshake.Sender, handshake.UserName);
+            this.Broadcast(welcomePacket);
         }
 
-        private void HandleDisconnect(int sender, Disconnect disconnect)
+        private void HandleDisconnect(int connectionId, GameUser sender, Disconnect disconnect)
         {
             // received a graceful disconnect
             this.Broadcast(disconnect);
@@ -183,7 +184,7 @@ namespace Multiplayer.Networking.Server
             // this gets cleaned up on EventType.Disconnected
             //this.connectionIdToUser.Remove(sender);
             //this.connectedClients.Remove(sender);
-            this.RawServer.Disconnect(sender);
+            this.RawServer.Disconnect(connectionId);
         }
 
         private void InternalHandleMessage(Message msg)
@@ -213,16 +214,20 @@ namespace Multiplayer.Networking.Server
                     if (packet.Sender == null)
                     {
                         // do not allow server impersonation !!!
-                        var badDisconnect = new Disconnect(null, DisconnectReason.Kicked);
+                        
                         if (this.connectionIdToUser.TryGetValue(sender, out var badUser))
                         {
+                            var badDisconnect = new Disconnect(badUser.Id, DisconnectReason.Kicked);
                             // graceful disconnect
-                            this.HandleDisconnect(sender, badDisconnect);
+                            this.HandleDisconnect(sender, badUser, badDisconnect);
                         }
                         else
                         {
                             // this one did not complete the handshake
-                            this.Send(sender, badDisconnect);
+                            // might be something like this, but the null sender is kinda problematic as it does not clean up on the client side
+                            this.Send(sender, new Disconnect(null, DisconnectReason.Kicked));
+                            // cut the connection then...
+                            this.RawServer.Disconnect(sender);
                         }
                         break;
                     }
@@ -233,16 +238,16 @@ namespace Multiplayer.Networking.Server
                         break;
                     }
 
-                    if (packet is Disconnect disconnect)
-                    {
-                        this.HandleDisconnect(sender, disconnect);
-                        break;
-                    }
-
                     if (!this.connectionIdToUser.TryGetValue(sender, out var gameUser))
                     {
                         // something is off ...
                         throw new Exception("cannot handle packet for unknown user");
+                    }
+
+                    if (packet is Disconnect disconnect)
+                    {
+                        this.HandleDisconnect(sender, gameUser, disconnect);
+                        break;
                     }
 
                     if(this.bakedHandlers.TryGetValue(packet.GetType(), out var packetHandlers))
@@ -276,8 +281,14 @@ namespace Multiplayer.Networking.Server
                 case EventType.Disconnected:
                     // for some reason we have to close a connection
 
+                    if (this.connectionIdToUser.TryGetValue(sender, out var disconnectUser))
+                    {
+                        this.userIdToConnectionId.Remove(disconnectUser.Id);
+                        this.UserManager.RemoveUser(disconnectUser);
+                    }
+                    this.connectionIdToUser.Remove(sender);
                     this.connectedClients.Remove(sender);
-                    //UserManager.RemoveUser()
+
                     this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(sender));
                     break;
             }

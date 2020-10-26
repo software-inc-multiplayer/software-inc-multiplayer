@@ -14,6 +14,7 @@ namespace Multiplayer.Networking.Client
         #region Events
         public event EventHandler<ClientConnectedEventArgs> ClientConnected;
         public event EventHandler<ClientDisconnectedEventArgs> ClientDisconnected;
+        public event EventHandler ConnectionReady;
         #endregion
 
         private readonly ILogger logger;
@@ -50,24 +51,31 @@ namespace Multiplayer.Networking.Client
             }
         }
 
-        private void HandleWelcomeUser(WelcomeUser handshake)
+        private void HandleWelcomeUser(WelcomeUser welcomeUser)
         {
             var newUser = this.UserManager.GetOrAddUser(new GameUser()
             {
-                Id = handshake.Sender,
-                Name = handshake.UserName,
+                Id = welcomeUser.Sender,
+                Name = welcomeUser.UserName,
             });
+            if (welcomeUser.Sender == this.gameUser.Id)
+                this.ConnectionReady?.Invoke(this, null);
         }
 
         private void HandleDisconnect(Disconnect disconnect)
         {
-            // received a graceful disconnect
-            this.Broadcast(disconnect);
+            var disconnectedUserId = disconnect.Sender;
 
-            // this gets cleaned up on EventType.Disconnected
-            //this.connectionIdToUser.Remove(sender);
-            //this.connectedClients.Remove(sender);
-            this.RawServer.Disconnect(sender);
+            if(disconnectedUserId == null || disconnectedUserId == this.gameUser.Id)
+            {
+                // duh something bad happened and this client is doomed...
+                this.RawClient.Disconnect();
+
+                this.UserManager.Clear();
+                return;
+            }
+
+            this.UserManager.RemoveUser(disconnectedUserId);
         }
 
         private void InternalHandleMessage(Message msg)
@@ -91,6 +99,7 @@ namespace Multiplayer.Networking.Client
                         // maybe add some more details
                         this.logger.Warn("received unknown packet");
 #endif
+                        break;
                     }
 
                     if (packet is WelcomeUser welcomeUser)
@@ -107,6 +116,8 @@ namespace Multiplayer.Networking.Client
 
                     break;
                 case EventType.Disconnected:
+
+                    this.UserManager.Clear();
                     this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(msg.connectionId));
                     break;
             }

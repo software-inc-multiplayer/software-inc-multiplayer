@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Multiplayer.Networking.Shared
 {
@@ -13,11 +14,16 @@ namespace Multiplayer.Networking.Shared
 
     public interface IUserManager
     {
+        event EventHandler<UserAddedEventArgs> UserAdded;
+        event EventHandler<UserRemovedEventArgs> UserRemoved;
+
         bool HasUser(string userId);
         GameUser GetUser(string userId);
         GameUser GetOrAddUser(GameUser user);
         void RemoveUser(string userId);
         void RemoveUser(GameUser user);
+
+        void Clear();
     }
 
     /// <summary>
@@ -106,6 +112,15 @@ namespace Multiplayer.Networking.Shared
         public void RemoveUser(GameUser user)
         {
             this.RemoveUser(user.Id);
+        }
+
+        public void Clear()
+        {
+            foreach(var removedUser in this.userIdToUser.Select(x => x.Value).ToList())
+            {
+                this.userIdToUser.Remove(removedUser.Id);
+                this.UserRemoved?.Invoke(this, new UserRemovedEventArgs(removedUser));
+            }
         }
     }
 

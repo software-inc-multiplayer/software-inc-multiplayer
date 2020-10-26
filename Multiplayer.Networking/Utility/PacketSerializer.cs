@@ -158,8 +158,6 @@ namespace Packets
         [Key(0)]
         public string Sender { get; }
         [Key(1)]
-        public string Target { get; }
-        [Key(2)]
         public DisconnectReason Reason { get; }
 
         public Disconnect(string sender, DisconnectReason reason)
