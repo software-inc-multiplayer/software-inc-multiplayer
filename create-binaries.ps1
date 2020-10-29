@@ -3,16 +3,16 @@ Try {
     New-Item -Path "./installer-binaries/" -Name "mf" -ItemType "directory" -Force
     New-Item -Path "./installer-binaries/" -Name "manage" -ItemType "directory" -Force
     # Copy assets etc. 
-    Copy-Item -Path ".\swinc.multiplayer\Assets\" -Destination ".\installer-binaries\mf\Assets\" -Recurse -Force
-    Copy-Item -Path ".\swinc.multiplayer\Localization\" -Destination ".\installer-binaries\mf\" -Recurse -Force
-    # .\swinc.multiplayer\Multiplayer.Core\bin\Debug\Multiplayer.Core.dll
-    Copy-Item -Path ".\swinc.multiplayer\Multiplayer.Core\bin\Debug\Multiplayer.Core.dll" -Destination ".\installer-binaries\mf\" -Recurse
-    Copy-Item -Path ".\swinc.multiplayer\Multiplayer.Networking\bin\Debug\Multiplayer.Networking.dll" -Destination ".\installer-binaries\manage\" -Recurse -Force
-    Copy-Item -Path ".\swinc.multiplayer\Multiplayer.Extensions\bin\Debug\Multiplayer.Extensions.dll" -Destination ".\installer-binaries\manage\" -Recurse -Force
-    Copy-Item -Path ".\swinc.multiplayer\Multiplayer.Debugging\bin\Debug\Multiplayer.Debugging.dll" -Destination ".\installer-binaries\manage\" -Recurse -Force
-    # .\swinc.multiplayer\References
-    Copy-Item -Path ".\swinc.multiplayer\References\Telepathy.dll" -Destination ".\installer-binaries\manage\" -Force
-    Copy-Item -Path ".\swinc.multiplayer\References\Newtonsoft.Json.dll" -Destination ".\installer-binaries\manage\" -Force
+    Copy-Item -Path ".\Assets\" -Destination ".\installer-binaries\mf\Assets\" -Recurse -Force
+    Copy-Item -Path ".\Localization\" -Destination ".\installer-binaries\mf\" -Recurse -Force
+    # .\Multiplayer.Core\bin\Debug\Multiplayer.Core.dll
+    Copy-Item -Path ".\Multiplayer.Core\bin\Debug\Multiplayer.Core.dll" -Destination ".\installer-binaries\mf\" -Recurse
+    Copy-Item -Path ".\Multiplayer.Networking\bin\Debug\Multiplayer.Networking.dll" -Destination ".\installer-binaries\manage\" -Recurse -Force
+    Copy-Item -Path ".\Multiplayer.Extensions\bin\Debug\Multiplayer.Extensions.dll" -Destination ".\installer-binaries\manage\" -Recurse -Force
+    Copy-Item -Path ".\Multiplayer.Debugging\bin\Debug\Multiplayer.Debugging.dll" -Destination ".\installer-binaries\manage\" -Recurse -Force
+    # .\References
+    Copy-Item -Path ".\References\Telepathy.dll" -Destination ".\installer-binaries\manage\" -Force
+    Copy-Item -Path ".\References\Newtonsoft.Json.dll" -Destination ".\installer-binaries\manage\" -Force
     Compress-Archive -Path ".\installer-binaries\*" -DestinationPath ".\installer-binaries.zip" -Force
 } 
 Catch {

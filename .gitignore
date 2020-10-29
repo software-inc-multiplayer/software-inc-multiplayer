@@ -5,6 +5,8 @@
 
 # User-specific files
 *.rsuser
+*.zip
+installer-binaries/
 *.suo
 *.user
 *.userosscache
