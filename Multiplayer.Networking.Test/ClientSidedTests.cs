@@ -18,10 +18,11 @@ namespace Multiplayer.Networking.Test
         private readonly TestLogger logger;
         private readonly PacketSerializer packetSerializer;
 
+        private static readonly ulong userId = 0123456789;
         private readonly GameClient client;
         private readonly GameUser testUser = new GameUser()
         {
-            Id = "TestUser",
+            Id = userId,
             Name = "test-user",
             Role = UserRole.Host
         };

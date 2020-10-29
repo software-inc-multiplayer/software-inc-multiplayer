@@ -24,16 +24,20 @@ namespace Multiplayer.Networking.Test.ServerHandlerTests
         private readonly TestLogger logger;
         private readonly PacketSerializer packetSerializer;
         private readonly GameServer server;
+
+        private static readonly ulong userId1 = 0123456789;
+        private static readonly ulong userId2 = 9876543210;
+
         private readonly GameClient client1;
         private readonly GameClient client2;
         private readonly GameUser testUser1 = new GameUser() {
-            Id = "TestUser-1",
+            Id = userId1,
             Name = "test-user-1",
             Role = UserRole.Host
         };
         private readonly GameUser testUser2 = new GameUser()
         {
-            Id = "TestUser-2",
+            Id = userId2,
             Name = "test-user-2",
             Role = UserRole.Player
         };

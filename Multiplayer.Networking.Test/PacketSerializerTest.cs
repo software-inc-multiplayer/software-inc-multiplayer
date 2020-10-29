@@ -35,7 +35,7 @@ namespace Multiplayer.Networking.Test
         [Fact()]
         public void HandshakePacket()
         {
-            var packet = new Handshake("placeholder", "placeholder");
+            var packet = new Handshake(1234567890, "placeholder");
 
             var serializedPacket = this.packetSerializer.SerializePacket(packet);
 
