@@ -34,6 +34,7 @@ namespace Multiplayer.Core
                 return;
             }
             MPWindow = WindowManager.SpawnWindow();
+            MPWindow.Modal = true;
             MPWindow.SetTitle("MultiplayerButton".LocDef("Multiplayer"));
             MPWindow.ShowCentered = true;
             MPWindow.MinSize = new Vector2(730, 500);
