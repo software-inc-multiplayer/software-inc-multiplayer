@@ -40,8 +40,8 @@ namespace Multiplayer.Core
             MPWindow.MinSize = new Vector2(730, 500);
             MPWindow.SizeButton.SetActive(false);
 
-            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("Create Server".LocDef("CreateServerTab"), new Rect(0,0,150,25),CreateServerClicked, MPWindow,"tab_create");
-            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("Connect to Server".LocDef("ConnectServerTab"),new Rect(150,0,150,25),ConnectServerClicked,MPWindow,"tab_connect");
+            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(0,0,150,25),CreateServerClicked, MPWindow,"tab_create");
+            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"),new Rect(150,0,150,25),ConnectServerClicked,MPWindow,"tab_connect");
 
             MPWindow.Show();
         }
