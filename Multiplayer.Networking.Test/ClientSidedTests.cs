@@ -5,6 +5,7 @@ using System.Threading;
 using Multiplayer.Networking.Utility;
 using Multiplayer.Networking.Server;
 using Multiplayer.Networking.Shared;
+using Multiplayer.Networking.Client;
 
 namespace Multiplayer.Networking.Test
 {
@@ -17,7 +18,7 @@ namespace Multiplayer.Networking.Test
         private readonly TestLogger logger;
         private readonly PacketSerializer packetSerializer;
 
-        private readonly Client client;
+        private readonly GameClient client;
         private readonly GameUser testUser = new GameUser()
         {
             Id = "TestUser",
@@ -45,7 +46,7 @@ namespace Multiplayer.Networking.Test
                 DefaultRole = Shared.UserRole.Host
             });
 
-            this.client = new Client(this.logger, this.testUser, this.packetSerializer);
+            this.client = new GameClient(this.logger, this.testUser, this.packetSerializer, new UserManager());
         }
 
         public void Dispose()

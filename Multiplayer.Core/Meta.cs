@@ -97,7 +97,7 @@ namespace Multiplayer.Core
         }
         public override void Initialize(ModController.DLLMod parentMod)
         {
-            Meta.Logging.Start();
+            UnityLogger.Start();
             Logging = new UnityLogger();
             ThisMod = parentMod;
             Application.runInBackground = true;

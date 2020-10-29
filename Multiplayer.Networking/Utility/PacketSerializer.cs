@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Ports;
 using System.Linq;
 using MessagePack;
 using Multiplayer.Networking;
@@ -25,7 +24,9 @@ namespace Multiplayer.Networking.Utility
         /// </summary>
         private static readonly IReadOnlyDictionary<byte, Type> PacketMapping = new Dictionary<byte, Type>()
         {
-            { 1, typeof(TestPacket) },
+            { 1, typeof(Handshake) },
+            { 2, typeof(Disconnect) },
+            { 3, typeof(WelcomeUser) },
         };
 
         private static readonly IReadOnlyDictionary<Type, byte> ReversePacketMapping;
@@ -53,17 +54,17 @@ namespace Multiplayer.Networking.Utility
         {
             // TODO maybe we need locking here
 #if PACKET_ID
-            /*if (!ReversePacketMapping.TryGetValue(typeof(TPacket), out var packetId))
+            if (!ReversePacketMapping.TryGetValue(typeof(TPacket), out var packetId))
                 return null;
             // this is a variant with a dedicated packetId
             this.packetStream.WriteByte(packetId);
-            MessagePackSerializer.Serialize(this.packetStream, packet, this.options);
+            MessagePackSerializer.Serialize(this.packetStream, packet, this.Options);
 
             // create a byte[] copy of the stream contents
             var serializedPacket = this.packetStream.ToArray();
             this.packetStream.SetLength(0L);
 
-            return serializedPacket;*/
+            return serializedPacket;
 #else
             return MessagePackSerializer.Typeless.Serialize(packet, this.Options);
 #endif
@@ -79,7 +80,7 @@ namespace Multiplayer.Networking.Utility
             if (!PacketMapping.TryGetValue(packetId, out var packetType))
                 return null;
 
-            return MessagePackSerializer.Deserialize(packetType, packetData, this.options) as IPacket;
+            return MessagePackSerializer.Deserialize(packetType, packetData, this.Options) as IPacket;
 #else
             return MessagePackSerializer.Typeless.Deserialize(buffer, this.Options) as IPacket;
 #endif

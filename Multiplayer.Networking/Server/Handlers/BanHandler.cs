@@ -4,7 +4,7 @@ using Packets;
 
 namespace Multiplayer.Networking.Server.Handlers
 {
-    public class BanHandler : PacketHandler
+    public class BanHandler : ServerPacketHandler
     {
         public override int Priority => 100;
         public override Type[] PacketsFilter => new Type[] { typeof(Handshake) };

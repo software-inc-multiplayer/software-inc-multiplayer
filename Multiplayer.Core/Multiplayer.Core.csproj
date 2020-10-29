@@ -243,9 +243,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviours\NetworkingServerBehaviour.cs" />
     <Compile Include="DebugConsole.cs" />
     <Compile Include="Behaviours\GameBehaviour.cs" />
-    <Compile Include="NetworkingManager.cs" />
+    <Compile Include="Behaviours\NetworkingClientBehaviour.cs" />
     <Compile Include="Utils\IPUtils.cs" />
     <Compile Include="Behaviours\LaunchBehaviour.cs" />
     <Compile Include="Behaviours\MenuBehaviour.cs" />
