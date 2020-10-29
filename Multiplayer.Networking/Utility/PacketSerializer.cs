@@ -4,21 +4,25 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MessagePack;
+using System.Runtime.Serialization.Formatters.Binary;
+//using MessagePack;
 using Multiplayer.Networking;
 using Packets;
 
 namespace Multiplayer.Networking.Utility
 {
     public class PacketSerializer
-#if PACKET_ID
+//#if PACKET_ID
         : IDisposable
-#endif
+//#endif
     {
-        public MessagePackSerializerOptions Options { get; }
+        //public MessagePackSerializerOptions Options { get; }
+
+        private readonly MemoryStream packetStream = new MemoryStream();
+        private readonly BinaryFormatter formatter = new BinaryFormatter();
 
 #if PACKET_ID
-        private MemoryStream packetStream = new MemoryStream();
+        private readonly MemoryStream packetStream = new MemoryStream();
         /// <summary>
         /// This is the central place to register known packet types
         /// </summary>
@@ -27,6 +31,8 @@ namespace Multiplayer.Networking.Utility
             { 1, typeof(Handshake) },
             { 2, typeof(Disconnect) },
             { 3, typeof(WelcomeUser) },
+            { 4, typeof(ChatMessage) },
+            { 5, typeof(PrivateChatMessage) },
         };
 
         private static readonly IReadOnlyDictionary<Type, byte> ReversePacketMapping;
@@ -42,11 +48,14 @@ namespace Multiplayer.Networking.Utility
                 new[] { MessagePack.Formatters.TypelessFormatter.Instance },
                 new[] { MessagePack.Resolvers.StandardResolver.Instance });*/
 
-            this.Options = MessagePackSerializer.Typeless.DefaultOptions//MessagePackSerializerOptions.Standard
+            /*this.Options = MessagePackSerializer.Typeless.DefaultOptions//MessagePackSerializerOptions.Standard
                 .WithOmitAssemblyVersion(true)
                 //.WithResolver(resolver)
                 //.WithCompression(MessagePackCompression.Lz4Block)
-                .WithSecurity(MessagePackSecurity.UntrustedData);
+                .WithSecurity(MessagePackSecurity.UntrustedData);*/
+
+            this.formatter.FilterLevel = System.Runtime.Serialization.Formatters.TypeFilterLevel.Low;
+            this.formatter.TypeFormat = System.Runtime.Serialization.Formatters.FormatterTypeStyle.TypesWhenNeeded;
         }
 
         public byte[] SerializePacket<TPacket>(TPacket packet)
@@ -54,8 +63,8 @@ namespace Multiplayer.Networking.Utility
         {
             // TODO maybe we need locking here
 #if PACKET_ID
-            if (!ReversePacketMapping.TryGetValue(typeof(TPacket), out var packetId))
-                return null;
+            //if (!ReversePacketMapping.TryGetValue(typeof(TPacket), out var packetId))
+            //    return null;
             // this is a variant with a dedicated packetId
             this.packetStream.WriteByte(packetId);
             MessagePackSerializer.Serialize(this.packetStream, packet, this.Options);
@@ -66,7 +75,12 @@ namespace Multiplayer.Networking.Utility
 
             return serializedPacket;
 #else
-            return MessagePackSerializer.Typeless.Serialize(packet, this.Options);
+            formatter.Serialize(packetStream, packet);
+            var bytes = packetStream.ToArray();
+            packetStream.SetLength(0);
+
+            return bytes;
+            //return MessagePackSerializer.Typeless.Serialize(packet, this.Options);
 #endif
         }
 
@@ -82,22 +96,27 @@ namespace Multiplayer.Networking.Utility
 
             return MessagePackSerializer.Deserialize(packetType, packetData, this.Options) as IPacket;
 #else
-            return MessagePackSerializer.Typeless.Deserialize(buffer, this.Options) as IPacket;
+            //return MessagePackSerializer.Typeless.Deserialize(buffer, this.Options) as IPacket;
+            this.packetStream.Write(buffer, 0, buffer.Length);
+            this.packetStream.Position = 0;
+            var obj = formatter.Deserialize(packetStream);
+            packetStream.SetLength(0);
+
+            return obj as IPacket;
 #endif
         }
 
-#if PACKET_ID
+//#if PACKET_ID
         public void Dispose()
         {
             this.packetStream?.Dispose();
-            this.packetStream = null;
         }
 
         ~PacketSerializer()
         {
             this.Dispose();
         }
-#endif
+//#endif
     }
 
 
@@ -113,14 +132,15 @@ namespace Packets
         ulong Sender { get; }
     }
 
-    [MessagePackObject]
+    //[MessagePackObject]
+    [Serializable]
     public class Handshake : IPacket
     {
-        [Key(0)]
+        //[Key(0)]
         public ulong Sender { get; }
-        [Key(1)]
+        //[Key(1)]
         public string UserName { get; set; }
-        [Key(2)]
+        //[Key(2)]
         public string Password { get; set; }
 
         public Handshake(ulong userId, string userName, string password = null)
@@ -133,12 +153,13 @@ namespace Packets
         // TODO in the future we need to use the steam networking library to verify the user identity via steam tokens
     }
 
-    [MessagePackObject]
+    //[MessagePackObject]
+    [Serializable]
     public class WelcomeUser : IPacket
     {
-        [Key(0)]
+        //[Key(0)]
         public ulong Sender { get; }
-        [Key(1)]
+        //[Key(1)]
         public string UserName { get; set; }
 
         public WelcomeUser(ulong userId, string userName)
@@ -153,12 +174,13 @@ namespace Packets
     /// <summary>
     /// this enforces a clean disconnect
     /// </summary>
-    [MessagePackObject]
+    //[MessagePackObject]
+    [Serializable]
     public class Disconnect : IPacket
     {
-        [Key(0)]
+        //[Key(0)]
         public ulong Sender { get; }
-        [Key(1)]
+        //[Key(1)]
         public DisconnectReason Reason { get; }
 
         public Disconnect(ulong sender, DisconnectReason reason)
@@ -168,12 +190,13 @@ namespace Packets
         }
     }
 
-    [MessagePackObject]
+    //[MessagePackObject]
+    [Serializable]
     public class ChatMessage : IPacket
     {
-        [Key(0)]
+        //[Key(0)]
         public ulong Sender { get; }
-        [Key(1)]
+        //[Key(1)]
         public string Message { get; }
 
         public ChatMessage(ulong sender, string message)
@@ -183,14 +206,15 @@ namespace Packets
         }
     }
 
-    [MessagePackObject]
+    //[MessagePackObject]
+    [Serializable]
     public class PrivateChatMessage : IPacket
     {
-        [Key(0)]
+        //[Key(0)]
         public ulong Sender { get; }
-        [Key(1)]
+        //[Key(1)]
         public ulong Receiver { get; }
-        [Key(2)]
+        //[Key(2)]
         public string Message { get; }
 
         public PrivateChatMessage(ulong sender, ulong receiver, string message)

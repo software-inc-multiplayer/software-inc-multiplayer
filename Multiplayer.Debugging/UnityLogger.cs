@@ -15,18 +15,28 @@ namespace Multiplayer.Debugging
         // TODO maybe we can trigger this from client main
         public static void Start()
         {
-            File.Create(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"));
-            File.Create(Path.Combine(Application.dataPath, "Multiplayer", "Logs", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"));
+            lock (externalLogLock)
+            {
+                //File.Create(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"));
+                //File.Create(Path.Combine(Application.dataPath, "Multiplayer", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"));
+            }
         }
+        
         // TODO maybe we can trigger this from client main
         public static void OnDisable()
         {
             lock (externalLogLock)
             {
-                File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"), messageQueue.ToArray());
-                File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", "Logs", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"), messageQueue.ToArray());
+                //File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", "latest.log"), messageQueue.ToArray());
+                //File.WriteAllLines(Path.Combine(Application.dataPath, "Multiplayer", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"), messageQueue.ToArray());
             }
         }
+
+        public UnityLogger()
+        {
+            Start();
+        }
+
         public void LogInternal(Shared.LogType logType, string message)
         {
             switch (logType)
