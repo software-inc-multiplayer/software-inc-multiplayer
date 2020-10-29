@@ -21,16 +21,19 @@ namespace Multiplayer.Core
 
         public override void OnActivate()
         {
+            this.logger = new UnityLogger();
+            this.logger.Debug("booting server");
+
             this.UserManager = new UserManager();
             this.BanManager = new BanManager();
 
-            this.logger = new UnityLogger();
             this.server = new GameServer(
                 this.logger,
                 new PacketSerializer(),
                 this.UserManager,
                 this.BanManager
             );
+            this.logger.Debug("server booted");
         }
 
         public override void OnDeactivate()

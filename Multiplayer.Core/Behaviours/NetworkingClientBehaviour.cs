@@ -19,11 +19,15 @@ namespace Multiplayer.Core
 
         public override void OnActivate()
         {
+            this.logger = new UnityLogger();
+            this.logger.Debug("booting client behavior");
+
             if (!SteamManager.Initialized)
                 return;
 
             var currentUserId = Steamworks.SteamUser.GetSteamID().m_SteamID;
             var currentUserName = Steamworks.SteamFriends.GetPersonaName();
+            this.logger.Debug("Got steam info", currentUserId, currentUserName);
 
             var currentUser = new GameUser()
             {
@@ -33,19 +37,20 @@ namespace Multiplayer.Core
             };
 
             this.UserManager = new UserManager();
-
-            this.logger = new UnityLogger();
+            
             this.client = new GameClient(
                 this.logger,
                 currentUser,
                 new PacketSerializer(),
                 this.UserManager
             );
+
+            this.logger.Debug("client booted");
         }
 
         public override void OnDeactivate()
         {
-            
+            this.logger.Debug("destroying client");
         }
 
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity")]
