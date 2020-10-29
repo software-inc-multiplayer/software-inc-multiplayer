@@ -40,11 +40,23 @@ namespace Multiplayer.Core
             MPWindow.MinSize = new Vector2(730, 500);
             MPWindow.SizeButton.SetActive(false);
 
+            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("Create Server".LocDef("CreateServerTab"), new Rect(0,0,150,25),CreateServerClicked, MPWindow,"tab_create");
+            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("Connect to Server".LocDef("ConnectServerTab"),new Rect(150,0,150,25),ConnectServerClicked,MPWindow,"tab_connect");
 
             MPWindow.Show();
         }
 
-        public override void Initialize(ModController.DLLMod parentMod)
+		private void ConnectServerClicked()
+		{
+
+		}
+
+		private void CreateServerClicked()
+		{
+
+		}
+
+		public override void Initialize(ModController.DLLMod parentMod)
         {
             ThisMod = parentMod;
             Application.runInBackground = true;
