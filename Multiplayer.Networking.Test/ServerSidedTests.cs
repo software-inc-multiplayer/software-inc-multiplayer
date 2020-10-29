@@ -24,7 +24,7 @@ namespace Multiplayer.Networking.Test
         private readonly GameServer server;
         private readonly GameUser testUser = new GameUser()
         {
-            Id = "TestUser",
+            Id = 0123456789,
             Name = "test-user",
             Role = UserRole.Host
         };
@@ -220,7 +220,7 @@ namespace Multiplayer.Networking.Test
             client.SafeHandleMessages(); // trigger handshake
             server.SafeHandleMessages(); // handle client handshake
 
-            var handshake = new Handshake("placeholder", "placeholder");
+            var handshake = new Handshake(0123456789, "placeholder");
             client.RawClient.Send(this.packetSerializer.SerializePacket(handshake));
             server.SafeHandleMessages();
             client.SafeHandleMessages();

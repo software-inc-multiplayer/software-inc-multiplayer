@@ -17,10 +17,10 @@ namespace Multiplayer.Networking.Shared
         event EventHandler<UserAddedEventArgs> UserAdded;
         event EventHandler<UserRemovedEventArgs> UserRemoved;
 
-        bool HasUser(string userId);
-        GameUser GetUser(string userId);
+        bool HasUser(ulong userId);
+        GameUser GetUser(ulong userId);
         GameUser GetOrAddUser(GameUser user);
-        void RemoveUser(string userId);
+        void RemoveUser(ulong userId);
         void RemoveUser(GameUser user);
 
         void Clear();
@@ -67,19 +67,19 @@ namespace Multiplayer.Networking.Shared
         public event EventHandler<UserRemovedEventArgs> UserRemoved;
         #endregion
 
-        private readonly Dictionary<string, GameUser> userIdToUser = new Dictionary<string, GameUser>();
+        private readonly Dictionary<ulong, GameUser> userIdToUser = new Dictionary<ulong, GameUser>();
 
         public UserManager()
         {
             // TODO implement persistance
         }
 
-        public bool HasUser(string userId)
+        public bool HasUser(ulong userId)
         {
             return this.userIdToUser.ContainsKey(userId);
         }
 
-        public GameUser GetUser(string userId)
+        public GameUser GetUser(ulong userId)
         {
             if (this.userIdToUser.TryGetValue(userId, out var user))
                 return user;
@@ -99,7 +99,7 @@ namespace Multiplayer.Networking.Shared
             return oldUser;
         }
 
-        public void RemoveUser(string userId)
+        public void RemoveUser(ulong userId)
         {
             if (!this.userIdToUser.TryGetValue(userId, out var removeUser))
                 return;

@@ -110,20 +110,20 @@ namespace Packets
 {
     public interface IPacket
     {
-        string Sender { get; }
+        ulong Sender { get; }
     }
 
     [MessagePackObject]
     public class Handshake : IPacket
     {
         [Key(0)]
-        public string Sender { get; }
+        public ulong Sender { get; }
         [Key(1)]
         public string UserName { get; set; }
         [Key(2)]
         public string Password { get; set; }
 
-        public Handshake(string userId, string userName, string password = null)
+        public Handshake(ulong userId, string userName, string password = null)
         {
             this.Sender = userId;
             this.UserName = userName;
@@ -137,11 +137,11 @@ namespace Packets
     public class WelcomeUser : IPacket
     {
         [Key(0)]
-        public string Sender { get; }
+        public ulong Sender { get; }
         [Key(1)]
         public string UserName { get; set; }
 
-        public WelcomeUser(string userId, string userName)
+        public WelcomeUser(ulong userId, string userName)
         {
             this.Sender = userId;
             this.UserName = userName;
@@ -157,11 +157,11 @@ namespace Packets
     public class Disconnect : IPacket
     {
         [Key(0)]
-        public string Sender { get; }
+        public ulong Sender { get; }
         [Key(1)]
         public DisconnectReason Reason { get; }
 
-        public Disconnect(string sender, DisconnectReason reason)
+        public Disconnect(ulong sender, DisconnectReason reason)
         {
             this.Sender = sender;
             this.Reason = reason;
@@ -172,11 +172,11 @@ namespace Packets
     public class ChatMessage : IPacket
     {
         [Key(0)]
-        public string Sender { get; }
+        public ulong Sender { get; }
         [Key(1)]
         public string Message { get; }
 
-        public ChatMessage(string sender, string message)
+        public ChatMessage(ulong sender, string message)
         {
             this.Sender = sender;
             this.Message = message;
@@ -187,13 +187,13 @@ namespace Packets
     public class PrivateChatMessage : IPacket
     {
         [Key(0)]
-        public string Sender { get; }
+        public ulong Sender { get; }
         [Key(1)]
-        public string Receiver { get; }
+        public ulong Receiver { get; }
         [Key(2)]
         public string Message { get; }
 
-        public PrivateChatMessage(string sender, string receiver, string message)
+        public PrivateChatMessage(ulong sender, ulong receiver, string message)
         {
             this.Sender = sender;
             this.Receiver = receiver;

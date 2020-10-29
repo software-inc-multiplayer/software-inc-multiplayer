@@ -21,7 +21,7 @@ namespace Multiplayer.Networking.Server.Handlers
                 var receiverUser = this.server.UserManager.GetUser(privateChatMessage.Receiver);
                 if (receiverUser == null)
                 {
-                    this.server.Send(sender, new PrivateChatMessage(null, sender.Id, "Invalid target player for pm"));
+                    this.server.Send(sender, new PrivateChatMessage(0, sender.Id, "Invalid target player for pm"));
                     return;
                 }
 

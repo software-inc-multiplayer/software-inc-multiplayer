@@ -41,7 +41,7 @@ namespace Multiplayer.Networking.Server
         // a client can be connected but might not have a GameUser attached
         private readonly HashSet<int> connectedClients = new HashSet<int>();
         private readonly Dictionary<int, GameUser> connectionIdToUser = new Dictionary<int, GameUser>();
-        private readonly Dictionary<string, int> userIdToConnectionId = new Dictionary<string, int>();
+        private readonly Dictionary<ulong, int> userIdToConnectionId = new Dictionary<ulong, int>();
 
         /// <summary>
         /// The list of "known" connections
@@ -82,7 +82,7 @@ namespace Multiplayer.Networking.Server
 
         public void Stop()
         {
-            var stopPacket = this.packetSerializer.SerializePacket(new Disconnect(null, DisconnectReason.ServerStop));
+            var stopPacket = this.packetSerializer.SerializePacket(new Disconnect(0, DisconnectReason.ServerStop));
 
             // first send a clean disconnect to all clients
             foreach (var connectionId in this.ConnectedClients)
@@ -156,7 +156,7 @@ namespace Multiplayer.Networking.Server
             // TODO implement brute-force countermeasures
             if (this.ServerInfo.HasPassword && this.ServerInfo.Password != handshake.Password)
             {
-                this.Send(sender, new Disconnect(null, DisconnectReason.InvalidPassword));
+                this.Send(sender, new Disconnect(0, DisconnectReason.InvalidPassword));
                 this.RawServer.Disconnect(sender);
 
                 return;
@@ -211,7 +211,7 @@ namespace Multiplayer.Networking.Server
                         break;
                     }
 
-                    if (packet.Sender == null)
+                    if (packet.Sender == 0)
                     {
                         // do not allow server impersonation !!!
                         
@@ -225,7 +225,7 @@ namespace Multiplayer.Networking.Server
                         {
                             // this one did not complete the handshake
                             // might be something like this, but the null sender is kinda problematic as it does not clean up on the client side
-                            this.Send(sender, new Disconnect(null, DisconnectReason.Kicked));
+                            this.Send(sender, new Disconnect(0, DisconnectReason.Kicked));
                             // cut the connection then...
                             this.RawServer.Disconnect(sender);
                         }

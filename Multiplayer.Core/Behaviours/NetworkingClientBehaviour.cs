@@ -27,7 +27,7 @@ namespace Multiplayer.Core
 
             var currentUser = new GameUser()
             {
-                Id = "<placeholder>",
+                Id = currentUserId,
                 Name = currentUserName,
                 Role = UserRole.Guest
             };

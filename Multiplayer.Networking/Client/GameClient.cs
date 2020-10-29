@@ -66,7 +66,7 @@ namespace Multiplayer.Networking.Client
         {
             var disconnectedUserId = disconnect.Sender;
 
-            if(disconnectedUserId == null || disconnectedUserId == this.gameUser.Id)
+            if(disconnectedUserId == 0L || disconnectedUserId == this.gameUser.Id)
             {
                 // duh something bad happened and this client is doomed...
                 this.RawClient.Disconnect();
