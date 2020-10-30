@@ -13,7 +13,7 @@ namespace Multiplayer.Core
     public class NetworkingClientBehaviour : ModBehaviour
     {
         private Shared.ILogger logger;
-        private GameClient client;
+        public GameClient Client { get; private set; }
 
         public IUserManager UserManager { get; private set; }
 
@@ -27,7 +27,7 @@ namespace Multiplayer.Core
 
             var currentUserId = Steamworks.SteamUser.GetSteamID().m_SteamID;
             var currentUserName = Steamworks.SteamFriends.GetPersonaName();
-            this.logger.Debug("Got steam info", currentUserId, currentUserName);
+            this.logger.Debug("got steam info", currentUserId, currentUserName);
 
             var currentUser = new GameUser()
             {
@@ -38,26 +38,33 @@ namespace Multiplayer.Core
 
             this.UserManager = new UserManager();
             
-            this.client = new GameClient(
+            this.Client = new GameClient(
                 this.logger,
                 currentUser,
                 new PacketSerializer(),
                 this.UserManager
             );
 
-            this.logger.Debug("client booted");
+            this.logger.Debug("client behaviour booted");
         }
 
         public override void OnDeactivate()
         {
-            this.logger.Debug("destroying client");
+            this.logger.Debug("destroying client behaviour");
         }
 
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity")]
         private void Update()
         {
             // this is the games update loop
-            this.client.HandleMessages();
+            this.Client.HandleMessages();
+        }
+
+        public void Connect()
+        {
+            this.logger.Debug("client connecting");
+            this.Client.Connect("localhost", 1337);
+            this.logger.Debug("client connected");
         }
     }
 }

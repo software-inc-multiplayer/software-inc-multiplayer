@@ -30,7 +30,10 @@ namespace Multiplayer.Networking.Server
 
         public event EventHandler<ClientConnectedEventArgs> ClientConnected;
         public event EventHandler<ClientDisconnectedEventArgs> ClientDisconnected;
-        // TODO add events for UserConnected/Disconnected
+
+        public event EventHandler<UserConnectedEventArgs> UserConnected;
+        public event EventHandler<UserDisconnectedEventArgs> UserDisconnected;
+
         #endregion
 
         public Telepathy.Server RawServer { get; }
@@ -156,14 +159,14 @@ namespace Multiplayer.Networking.Server
             // TODO implement brute-force countermeasures
             if (this.ServerInfo.HasPassword && this.ServerInfo.Password != handshake.Password)
             {
+                this.logger.Debug("[server] wrong password", sender);
                 this.Send(sender, new Disconnect(0, DisconnectReason.InvalidPassword));
                 this.RawServer.Disconnect(sender);
 
                 return;
             }
 
-            var newUser = this.UserManager.GetOrAddUser(new GameUser()
-            {
+            var newUser = this.UserManager.GetOrAddUser(new GameUser() {
                 Id = handshake.Sender,
                 Name = handshake.UserName,
                 Role = this.ServerInfo.DefaultRole
@@ -174,6 +177,9 @@ namespace Multiplayer.Networking.Server
 
             var welcomePacket = new WelcomeUser(handshake.Sender, handshake.UserName);
             this.Broadcast(welcomePacket);
+
+            this.UserConnected?.Invoke(this, new UserConnectedEventArgs(newUser));
+            this.logger.Debug("[server] accepted user", newUser.Id, newUser.Name, sender);
         }
 
         private void HandleDisconnect(int connectionId, GameUser sender, Disconnect disconnect)
@@ -197,6 +203,8 @@ namespace Multiplayer.Networking.Server
 
                     var eventArgs = new ClientConnectedEventArgs(sender);
                     this.ClientConnected?.Invoke(this, eventArgs);
+                    this.logger.Debug("[server] accepted connection", sender);
+
                     break;
                 case EventType.Data:
                     if (msg.data == null || !msg.data.Any())
@@ -206,7 +214,7 @@ namespace Multiplayer.Networking.Server
                     if (packet == null)
                     {
 #if DEBUG
-                        logger.Warn($"Packet received from connectionId {msg.connectionId} is null! Ignoring packet for now.");
+                        this.logger.Warn($"Packet received from connectionId {msg.connectionId} is null! Ignoring packet for now.");
 #endif
                         break;
                     }
@@ -280,16 +288,20 @@ namespace Multiplayer.Networking.Server
                     break;
                 case EventType.Disconnected:
                     // for some reason we have to close a connection
-
+                    this.logger.Debug("[server] closing connection", sender);
                     if (this.connectionIdToUser.TryGetValue(sender, out var disconnectUser))
                     {
+                        this.logger.Debug("[server] removing user", disconnectUser.Id);
                         this.userIdToConnectionId.Remove(disconnectUser.Id);
                         this.UserManager.RemoveUser(disconnectUser);
+                        this.logger.Debug("[server] removed user", disconnectUser.Id);
                     }
                     this.connectionIdToUser.Remove(sender);
                     this.connectedClients.Remove(sender);
 
                     this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(sender));
+                    this.UserDisconnected?.Invoke(this, new UserDisconnectedEventArgs(disconnectUser));
+                    this.logger.Debug("[server] closed connection", sender);
                     break;
             }
         }

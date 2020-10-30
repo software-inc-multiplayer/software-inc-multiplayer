@@ -6,6 +6,7 @@ using Multiplayer.Networking.Server;
 using Multiplayer.Networking.Shared;
 using Multiplayer.Networking.Utility;
 using Multiplayer.Networking.Server.Managers;
+using Multiplayer.Networking;
 
 namespace Multiplayer.Core
 {
@@ -14,7 +15,7 @@ namespace Multiplayer.Core
     public class NetworkingServerBehaviour : ModBehaviour
     {
         private Shared.ILogger logger;
-        private GameServer server;
+        public GameServer Server { get; private set; }
 
         public IUserManager UserManager { get; private set; }
         public BanManager BanManager { get; private set; }
@@ -22,30 +23,44 @@ namespace Multiplayer.Core
         public override void OnActivate()
         {
             this.logger = new UnityLogger();
-            this.logger.Debug("booting server");
+            this.logger.Debug("booting server behaviour");
 
             this.UserManager = new UserManager();
             this.BanManager = new BanManager();
 
-            this.server = new GameServer(
+            this.Server = new GameServer(
                 this.logger,
                 new PacketSerializer(),
                 this.UserManager,
                 this.BanManager
             );
-            this.logger.Debug("server booted");
+            this.logger.Debug("server behaviour booted");
         }
 
         public override void OnDeactivate()
         {
-            
+            this.logger.Debug("destroying server behaviour");
+        }
+
+        public void Host()
+        {
+            var serverInfo = new ServerInfo()
+            {
+                Name = "<placeholder>",
+                Description = "<placeholder>",
+                Port = 1337,
+                DefaultRole = UserRole.Guest
+            };
+            this.logger.Debug("server starting");
+            this.Server.Start(serverInfo);
+            this.logger.Debug("server started");
         }
 
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity")]
         private void Update()
         {
             // this is the games update loop
-            this.server.HandleMessages();
+            this.Server.HandleMessages();
         }
     }
 }

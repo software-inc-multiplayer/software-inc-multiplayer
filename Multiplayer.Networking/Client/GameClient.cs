@@ -53,11 +53,14 @@ namespace Multiplayer.Networking.Client
 
         private void HandleWelcomeUser(WelcomeUser welcomeUser)
         {
+            this.logger.Debug("[client] welcome client", welcomeUser.Sender, welcomeUser.UserName);
+
             var newUser = this.UserManager.GetOrAddUser(new GameUser()
             {
                 Id = welcomeUser.Sender,
                 Name = welcomeUser.UserName,
             });
+
             if (welcomeUser.Sender == this.gameUser.Id)
                 this.ConnectionReady?.Invoke(this, null);
         }
@@ -66,7 +69,7 @@ namespace Multiplayer.Networking.Client
         {
             var disconnectedUserId = disconnect.Sender;
 
-            if(disconnectedUserId == 0L || disconnectedUserId == this.gameUser.Id)
+            if(disconnectedUserId == 0UL || disconnectedUserId == this.gameUser.Id)
             {
                 // duh something bad happened and this client is doomed...
                 this.RawClient.Disconnect();
@@ -76,6 +79,7 @@ namespace Multiplayer.Networking.Client
             }
 
             this.UserManager.RemoveUser(disconnectedUserId);
+            this.logger.Debug("[client] removing client", disconnectedUserId);
         }
 
         private void InternalHandleMessage(Message msg)
@@ -86,7 +90,7 @@ namespace Multiplayer.Networking.Client
                     this.ClientConnected?.Invoke(this, new ClientConnectedEventArgs(msg.connectionId));
 
                     this.Send(new Handshake(this.gameUser.Id, this.gameUser.Name));
-
+                    this.logger.Debug("[client] connected to server");
                     break;
                 case EventType.Data:
 
@@ -119,6 +123,7 @@ namespace Multiplayer.Networking.Client
 
                     this.UserManager.Clear();
                     this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(msg.connectionId));
+                    this.logger.Debug("[client] disconnected from server");
                     break;
             }
         }
