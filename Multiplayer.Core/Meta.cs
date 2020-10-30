@@ -45,9 +45,9 @@ namespace Multiplayer.Core
             MPWindow.MinSize = new Vector2(730, 500);
             MPWindow.SizeButton.SetActive(false);
 
-            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(0,0,145,25),CreateServerClicked, MPWindow,"mp_tab_create");
-            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"),new Rect(150,0,145,25),ConnectServerClicked,MPWindow,"mp_tab_connect");
-            Utils.Controls.Window.UIButton tabServerlist = new Utils.Controls.Window.UIButton("ServerListTab".LocDef("Server List"), new Rect(300, 0, 145, 25), ServerlistClicked, MPWindow, "mp_tab_serverlist");
+            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(0,0,240,25),CreateServerClicked, MPWindow,"mp_tab_create");
+            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"),new Rect(245,0,240,25),ConnectServerClicked,MPWindow,"mp_tab_connect");
+            Utils.Controls.Window.UIButton tabServerlist = new Utils.Controls.Window.UIButton("ServerListTab".LocDef("Server List"), new Rect(490, 0, 240, 25), ServerlistClicked, MPWindow, "mp_tab_serverlist");
 
             //Create the controls inside the tabs
             hostport = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Port", "mp_hostport");
