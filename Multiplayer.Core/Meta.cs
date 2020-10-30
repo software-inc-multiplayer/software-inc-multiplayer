@@ -15,9 +15,11 @@ namespace Multiplayer.Core
 
         #region Multiplayer Window Controls
         Utils.Controls.Window.UITextbox hostport;
+        Utils.Controls.Window.UITextbox hostpassword;
         Utils.Controls.Window.UIButton hostbutton;
         Utils.Controls.Window.UITextbox connectremoteip;
         Utils.Controls.Window.UITextbox connectremoteport;
+        Utils.Controls.Window.UITextbox connectremotepassword;
         Utils.Controls.Window.UIButton connectbutton;
         Utils.Controls.Window.UILabel serverlistplaceholder;
         #endregion
@@ -52,14 +54,19 @@ namespace Multiplayer.Core
 
             //Create the controls inside the tabs
             hostport = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Port", "mp_hostport");
-            hostbutton = new Utils.Controls.Window.UIButton("Host Server", new Rect(25, 90, 150, 50), HostClicked, MPWindow, "mp_hostbutton");
+            hostpassword = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MPWindow, "Password", "mp_hostpassword");
+            hostbutton = new Utils.Controls.Window.UIButton("Host Server", new Rect(25, 130, 150, 50), HostClicked, MPWindow, "mp_hostbutton");
             connectremoteip = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Remote IP", "mp_remoteip");
             connectremoteport = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MPWindow, "Remote Port", "mp_remoteport");
-            connectbutton = new Utils.Controls.Window.UIButton("Connect", new Rect(25, 130, 150, 50), ConnectClicked, MPWindow, "mp_remotebutton");
+            connectremotepassword = new Utils.Controls.Window.UITextbox(new Rect(25, 130, 150, 30), MPWindow, "Password", "mp_remotepassword");
+            connectbutton = new Utils.Controls.Window.UIButton("Connect", new Rect(25, 170, 150, 50), ConnectClicked, MPWindow, "mp_remotebutton");
             serverlistplaceholder = new Utils.Controls.Window.UILabel("Coming soon!", new Rect(25, 50, 150, 25), MPWindow, "mp_serverlistplaceholder",true);
             hostport.obj.gameObject.SetActive(false);
+            hostpassword.obj.gameObject.SetActive(false);
+            hostbutton.obj.gameObject.SetActive(false);
             connectremoteip.obj.gameObject.SetActive(false);
             connectremoteport.obj.gameObject.SetActive(false);
+            connectremotepassword.obj.gameObject.SetActive(false);
             connectbutton.obj.gameObject.SetActive(false);
             serverlistplaceholder.obj.gameObject.SetActive(false);
 
@@ -81,8 +88,10 @@ namespace Multiplayer.Core
         {
             connectremoteip.obj.gameObject.SetActive(false);
             connectremoteport.obj.gameObject.SetActive(false);
+            connectremotepassword.obj.gameObject.SetActive(false);
             connectbutton.obj.gameObject.SetActive(false);
             hostport.obj.gameObject.SetActive(false);
+            hostpassword.obj.gameObject.SetActive(false);
             hostbutton.obj.gameObject.SetActive(false);
             serverlistplaceholder.obj.gameObject.SetActive(true);
         }
@@ -91,8 +100,10 @@ namespace Multiplayer.Core
         {
             connectremoteip.obj.gameObject.SetActive(true);
             connectremoteport.obj.gameObject.SetActive(true);
+            connectremotepassword.obj.gameObject.SetActive(true);
             connectbutton.obj.gameObject.SetActive(true);
             hostport.obj.gameObject.SetActive(false);
+            hostpassword.obj.gameObject.SetActive(false);
             hostbutton.obj.gameObject.SetActive(false);
             serverlistplaceholder.obj.gameObject.SetActive(false);
         }
@@ -101,8 +112,10 @@ namespace Multiplayer.Core
         {
             connectremoteip.obj.gameObject.SetActive(false);
             connectremoteport.obj.gameObject.SetActive(false);
+            connectremotepassword.obj.gameObject.SetActive(false);
             connectbutton.obj.gameObject.SetActive(false);
             hostport.obj.gameObject.SetActive(true);
+            hostpassword.obj.gameObject.SetActive(true);
             hostbutton.obj.gameObject.SetActive(true);
             serverlistplaceholder.obj.gameObject.SetActive(false);
         }
