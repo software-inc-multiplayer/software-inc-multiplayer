@@ -17,7 +17,7 @@ namespace Multiplayer.Core
                 /// </summary>
                 public class UILabel : UIControl
                 {
-                    public Text obj;
+                    public Text obj { get; private set; }
                     public UILabel(string text, Rect pos, GUIWindow parent, string name = "", bool isBold = false, uint fontsize = 0) : base(pos, parent)
                     {
                         Text label = WindowManager.SpawnLabel();
@@ -48,7 +48,7 @@ namespace Multiplayer.Core
                 /// </summary>
                 public class UIButton : UIControl
                 {
-                    public Button obj;
+                    public Button obj { get; private set; }
                     public UIButton(string text, Rect pos, UnityAction action, GUIWindow parent, string name = "", string tooltiptitle = "", string tooltipdesc = "") : base(pos, parent)
                     {
                         Button button = WindowManager.SpawnButton();
@@ -80,7 +80,7 @@ namespace Multiplayer.Core
                 /// </summary>
                 public class UISlider : UIControl
                 {
-                    public Slider obj;
+                    public Slider obj { get; private set; }
                     public UISlider(int min, int max, int value, Rect pos, GUIWindow parent, UnityAction<float> action = null, string name = "", string tooltiptitle = "", string tooltipdesc = "") : base(pos, parent)
                     {
                         Slider slider = WindowManager.SpawnSlider();
@@ -110,7 +110,7 @@ namespace Multiplayer.Core
                 /// </summary>
                 public class UICombobox : UIControl
                 {
-                    public GUICombobox obj;
+                    public GUICombobox obj { get; private set; }
                     public UICombobox(string[] items, Rect pos, GUIWindow parent, UnityAction action = null, int selected = 0) : base(pos, parent)
                     {
                         GUICombobox box = WindowManager.SpawnComboBox();
@@ -135,7 +135,7 @@ namespace Multiplayer.Core
                 /// </summary>
                 public class UICheckbox : UIControl
                 {
-                    public Toggle obj;
+                    public Toggle obj { get; private set; }
                     public UICheckbox(string label, Rect pos, GUIWindow parent, UnityAction<bool> action = null, bool state = false, string tooltiptitle = "", string tooltipdesc = "") : base(pos, parent)
                     {
                         Toggle t = WindowManager.SpawnCheckbox();
@@ -149,6 +149,7 @@ namespace Multiplayer.Core
                         if (!string.IsNullOrEmpty(tooltiptitle) && !string.IsNullOrEmpty(tooltipdesc))
                             new UITooltip(tooltiptitle, tooltipdesc, t.gameObject);
                         Place(t.gameObject);
+                        obj = t;
                     }
                 }
 
@@ -157,7 +158,7 @@ namespace Multiplayer.Core
                 /// </summary>
                 public class UITextbox : UIControl
                 {
-                    public InputField obj;
+                    public InputField obj { get; private set; }
                     public UITextbox(Rect pos, GUIWindow parent, string placeholder = "", string name = "", UnityAction<string> endeditaction = null, int fontsize = 15) : base(pos, parent)
                     {
                         InputField field = WindowManager.SpawnInputbox();
@@ -201,7 +202,7 @@ namespace Multiplayer.Core
                 /// </summary>
                 public class UITooltip
                 {
-                    public GUIToolTipper obj;
+                    public GUIToolTipper obj { get; private set; }
                     public UITooltip(string title, string description, GameObject go)
                     {
                         GUIToolTipper tt = (GUIToolTipper)go.AddComponent(typeof(GUIToolTipper));
@@ -226,7 +227,7 @@ namespace Multiplayer.Core
 
                 public class UILabel : UIControl
                 {
-                    public Text obj;
+                    public Text obj { get; private set; }
                     public GameObject gameObject;
                     public UILabel(string text, Rect pos, GameObject parent, string name = "", bool isBold = false, uint fontsize = 0, Outline outline = null) : base(pos, parent)
                     {
@@ -256,7 +257,7 @@ namespace Multiplayer.Core
 
                 public class UIButton : UIControl
                 {
-                    public Button obj;
+                    public Button obj { get; private set; }
                     public UIButton(string text, Rect pos, UnityAction action, GameObject parent, string name = "", string tooltiptitle = "", string tooltipdesc = "") : base(pos, parent)
                     {
                         Button button = WindowManager.SpawnButton();
@@ -285,7 +286,7 @@ namespace Multiplayer.Core
 
                 public class UISlider : UIControl
                 {
-                    public Slider obj;
+                    public Slider obj { get; private set; }
                     public UISlider(int min, int max, int value, Rect pos, GameObject parent, UnityAction<float> action = null, string name = "", string tooltiptitle = "", string tooltipdesc = "") : base(pos, parent)
                     {
                         Slider slider = WindowManager.SpawnSlider();
@@ -312,7 +313,7 @@ namespace Multiplayer.Core
 
                 public class UICombobox : UIControl
                 {
-                    private GUICombobox obj;
+                    public GUICombobox obj { get; private set; }
                     public UICombobox(string[] items, Rect pos, GameObject parent, UnityAction action = null, int selected = 0) : base(pos, parent)
                     {
                         GUICombobox box = WindowManager.SpawnComboBox();
@@ -702,7 +703,7 @@ namespace Multiplayer.Core
 
                 public class UICheckbox : UIControl
                 {
-                    public Toggle obj;
+                    public Toggle obj { get; private set; }
                     public UICheckbox(string label, Rect pos, GameObject parent, UnityAction<bool> action = null, bool state = false, string tooltiptitle = "", string tooltipdesc = "") : base(pos, parent)
                     {
                         Toggle t = WindowManager.SpawnCheckbox();
@@ -716,12 +717,13 @@ namespace Multiplayer.Core
                         if (!string.IsNullOrEmpty(tooltiptitle) && !string.IsNullOrEmpty(tooltipdesc))
                             new UITooltip(tooltiptitle, tooltipdesc, t.gameObject);
                         Place(t.gameObject);
+                        obj = t;
                     }
                 }
 
                 public class UITextbox : UIControl
                 {
-                    public InputField obj;
+                    public InputField obj { get; private set; }
                     public UITextbox(Rect pos, GameObject parent, string placeholder = "", string name = "", UnityAction<string> endeditaction = null, int fontsize = 15, bool isPassword = false) : base(pos, parent)
                     {
                         InputField field = WindowManager.SpawnInputbox();
@@ -763,7 +765,7 @@ namespace Multiplayer.Core
 
                 public class UITooltip
                 {
-                    public GUIToolTipper obj;
+                    public GUIToolTipper obj { get; private set; }
                     public UITooltip(string title, string description, GameObject go)
                     {
                         GUIToolTipper tt = (GUIToolTipper)go.AddComponent(typeof(GUIToolTipper));
