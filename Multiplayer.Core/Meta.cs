@@ -1,5 +1,6 @@
 ﻿using Multiplayer.Debugging;
 using Multiplayer.Extensions;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -51,10 +52,10 @@ namespace Multiplayer.Core
 
             //Create the controls inside the tabs
             hostport = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Port", "mp_hostport");
-            hostbutton = new Utils.Controls.Window.UIButton("Host Server", new Rect(25, 90, 150, 50), null, MPWindow, "mp_hostbutton");
+            hostbutton = new Utils.Controls.Window.UIButton("Host Server", new Rect(25, 90, 150, 50), HostClicked, MPWindow, "mp_hostbutton");
             connectremoteip = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Remote IP", "mp_remoteip");
             connectremoteport = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MPWindow, "Remote Port", "mp_remoteport");
-            connectbutton = new Utils.Controls.Window.UIButton("Connect", new Rect(25, 130, 150, 50), null, MPWindow, "mp_remotebutton");
+            connectbutton = new Utils.Controls.Window.UIButton("Connect", new Rect(25, 130, 150, 50), ConnectClicked, MPWindow, "mp_remotebutton");
             serverlistplaceholder = new Utils.Controls.Window.UILabel("Coming soon!", new Rect(25, 50, 150, 25), MPWindow, "mp_serverlistplaceholder",true);
             hostport.obj.gameObject.SetActive(false);
             connectremoteip.obj.gameObject.SetActive(false);
@@ -66,7 +67,17 @@ namespace Multiplayer.Core
             ConnectServerClicked();
         }
 
-        private void ServerlistClicked()
+		private void HostClicked()
+		{
+
+		}
+
+		private void ConnectClicked()
+		{
+
+		}
+
+		private void ServerlistClicked()
         {
             connectremoteip.obj.gameObject.SetActive(false);
             connectremoteport.obj.gameObject.SetActive(false);
