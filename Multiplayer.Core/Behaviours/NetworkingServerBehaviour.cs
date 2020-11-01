@@ -23,7 +23,7 @@ namespace Multiplayer.Core
         public override void OnActivate()
         {
             this.logger = new UnityLogger();
-            this.logger.Debug("booting server behaviour");
+            this.logger.Debug("server behaviour booting");
 
             this.UserManager = new UserManager();
             this.BanManager = new BanManager();
@@ -42,13 +42,13 @@ namespace Multiplayer.Core
             this.logger.Debug("destroying server behaviour");
         }
 
-        public void Host()
+        public void Host(string name, string description, int port)
         {
             var serverInfo = new ServerInfo()
             {
-                Name = "<placeholder>",
-                Description = "<placeholder>",
-                Port = 1337,
+                Name = name,
+                Description = description,
+                Port = port,
                 DefaultRole = UserRole.Guest
             };
             this.logger.Debug("server starting");

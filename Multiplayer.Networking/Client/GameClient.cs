@@ -99,10 +99,8 @@ namespace Multiplayer.Networking.Client
                     var packet = this.packetSerializer.DeserializePacket(msg.data);
                     if (packet == null)
                     {
-#if DEBUG
                         // maybe add some more details
-                        this.logger.Warn("received unknown packet");
-#endif
+                        this.logger.Warn("[client] received unknown packet");
                         break;
                     }
 

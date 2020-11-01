@@ -20,7 +20,7 @@ namespace Multiplayer.Core
         public override void OnActivate()
         {
             this.logger = new UnityLogger();
-            this.logger.Debug("booting client behavior");
+            this.logger.Debug("client behavior booting");
 
             if (!SteamManager.Initialized)
                 return;
@@ -60,10 +60,10 @@ namespace Multiplayer.Core
             this.Client.HandleMessages();
         }
 
-        public void Connect()
+        public void Connect(string host, int port)
         {
             this.logger.Debug("client connecting");
-            this.Client.Connect("localhost", 1337);
+            this.Client.Connect(host, port);
             this.logger.Debug("client connected");
         }
     }

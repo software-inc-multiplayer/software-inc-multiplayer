@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Multiplayer.Debugging;
 using Multiplayer.Extensions;
 using UnityEngine;
@@ -50,8 +51,8 @@ namespace Multiplayer.Core
             MPWindow.MinSize = new Vector2(730, 500);
             MPWindow.SizeButton.SetActive(false);
 
-            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(0,0,145,25),CreateServerClicked, MPWindow,"mp_tab_create");
-            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"),new Rect(150,0,145,25),ConnectServerClicked,MPWindow,"mp_tab_connect");
+            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(0, 0, 145, 25), CreateServerClicked, MPWindow, "mp_tab_create");
+            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"), new Rect(150, 0, 145, 25), ConnectServerClicked, MPWindow, "mp_tab_connect");
             Utils.Controls.Window.UIButton tabServerlist = new Utils.Controls.Window.UIButton("ServerListTab".LocDef("Server List"), new Rect(300, 0, 145, 25), ServerlistClicked, MPWindow, "mp_tab_serverlist");
 
             //Create the controls inside the tabs
@@ -60,7 +61,7 @@ namespace Multiplayer.Core
             connectremoteip = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Remote IP", "mp_remoteip");
             connectremoteport = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MPWindow, "Remote Port", "mp_remoteport");
             connectbutton = new Utils.Controls.Window.UIButton("Connect", new Rect(25, 130, 150, 50), ConnectGameClicked, MPWindow, "mp_remotebutton");
-            serverlistplaceholder = new Utils.Controls.Window.UILabel("Coming soon!", new Rect(25, 50, 150, 25), MPWindow, "mp_serverlistplaceholder",true);
+            serverlistplaceholder = new Utils.Controls.Window.UILabel("Coming soon!", new Rect(25, 50, 150, 25), MPWindow, "mp_serverlistplaceholder", true);
             hostport.obj.gameObject.SetActive(false);
             connectremoteip.obj.gameObject.SetActive(false);
             connectremoteport.obj.gameObject.SetActive(false);
@@ -103,12 +104,24 @@ namespace Multiplayer.Core
 
         private void HostGameClicked()
         {
-            this.NetworkingServer.Host();
+            var strPort = this.hostport.obj.text;
+            var port = 1337;
+            if (!int.TryParse(strPort, out port))
+            {
+                // show some error to the user?
+            }
+            this.NetworkingServer.Host("<placeholder>", "<placeholder>", port);
         }
 
         private void ConnectGameClicked()
         {
-            this.NetworkingClient.Connect();
+            var strPort = this.connectremoteport.obj.text;
+            var port = 1337;
+            if (!int.TryParse(strPort, out port))
+            {
+                // show some error to the user?
+            }
+            this.NetworkingClient.Connect(this.connectremoteip.obj.text, port);
         }
 
         public override void Initialize(ModController.DLLMod parentMod)

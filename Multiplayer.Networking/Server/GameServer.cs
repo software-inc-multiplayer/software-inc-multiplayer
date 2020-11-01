@@ -159,7 +159,7 @@ namespace Multiplayer.Networking.Server
             // TODO implement brute-force countermeasures
             if (this.ServerInfo.HasPassword && this.ServerInfo.Password != handshake.Password)
             {
-                this.logger.Debug("[server] wrong password", sender);
+                this.logger.Debug($"[server] wrong password {sender}");
                 this.Send(sender, new Disconnect(0, DisconnectReason.InvalidPassword));
                 this.RawServer.Disconnect(sender);
 
@@ -179,7 +179,7 @@ namespace Multiplayer.Networking.Server
             this.Broadcast(welcomePacket);
 
             this.UserConnected?.Invoke(this, new UserConnectedEventArgs(newUser));
-            this.logger.Debug("[server] accepted user", newUser.Id, newUser.Name, sender);
+            this.logger.Debug($"[server] accepted user {sender} {newUser.Id} {newUser.Name}");
         }
 
         private void HandleDisconnect(int connectionId, GameUser sender, Disconnect disconnect)
@@ -203,7 +203,7 @@ namespace Multiplayer.Networking.Server
 
                     var eventArgs = new ClientConnectedEventArgs(sender);
                     this.ClientConnected?.Invoke(this, eventArgs);
-                    this.logger.Debug("[server] accepted connection", sender);
+                    this.logger.Debug($"[server] accepted connection {sender}");
 
                     break;
                 case EventType.Data:
@@ -213,9 +213,7 @@ namespace Multiplayer.Networking.Server
                     var packet = this.packetSerializer.DeserializePacket(msg.data);
                     if (packet == null)
                     {
-#if DEBUG
-                        this.logger.Warn($"Packet received from connectionId {msg.connectionId} is null! Ignoring packet for now.");
-#endif
+                        this.logger.Warn($"[server] packet received from connectionId {msg.connectionId} is null! Ignoring packet for now.");
                         break;
                     }
 
@@ -232,7 +230,6 @@ namespace Multiplayer.Networking.Server
                         else
                         {
                             // this one did not complete the handshake
-                            // might be something like this, but the null sender is kinda problematic as it does not clean up on the client side
                             this.Send(sender, new Disconnect(0, DisconnectReason.Kicked));
                             // cut the connection then...
                             this.RawServer.Disconnect(sender);
@@ -249,7 +246,10 @@ namespace Multiplayer.Networking.Server
                     if (!this.connectionIdToUser.TryGetValue(sender, out var gameUser))
                     {
                         // something is off ...
-                        throw new Exception("cannot handle packet for unknown user");
+                        // this user has not completed handshake but tries to send a different packet
+                        //throw new Exception("cannot handle packet for unknown user");
+                        this.logger.Warn($"[server] incompleted handshake {sender}");
+                        break;
                     }
 
                     if (packet is Disconnect disconnect)
@@ -267,41 +267,25 @@ namespace Multiplayer.Networking.Server
                     } else
                     {
                         // there is no packet handler here :(
+                        this.logger.Warn($"[server] missing packet handler {sender} {packet.GetType()}");
                     }
-
-                    /*var packetEventArgs = new ReceivedPacketEventArgs(sender, packet);
-                    this.ReceivedPacket?.Invoke(this, packetEventArgs);
-
-                    if (!packetEventArgs.Handled)
-                    {
-                        // What shall we do here?
-                        // for the start we enforce a disconnect
-                        // we could send a Desynced Packet to the connection id and when
-                        // the client gets this packet it shows a messagebox or warning. -cal
-                        this.Send(sender, new Disconnect(DisconnectReason.UnhandledPacket));
-                        this.RawServer.Disconnect(sender);
-                        this.connectedClients.Remove(sender);
-#if TEST
-                        throw new Exception($"unhandled packet {packet.GetType()}");
-#endif
-                    }*/
                     break;
                 case EventType.Disconnected:
                     // for some reason we have to close a connection
-                    this.logger.Debug("[server] closing connection", sender);
+                    this.logger.Debug($"[server] closing connection {sender}");
                     if (this.connectionIdToUser.TryGetValue(sender, out var disconnectUser))
                     {
-                        this.logger.Debug("[server] removing user", disconnectUser.Id);
+                        this.logger.Debug($"[server] removing user {sender} {disconnectUser.Id}");
                         this.userIdToConnectionId.Remove(disconnectUser.Id);
                         this.UserManager.RemoveUser(disconnectUser);
-                        this.logger.Debug("[server] removed user", disconnectUser.Id);
+                        this.logger.Debug($"[server] removed user {sender} {disconnectUser.Id}");
                     }
                     this.connectionIdToUser.Remove(sender);
                     this.connectedClients.Remove(sender);
 
                     this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(sender));
                     this.UserDisconnected?.Invoke(this, new UserDisconnectedEventArgs(disconnectUser));
-                    this.logger.Debug("[server] closed connection", sender);
+                    this.logger.Debug($"[server] closed connection {sender}");
                     break;
             }
         }
