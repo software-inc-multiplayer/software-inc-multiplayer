@@ -209,8 +209,15 @@ namespace Multiplayer.Networking.Server
                 case EventType.Data:
                     if (msg.data == null || !msg.data.Any())
                         break; // ignore null packets
-
-                    var packet = this.packetSerializer.DeserializePacket(msg.data);
+                    IPacket packet = null;
+                    try
+                    {
+                        packet = this.packetSerializer.DeserializePacket(msg.data);
+                    }
+                    catch(Exception)
+                    {
+                        // ignore serializer exceptions here
+                    }
                     if (packet == null)
                     {
                         this.logger.Warn($"[server] packet received from connectionId {msg.connectionId} is null! Ignoring packet for now.");

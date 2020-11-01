@@ -95,8 +95,14 @@ namespace Multiplayer.Networking.Client
                 case EventType.Data:
 
                     // TODO check msg.connectionId. It should not change
-
-                    var packet = this.packetSerializer.DeserializePacket(msg.data);
+                    IPacket packet = null;
+                    try
+                    {
+                        packet = this.packetSerializer.DeserializePacket(msg.data);
+                    } catch(Exception)
+                    {
+                        // ignore exceptions
+                    }
                     if (packet == null)
                     {
                         // maybe add some more details
