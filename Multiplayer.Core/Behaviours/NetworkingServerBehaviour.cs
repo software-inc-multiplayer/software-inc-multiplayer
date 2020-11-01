@@ -7,6 +7,7 @@ using Multiplayer.Networking.Shared;
 using Multiplayer.Networking.Utility;
 using Multiplayer.Networking.Server.Managers;
 using Multiplayer.Networking;
+using Multiplayer.Networking.Server.Handlers;
 
 namespace Multiplayer.Core
 {
@@ -19,6 +20,7 @@ namespace Multiplayer.Core
 
         public IUserManager UserManager { get; private set; }
         public BanManager BanManager { get; private set; }
+        public ChatHandler ChatHandler { get; private set; }
 
         public override void OnActivate()
         {
@@ -34,7 +36,16 @@ namespace Multiplayer.Core
                 this.UserManager,
                 this.BanManager
             );
+
+            this.RegisterHandlers();
+
             this.logger.Debug("server behaviour booted");
+        }
+
+        private void RegisterHandlers()
+        {
+            this.ChatHandler = new ChatHandler(this.Server);
+            this.Server.RegisterPacketHandler(this.ChatHandler);
         }
 
         public override void OnDeactivate()

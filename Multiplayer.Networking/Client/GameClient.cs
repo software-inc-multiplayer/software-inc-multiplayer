@@ -6,6 +6,8 @@ using Telepathy;
 using Packets;
 using System.Threading;
 using Multiplayer.Networking.Shared;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Multiplayer.Networking.Client
 {
@@ -15,6 +17,8 @@ namespace Multiplayer.Networking.Client
         public event EventHandler<ClientConnectedEventArgs> ClientConnected;
         public event EventHandler<ClientDisconnectedEventArgs> ClientDisconnected;
         public event EventHandler ConnectionReady;
+        public event EventHandler<UserConnectedEventArgs> UserConnected;
+        public event EventHandler<UserDisconnectedEventArgs> UserDisconnected;
         #endregion
 
         private readonly ILogger logger;
@@ -63,9 +67,10 @@ namespace Multiplayer.Networking.Client
 
             if (welcomeUser.Sender == this.gameUser.Id)
                 this.ConnectionReady?.Invoke(this, null);
+            this.UserConnected?.Invoke(this, new UserConnectedEventArgs(newUser));
         }
 
-        private void HandleDisconnect(Disconnect disconnect)
+        private void HandleDisconnect(GameUser user, Disconnect disconnect)
         {
             var disconnectedUserId = disconnect.Sender;
 
@@ -73,12 +78,10 @@ namespace Multiplayer.Networking.Client
             {
                 // duh something bad happened and this client is doomed...
                 this.RawClient.Disconnect();
-
-                this.UserManager.Clear();
                 return;
             }
 
-            this.UserManager.RemoveUser(disconnectedUserId);
+            this.UserManager.RemoveUser(user);
             this.logger.Debug("[client] removing client", disconnectedUserId);
         }
 
@@ -116,15 +119,38 @@ namespace Multiplayer.Networking.Client
                         break;
                     }
 
+                    var gameUser = this.UserManager.GetUser(packet.Sender);
+
+                    if (gameUser == null && packet.Sender != 0UL)
+                    {
+                        // this packet is not sent by the server and has no known user
+                        this.logger.Warn($"[client] incompleted handshake {packet.Sender}");
+                        break;
+                    }
+
                     if (packet is Disconnect disconnect)
                     {
-                        this.HandleDisconnect(disconnect);
+                        this.HandleDisconnect(gameUser, disconnect);
                         break;
+                    }
+
+                    if (this.bakedHandlers.TryGetValue(packet.GetType(), out var packetHandlers))
+                    {
+                        foreach (var packetHandler in packetHandlers)
+                        {
+                            packetHandler.HandlePacket(gameUser, packet);
+                        }
+                    }
+                    else
+                    {
+                        // there is no packet handler here :(
+                        this.logger.Warn($"[client] missing packet handler {packet.GetType()}");
                     }
 
                     break;
                 case EventType.Disconnected:
 
+                    // maybe we should fire a userdisconnected for all users here?
                     this.UserManager.Clear();
                     this.ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(msg.connectionId));
                     this.logger.Debug("[client] disconnected from server");
@@ -154,6 +180,32 @@ namespace Multiplayer.Networking.Client
             // TODO this send does not really work as the disconnect kills the connection
             this.Send(new Disconnect(this.gameUser.Id, DisconnectReason.Leaving));
             //this.RawClient.Disconnect();
+        }
+
+        private readonly Dictionary<Type, List<(int priority, IPacketHandler handler)>> packetHandlers = new Dictionary<Type, List<(int, IPacketHandler)>>();
+        private readonly Dictionary<Type, List<IPacketHandler>> bakedHandlers = new Dictionary<Type, List<IPacketHandler>>();
+        //public IReadOnlyDictionary<Type, IReadOnlyList<IPacketHandler>> PacketHandlers { get => this.bakedHandlers; }
+
+        public void RegisterPacketHandler(IPacketHandler packetHandler)
+        {
+            foreach (var packetType in packetHandler.PacketsFilter)
+            {
+                var handlers = this.packetHandlers.GetOrAdd(packetType, (_) => new List<(int, IPacketHandler)>());
+                handlers.Add((packetHandler.Priority, packetHandler));
+            }
+        }
+
+        private void BakeHandlers()
+        {
+            this.bakedHandlers.Clear();
+            foreach (var handlerKeyValue in this.packetHandlers)
+            {
+                this.bakedHandlers.Add(handlerKeyValue.Key,
+                    handlerKeyValue.Value
+                        .OrderBy(x => x.priority)
+                        .Select(x => x.handler)
+                        .ToList());
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Multiplayer.Networking.Shared;
 
 namespace Multiplayer.Networking.Client
 {
@@ -18,5 +19,23 @@ namespace Multiplayer.Networking.Client
             this.ConnectionId = connectionId;
         }
         public int ConnectionId { get; set; }
+    }
+
+    public class UserConnectedEventArgs : EventArgs
+    {
+        public UserConnectedEventArgs(GameUser user)
+        {
+            this.User = user;
+        }
+        public GameUser User { get; set; }
+    }
+
+    public class UserDisconnectedEventArgs : EventArgs
+    {
+        public UserDisconnectedEventArgs(GameUser user)
+        {
+            this.User = user;
+        }
+        public GameUser User { get; set; }
     }
 }

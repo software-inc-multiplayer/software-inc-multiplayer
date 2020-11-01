@@ -5,6 +5,7 @@ using Multiplayer.Debugging;
 using Multiplayer.Networking.Client;
 using Multiplayer.Networking.Shared;
 using Multiplayer.Networking.Utility;
+using Multiplayer.Networking.Client.Handlers;
 
 namespace Multiplayer.Core
 {
@@ -14,7 +15,7 @@ namespace Multiplayer.Core
     {
         private Shared.ILogger logger;
         public GameClient Client { get; private set; }
-
+        public ChatHandler ChatHandler { get; private set; }
         public IUserManager UserManager { get; private set; }
 
         public override void OnActivate()
@@ -45,7 +46,15 @@ namespace Multiplayer.Core
                 this.UserManager
             );
 
+            this.RegisterPacketHandler();
+
             this.logger.Debug("client behaviour booted");
+        }
+
+        private void RegisterPacketHandler()
+        {
+            this.ChatHandler = new ChatHandler(this.Client);
+            this.Client.RegisterPacketHandler(this.ChatHandler);
         }
 
         public override void OnDeactivate()
