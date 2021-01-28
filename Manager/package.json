@@ -55,7 +55,7 @@
   },
   "homepage": "https://github.com/cal3432/software-inc-multiplayer#readme",
   "devDependencies": {
-    "electron": "^9.2.0"
+    "electron": "^9.4.0"
   },
   "dependencies": {
     "@octokit/rest": "^18.0.3",
