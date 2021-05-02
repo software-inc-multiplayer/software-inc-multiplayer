@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using Multiplayer.Core.Behaviours;
 using Multiplayer.Debugging;
-using Multiplayer.Extensions;
+//using Multiplayer.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +17,7 @@ namespace Multiplayer.Core
 
         public NetworkingClientBehaviour NetworkingClient { get; private set; }
         public NetworkingServerBehaviour NetworkingServer { get; private set; }
-
+        public SteamHelperBehaviour SteamHelper { get; private set; }
         public GUIWindow MPWindow { get; set; }
 
         #region Multiplayer Window Controls
@@ -32,7 +34,8 @@ namespace Multiplayer.Core
         {
             Button bthost = WindowManager.SpawnButton();
             bthost.onClick.AddListener(CreateBaseMultiplayerWindow);
-            bthost.SetText("Start");
+            
+            //bthost.SetText("Start");
             WindowManager.AddElementToElement(bthost.gameObject, parent.gameObject, new Rect(15, 15, 192, 64), Rect.zero);
         }
 
@@ -46,7 +49,8 @@ namespace Multiplayer.Core
             }
             MPWindow = WindowManager.SpawnWindow();
             MPWindow.Modal = true;
-            MPWindow.SetTitle("MultiplayerButton".LocDef("Multiplayer"));
+            //MPWindow.SetTitle("MultiplayerButton".LocDef("Multiplayer"));
+            MPWindow.InitialTitle = "MultiplayerButton".LocDef("Multiplayer");
             MPWindow.ShowCentered = true;
             MPWindow.MinSize = new Vector2(730, 500);
             MPWindow.SizeButton.SetActive(false);
@@ -105,8 +109,8 @@ namespace Multiplayer.Core
         private void HostGameClicked()
         {
             var strPort = this.hostport.obj.text;
-            var port = 1337;
-            if (!int.TryParse(strPort, out port))
+            ushort port = 1337;
+            if (!ushort.TryParse(strPort, out port))
             {
                 // show some error to the user?
             }
@@ -132,6 +136,7 @@ namespace Multiplayer.Core
 
             this.NetworkingClient = parentMod.Behaviors.Single(x => x is NetworkingClientBehaviour) as NetworkingClientBehaviour;
             this.NetworkingServer = parentMod.Behaviors.Single(x => x is NetworkingServerBehaviour) as NetworkingServerBehaviour;
+            this.SteamHelper = parentMod.Behaviors.Single(x => x is SteamHelperBehaviour) as SteamHelperBehaviour;
 
             base.Initialize(parentMod);
         }

@@ -23,13 +23,13 @@ namespace Multiplayer.Networking.Test.ServerHandlerTests
 
         private readonly TestLogger logger;
         private readonly PacketSerializer packetSerializer;
-        private readonly GameServer server;
+        private readonly GameServer_old server;
 
         private static readonly ulong userId1 = 0123456789;
         private static readonly ulong userId2 = 9876543210;
 
-        private readonly GameClient client1;
-        private readonly GameClient client2;
+        private readonly GameClient_old client1;
+        private readonly GameClient_old client2;
         private readonly GameUser testUser1 = new GameUser() {
             Id = userId1,
             Name = "test-user-1",
@@ -45,13 +45,13 @@ namespace Multiplayer.Networking.Test.ServerHandlerTests
         public ServerHandlerTest()
         {
             this.serverPort = Interlocked.Increment(ref _serverPort);
-            this.serverInfo = new ServerInfo() { Port = this.serverPort, Name = "testserver", DefaultRole = UserRole.Host };
+            this.serverInfo = new ServerInfo() { Port = (ushort)this.serverPort, Name = "testserver", DefaultRole = UserRole.Host };
             this.logger = new TestLogger();
             this.packetSerializer = new PacketSerializer();
-            this.server = new GameServer(this.logger, this.packetSerializer, new UserManager(), new BanManager());
+            this.server = new GameServer_old(this.logger, this.packetSerializer, new UserManager(), new BanManager());
 
-            this.client1 = new GameClient(this.logger, this.testUser1, this.packetSerializer, new UserManager());
-            this.client2 = new GameClient(this.logger, this.testUser2, this.packetSerializer, new UserManager());
+            this.client1 = new GameClient_old(this.logger, this.testUser1, this.packetSerializer, new UserManager());
+            this.client2 = new GameClient_old(this.logger, this.testUser2, this.packetSerializer, new UserManager());
         }
 
         [DebuggerStepThrough]
@@ -63,8 +63,8 @@ namespace Multiplayer.Networking.Test.ServerHandlerTests
             }
             this.server.Start(this.serverInfo);
 
-            this.client1.Connect("localhost", serverPort);
-            this.client2.Connect("localhost", serverPort);
+            this.client1.Connect("localhost", (ushort)serverPort);
+            this.client2.Connect("localhost", (ushort)serverPort);
 
             this.server.SafeHandleMessages(); // finish server connected
             this.client1.SafeHandleMessages(); // trigger handshake

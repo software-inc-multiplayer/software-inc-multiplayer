@@ -13,7 +13,7 @@ namespace Multiplayer.Extensions
         }
         public static void CopyToClipboard(this string str)
         {
-            GUIUtility.systemCopyBuffer = str;
+            //GUIUtility.systemCopyBuffer = str;
         }
         public static string SetStringVariable(this string str, string varName, string toSet)
         {

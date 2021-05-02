@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Debugging", "Mu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Extensions", "Multiplayer.Extensions\Multiplayer.Extensions.csproj", "{816FE3F3-50EF-44A7-A54A-F2EE0346E9F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Networking", "Multiplayer.Networking\Multiplayer.Networking.csproj", "{19CD273F-A601-45ED-AB6D-6E61F47A074C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Networking", "Multiplayer.Networking\Multiplayer.Networking.csproj", "{19CD273F-A601-45ED-AB6D-6E61F47A074C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{F6DAFE06-4C3F-413E-BD60-C0D1F11D37C5}"
 EndProject
@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Networking.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{759A2496-5BF7-4FE1-B6EF-B13656B6E0F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Shared", "Multiplayer.Shared\Multiplayer.Shared.csproj", "{9DF5CA61-BCA1-47A5-A99F-559F91458F10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Shared", "Multiplayer.Shared\Multiplayer.Shared.csproj", "{9DF5CA61-BCA1-47A5-A99F-559F91458F10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

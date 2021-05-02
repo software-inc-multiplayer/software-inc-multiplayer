@@ -9,6 +9,6 @@ namespace Multiplayer.Networking
         public string Password { get; set; }
         public bool HasPassword { get => string.IsNullOrEmpty(this.Password); }
         public UserRole DefaultRole { get; set; }
-        public int Port { get; set; }
+        public ushort Port { get; set; }
     }
 }

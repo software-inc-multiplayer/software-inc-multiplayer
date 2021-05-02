@@ -6,6 +6,7 @@ using Multiplayer.Networking.Client;
 using Multiplayer.Networking.Shared;
 using Multiplayer.Networking.Utility;
 using Multiplayer.Networking.Client.Handlers;
+using System;
 
 namespace Multiplayer.Core
 {
@@ -14,6 +15,7 @@ namespace Multiplayer.Core
     public class NetworkingClientBehaviour : ModBehaviour
     {
         private Shared.ILogger logger;
+        //public GameClient_old Client { get; private set; }
         public GameClient Client { get; private set; }
         public ChatHandler ChatHandler { get; private set; }
         public IUserManager UserManager { get; private set; }
@@ -23,14 +25,14 @@ namespace Multiplayer.Core
             this.logger = new UnityLogger();
             this.logger.Debug("client behavior booting");
 
-            if (!SteamManager.Initialized)
-                return;
+            //if (!SteamManager.Initialized)
+            //    return;
 
-            var currentUserId = Steamworks.SteamUser.GetSteamID().m_SteamID;
-            var currentUserName = Steamworks.SteamFriends.GetPersonaName();
-            this.logger.Debug("got steam info", currentUserId, currentUserName);
+            //var currentUserId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+            //var currentUserName = Steamworks.SteamFriends.GetPersonaName();
+            //this.logger.Debug("got steam info", currentUserId, currentUserName);
 
-            var currentUser = new GameUser()
+            /*var currentUser = new GameUser()
             {
                 Id = currentUserId,
                 Name = currentUserName,
@@ -39,22 +41,24 @@ namespace Multiplayer.Core
 
             this.UserManager = new UserManager();
             
-            this.Client = new GameClient(
+            this.Client = new GameClient_old(
                 this.logger,
                 currentUser,
                 new PacketSerializer(),
                 this.UserManager
             );
 
-            this.RegisterPacketHandler();
+            this.RegisterPacketHandler();*/
+
+            this.Client = new GameClient();
 
             this.logger.Debug("client behaviour booted");
         }
 
         private void RegisterPacketHandler()
         {
-            this.ChatHandler = new ChatHandler(this.Client);
-            this.Client.RegisterPacketHandler(this.ChatHandler);
+            //this.ChatHandler = new ChatHandler(this.Client);
+            //this.Client.RegisterPacketHandler(this.ChatHandler);
         }
 
         public override void OnDeactivate()
@@ -66,14 +70,21 @@ namespace Multiplayer.Core
         private void Update()
         {
             // this is the games update loop
-            this.Client.HandleMessages();
+            //this.Client.HandleMessages();
         }
 
         public void Connect(string host, int port)
         {
-            this.logger.Debug("client connecting");
-            this.Client.Connect(host, port);
-            this.logger.Debug("client connected");
+            this.logger.Debug($"[client] connecting to {host}:{port}");
+            try
+            {
+                this.Client.Connect(host, (ushort)port);
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error("[client] not connected", ex);
+            }
+            this.logger.Debug("[client] connected");
         }
     }
 }

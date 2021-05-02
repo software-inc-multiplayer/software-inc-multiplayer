@@ -11,7 +11,7 @@ namespace Multiplayer.Networking.Server.Handlers
 
         private readonly UserManager userManager;
 
-        public BanHandler(GameServer server, UserManager userManager) : base(server)
+        public BanHandler(GameServer_old server, UserManager userManager) : base(server)
         {
             this.userManager = userManager;
         }

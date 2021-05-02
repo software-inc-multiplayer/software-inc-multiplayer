@@ -31,7 +31,8 @@ namespace Multiplayer.Extensions
             {
                 fileData = File.ReadAllBytes(filePath);
                 tex = new Texture2D(width, height);
-                tex.LoadImage(fileData);
+                tex.LoadRawTextureData(fileData);
+                //tex.LoadImage(fileData);
             }
             return tex;
         }

@@ -7,8 +7,8 @@ namespace Multiplayer.Networking
 
     public class ClientConnectedEventArgs : EventArgs
     {
-        public int ConnectionId { get; }
-        public ClientConnectedEventArgs(int connectionId)
+        public uint ConnectionId { get; }
+        public ClientConnectedEventArgs(uint connectionId)
         {
             this.ConnectionId = connectionId;
         }
@@ -16,8 +16,8 @@ namespace Multiplayer.Networking
 
     public class ClientDisconnectedEventArgs : EventArgs
     {
-        public int ConnectionId { get; }
-        public ClientDisconnectedEventArgs(int connectionId)
+        public uint ConnectionId { get; }
+        public ClientDisconnectedEventArgs(uint connectionId)
         {
             this.ConnectionId = connectionId;
         }
