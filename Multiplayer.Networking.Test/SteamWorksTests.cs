@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using Steamworks;
-using Steamworks.Data;
+using Facepunch.Steamworks;
+using Facepunch.Steamworks.Data;
 using Xunit;
 using Xunit.Abstractions;
 
