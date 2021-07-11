@@ -12,25 +12,29 @@ namespace Multiplayer.Core
 {
 
     [DisallowMultipleComponent]
-    public class NetworkingClientBehaviour : ModBehaviour
+    public class NetworkingClientBehaviour : ModBehaviour, IDisposable
+
     {
-        private Shared.ILogger logger;
+        private Shared.ILogger log;
+
         //public GameClient_old Client { get; private set; }
         public GameClient Client { get; private set; }
         public ChatHandler ChatHandler { get; private set; }
         public IUserManager UserManager { get; private set; }
+        public bool IsConnected => Client.Socket.Connected;
+
 
         public override void OnActivate()
         {
-            this.logger = new UnityLogger();
-            this.logger.Debug("client behavior booting");
+            this.log = Meta.Logger;
+            this.log.Debug("client behavior booting");
 
             //if (!SteamManager.Initialized)
             //    return;
 
             //var currentUserId = Steamworks.SteamUser.GetSteamID().m_SteamID;
             //var currentUserName = Steamworks.SteamFriends.GetPersonaName();
-            //this.logger.Debug("got steam info", currentUserId, currentUserName);
+            //this.log.Debug("got steam info", currentUserId, currentUserName);
 
             /*var currentUser = new GameUser()
             {
@@ -40,9 +44,9 @@ namespace Multiplayer.Core
             };
 
             this.UserManager = new UserManager();
-            
+
             this.Client = new GameClient_old(
-                this.logger,
+                this.log,
                 currentUser,
                 new PacketSerializer(),
                 this.UserManager
@@ -50,9 +54,8 @@ namespace Multiplayer.Core
 
             this.RegisterPacketHandler();*/
 
-            this.Client = new GameClient();
-
-            this.logger.Debug("client behaviour booted");
+            this.Client = new GameClient(log);
+            this.log.Debug("client behaviour booted");
         }
 
         private void RegisterPacketHandler()
@@ -63,28 +66,60 @@ namespace Multiplayer.Core
 
         public override void OnDeactivate()
         {
-            this.logger.Debug("destroying client behaviour");
+            this.log.Debug("destroying client behaviour");
+            Dispose();
         }
 
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity")]
         private void Update()
         {
+
             // this is the games update loop
             //this.Client.HandleMessages();
         }
 
         public void Connect(string host, int port)
         {
-            this.logger.Debug($"[client] connecting to {host}:{port}");
+            this.log.Debug($"[client] connecting to {host}:{port}");
             try
             {
+
                 this.Client.Connect(host, (ushort)port);
             }
             catch (Exception ex)
             {
-                this.logger.Error("[client] not connected", ex);
+                this.log.Error("[client] not connected", ex);
             }
-            this.logger.Debug("[client] connected");
+
+            this.log.Debug("[client] connected");
         }
+
+        public void Disconnect()
+        {
+            log.Debug("[client] disconnecting..");
+
+            try
+            {
+                Client.Disconnect();
+            }
+            catch (Exception e)
+            {
+                this.log.Error("[client] not connected", e);
+            }
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                Client?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+
     }
 }

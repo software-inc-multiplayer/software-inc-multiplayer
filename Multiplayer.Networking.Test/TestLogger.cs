@@ -1,27 +1,35 @@
-﻿using Multiplayer.Shared;
+﻿using System;
+using Multiplayer.Shared;
 
 namespace Multiplayer.Networking.Test
 {
     internal class TestLogger : ILogger
     {
-        public void Debug(params object[] objs)
+        #region ILogger Implementation
+        public void Log(LogType logType, object obj, Exception ex = null, string memberName = "", int sourceLineNumber = 0)
         {
+            throw new NotImplementedException();
         }
 
-        public void Error(params object[] objs)
+        public void Debug(object obj, Exception ex = null, string memberName = "", int sourceLineNumber = 0)
         {
+            throw new NotImplementedException();
         }
 
-        public void Info(params object[] objs)
+        public void Info(object obj, Exception ex = null, string memberName = "", int sourceLineNumber = 0)
         {
+            throw new NotImplementedException();
         }
 
-        public void Log(LogType logType, params object[] obj)
+        public void Warn(object obj, Exception ex = null, string memberName = "", int sourceLineNumber = 0)
         {
+            throw new NotImplementedException();
         }
 
-        public void Warn(params object[] objs)
+        public void Error(object obj, Exception ex = null, string memberName = "", int sourceLineNumber = 0)
         {
+            throw new NotImplementedException();
         }
+        #endregion
     }
 }

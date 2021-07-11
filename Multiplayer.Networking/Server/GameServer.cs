@@ -8,7 +8,7 @@ using Facepunch.Steamworks.Data;
 
 namespace Multiplayer.Networking.Server
 {
-    public class GameServer
+    public class GameServer : IDisposable
     {
         public GameServerSocket SocketManager { get; private set; }
         public void Start(ServerInfo serverInfo)
@@ -16,8 +16,13 @@ namespace Multiplayer.Networking.Server
             //this.ServerInfo = serverInfo;
             //this.BakeHandlers();
             this.SocketManager = SteamNetworkingSockets.CreateNormalSocket<GameServerSocket>(NetAddress.AnyIp(serverInfo.Port));
-            
+
             //this.ServerStarted?.Invoke(this, null);
+        }
+
+        public void Dispose()
+        {
+            SocketManager?.Dispose();
         }
     }
 }
