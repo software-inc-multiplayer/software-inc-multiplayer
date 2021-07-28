@@ -18,8 +18,8 @@ namespace Multiplayer.Core.Utils
         public ScrollRect scrollRect;
         private RectTransform scrollRectTransform;
 
-        private RectTransform ScrollRectTransform { get { if (scrollRect && !scrollRectTransform) scrollRectTransform = scrollRect.GetComponent<RectTransform>(); return scrollRectTransform; } }
-
+        private RectTransform GetScrollRectTransform()
+        { if (scrollRect && !scrollRectTransform) scrollRectTransform = scrollRect.GetComponent<RectTransform>(); return scrollRectTransform; }
         // parent gameobjects
         private CanvasScaler scaler;
 
@@ -148,7 +148,7 @@ namespace Multiplayer.Core.Utils
             float defaultHeight;
 
             // default text rect height (fit to scroll parent or expand to fit text)
-            if (scrollRect) defaultHeight = ScrollRectTransform.rect.height;
+            if (scrollRect) defaultHeight = GetScrollRectTransform().rect.height;
             else defaultHeight = ((new TextGenerator().GetPreferredHeight("", settings) * textRows) / ScaleFactor) + VerticalOffset;
 
             // force resize
