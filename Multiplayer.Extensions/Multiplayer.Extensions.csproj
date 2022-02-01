@@ -13,10 +13,10 @@
       <HintPath>..\References\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\References\UnityEngine.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
+	<Reference Include="UnityEngine">
+		<HintPath>..\References\UnityEngine.dll</HintPath>
+		<Private>false</Private>
+	</Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\References\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>

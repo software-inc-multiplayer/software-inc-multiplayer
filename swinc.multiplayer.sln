@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29609.76
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Core", "Multiplayer.Core\Multiplayer.Core.csproj", "{13F254D3-469C-4D57-BB72-7D8E881A8C64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Core", "Multiplayer.Core\Multiplayer.Core.csproj", "{13F254D3-469C-4D57-BB72-7D8E881A8C64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Debugging", "Multiplayer.Debugging\Multiplayer.Debugging.csproj", "{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Debugging", "Multiplayer.Debugging\Multiplayer.Debugging.csproj", "{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multiplayer.Extensions", "Multiplayer.Extensions\Multiplayer.Extensions.csproj", "{816FE3F3-50EF-44A7-A54A-F2EE0346E9F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Extensions", "Multiplayer.Extensions\Multiplayer.Extensions.csproj", "{816FE3F3-50EF-44A7-A54A-F2EE0346E9F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Multiplayer.Networking", "Multiplayer.Networking\Multiplayer.Networking.csproj", "{19CD273F-A601-45ED-AB6D-6E61F47A074C}"
 EndProject
@@ -31,6 +31,7 @@ Global
 		{13F254D3-469C-4D57-BB72-7D8E881A8C64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13F254D3-469C-4D57-BB72-7D8E881A8C64}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13F254D3-469C-4D57-BB72-7D8E881A8C64}.UNIT_TEST|Any CPU.ActiveCfg = Release|Any CPU
+		{13F254D3-469C-4D57-BB72-7D8E881A8C64}.UNIT_TEST|Any CPU.Build.0 = Release|Any CPU
 		{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BA2B696-5228-429F-8FFF-FBF6CA7A5303}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,8 +48,8 @@ Global
 		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.UNIT_TEST|Any CPU.ActiveCfg = UNIT_TEST|Any CPU
-		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.UNIT_TEST|Any CPU.Build.0 = UNIT_TEST|Any CPU
+		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.UNIT_TEST|Any CPU.ActiveCfg = Debug|Any CPU
+		{19CD273F-A601-45ED-AB6D-6E61F47A074C}.UNIT_TEST|Any CPU.Build.0 = Debug|Any CPU
 		{1B4A9A9F-00CD-4EEF-AC1A-09E0CD73B706}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B4A9A9F-00CD-4EEF-AC1A-09E0CD73B706}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B4A9A9F-00CD-4EEF-AC1A-09E0CD73B706}.Release|Any CPU.ActiveCfg = Release|Any CPU
