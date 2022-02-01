@@ -1,0 +1,496 @@
+<?xml version="1.0"?>
+<doc>
+	<assembly>
+		<name>Assembly-CSharp</name>
+	</assembly>
+	<members>
+		<member name="M:BuildController.ContainsPath(System.Collections.Generic.IList{UnityEngine.Vector2})">
+			<summary>
+            NOT THREAD SAFE
+            </summary>
+		</member>
+		<member name="M:BuildController.ContainsPath(System.Collections.Generic.IList{UnityEngine.Vector2},System.Int32)">
+			<summary>
+            NOT THREAD SAFE
+            </summary>
+		</member>
+		<member name="M:GameSettings.Lawsuit.#ctor(Company,System.String,System.Single,System.Single)">
+			<summary>
+            Sued by company
+            </summary>
+		</member>
+		<member name="M:GameSettings.Lawsuit.#ctor(System.String,System.String,System.Single,System.Single)">
+			<summary>
+            Sued by employee
+            </summary>
+		</member>
+		<member name="M:GameSettings.Lawsuit.#ctor(System.String,System.Single,System.Single)">
+			<summary>
+            Sued by the general public
+            </summary>
+		</member>
+		<member name="M:PathController.PathPoint.GetConnectedSegments">
+			<summary>
+            Should only be used for iteration
+            </summary>
+		</member>
+		<member name="M:PathController.SplitPath(PathController.PathPoint,PathController.PathPoint,UnityEngine.Vector2,PathController.PathPoint,System.Nullable{System.Boolean})">
+			<summary>
+            Does not refresh path!
+            </summary>
+		</member>
+		<member name="M:Versioning.Version.Before(Versioning.Version,System.Int32)">
+			<summary>
+            </summary>
+			<param name="order">0 = type, 1 = major, 2 = minor, 3 = revision</param>
+		</member>
+		<member name="M:WindowManager.FindElementPath(System.String,UnityEngine.Transform)">
+			<summary>
+            Find the element using a path, e.g. Window/Button
+            You can find paths using the in-game command UI_UNDER_MOUSE
+            </summary>
+			<param name="path">The path</param>
+			<param name="startFrom">Where to start looking, default is main UI Canvas</param>
+			<returns></returns>
+		</member>
+		<member name="M:WindowManager.AddElementToWindow(UnityEngine.GameObject,GUIWindow,UnityEngine.Rect,UnityEngine.Rect)">
+			<summary>
+            Add a UI element to a window
+            </summary>
+			<param name="position">The position and size</param>
+			<param name="anchors">How to anchor the position and size, relative to the window</param>
+		</member>
+		<member name="M:WindowManager.AddElementToElement(UnityEngine.GameObject,UnityEngine.GameObject,UnityEngine.Rect,UnityEngine.Rect)">
+			<summary>
+            Add a UI element to a UI element
+            </summary>
+			<param name="parent">The parent UI element</param>
+			<param name="position">The position and size</param>
+			<param name="anchors">How to anchor the position and size, relative to the parent UI element</param>
+		</member>
+		<member name="M:WindowManager.IsActiveWindow(GUIWindow)">
+			<summary>
+            Is window the current top most window
+            </summary>
+		</member>
+		<member name="M:WindowManager.FindWindowType``1">
+			<summary>
+            Find all open non-modal windows with a certain component attached
+            </summary>
+			<typeparam name="T">The component type to look for</typeparam>
+		</member>
+		<member name="M:WindowManager.FindWindowTypeEnum``1">
+			<summary>
+            Find all open non-modal windows with a certain component attached
+            </summary>
+			<typeparam name="T">The component type to look for</typeparam>
+		</member>
+		<member name="M:WindowManager.AnyWindowsOfType``1">
+			<summary>
+            Find all open windows with a certain component attached, including modal windows
+            </summary>
+			<typeparam name="T">The component type to look for</typeparam>
+		</member>
+		<member name="M:WindowManager.RegisterWindow(GUIWindow)">
+			<summary>
+            Should only be called by the window itself
+            Will fail if the window manager of this scene isn't ready yet
+            </summary>
+			<param name="window">The window to register</param>
+		</member>
+		<member name="M:WindowManager.Focus(GUIWindow)">
+			<summary>
+            Make a window the top-most winodw
+            </summary>
+		</member>
+		<member name="M:WindowManager.CloseAll(GUIWindow)">
+			<summary>
+            Close all open non-modal windows, except the exempt window
+            </summary>
+		</member>
+		<member name="M:WindowManager.DeregisterWindow(GUIWindow)">
+			<summary>
+            Should only be called by the window itself
+            </summary>
+		</member>
+		<member name="M:WindowManager.ShowMessageBox(System.String,System.Boolean,DialogWindow.DialogType,System.Action,System.String,System.Action,System.Boolean)">
+			<summary>
+            Ask the player a yes/no question. If the questionID is supplied, the game will ask whether to ask again and save response.
+            </summary>
+			<returns>The window generated, futher action not required</returns>
+			<param name="extraNoAction">Optionally carry out an extra action if player clicks no</param>
+		</member>
+		<member name="M:WindowManager.SpawnFader(UnityEngine.RectTransform,UnityEngine.RectTransform)">
+			<summary>
+            Spawn a rectangle that fades from start to end rect.
+            Used by windows to signify a related button, see GUIWindow.SpawnFrom
+            </summary>
+		</member>
+		<member name="T:SVector3">
+			<summary>
+            Class to enable binary serialization of Unity's default Vector2, Vector3, Color and Quaternion structs
+            Has methods for direct string serialization as well
+            Has implicit converters to help readability
+            </summary>
+		</member>
+		<member name="M:Utilities.MinMaxInstance``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.KeyValuePair{System.Func{``0,System.Int32},System.Boolean}[])">
+			<summary>
+            True = min
+            </summary>
+		</member>
+		<member name="M:Utilities.PerDay(System.Single,System.Single,System.Boolean)">
+			<summary>
+            Is actually per month
+            </summary>
+		</member>
+		<member name="M:Utilities.PerDay(System.Single,System.Boolean)">
+			<summary>
+            Is actually per month
+            </summary>
+		</member>
+		<member name="M:Utilities.isLeft(UnityEngine.Vector2,UnityEngine.Vector2,UnityEngine.Vector2)">
+			<summary>
+            Whether p3 is left of line segment p1->p2
+            </summary>
+			<param name="p3">point</param>
+			<returns>-1 if right, 0 if on top, 1 if left</returns>
+		</member>
+		<member name="M:Utilities.GetLineIntersectionClamped(UnityEngine.Vector2,UnityEngine.Vector2,UnityEngine.Vector2,UnityEngine.Vector2,System.Single,System.Single)">
+			<summary>
+            First line, p - p2, has coordinates clamped
+            </summary>
+		</member>
+		<member name="M:Utilities.ConvertToBool(System.String,System.String)">
+			<summary>
+            Convert string to bool and return variable name in exception if it fails
+            </summary>
+		</member>
+		<member name="M:Utilities.ConvertToInt(System.String,System.String)">
+			<summary>
+            Convert string to integer and return variable name in exception if it fails
+            </summary>
+		</member>
+		<member name="M:Utilities.ConvertToFloat(System.String,System.String)">
+			<summary>
+            Convert string to float and return variable name in exception if it fails
+            </summary>
+		</member>
+		<member name="M:Utilities.ConvertToBoolDef(System.String,System.Boolean)">
+			<summary>
+            Convert string to bool and return default value if it fails
+            </summary>
+		</member>
+		<member name="M:Utilities.ConvertToIntDef(System.String,System.Int32)">
+			<summary>
+            Convert string to integer and return default value if it fails
+            </summary>
+		</member>
+		<member name="M:Utilities.ConvertToFloatDef(System.String,System.Single)">
+			<summary>
+            Convert string to float and return default value if it fails
+            </summary>
+		</member>
+		<member name="M:Utilities.SubmarketDistance(System.Single[],System.Single[])">
+			<summary>
+            Returns 1 if submarkets are the same, zero if they are completely different
+            </summary>
+		</member>
+		<member name="M:Utilities.SubmarketScore(System.Single[],System.Single[],System.Single[])">
+			<summary>
+            Calculates score based on actual market, targeted market and quality of implementation
+            </summary>
+			<param name="sub1">Actual market values</param>
+			<param name="sub2">Targted markets</param>
+			<param name="quality">Quality of implementation</param>
+		</member>
+		<member name="M:Utilities.SubmarketScore(System.Single[],System.Single[])">
+			<summary>
+            Calculates quality of implementation based on targeted markets
+            </summary>
+			<param name="sub">Targted markets</param>
+			<param name="quality">Quality of implementation</param>
+		</member>
+		<member name="M:Utilities.GetSecondaryWhere``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean},System.Func{``0,System.Boolean},System.Collections.Generic.List{``0})">
+			<summary>
+            Puts items from input to output such that they are filtered by where and where2
+            Unless there are no items that fit where2, then only items filtered by where
+            </summary>
+		</member>
+		<member name="E:MarketSimulation.OnProductReleased">
+			<summary>
+            Not raised for mock products, i.e. products that can be supported before they are released
+            </summary>
+		</member>
+		<member name="E:MarketSimulation.OnCompanyFounded">
+			<summary>
+            Not raised for player company
+            </summary>
+		</member>
+		<member name="E:MarketSimulation.OnTechResearched">
+			<summary>
+            Not raised for initial tech levels
+            </summary>
+		</member>
+		<member name="M:MarketSimulation.FixSales(System.Int32,SoftwareProduct,System.Single,System.Single,System.Int32,System.Single,ScriptSystem.SaleScope)">
+			<summary>
+            Turn sales data into actual countable sales numbers 
+            </summary>
+			<returns>physical sales, digital sales, total refunds</returns>
+		</member>
+		<member name="M:SDateTime.ToTimeString(System.Boolean)">
+			<summary>
+            20:33 AM/PM
+            </summary>
+			<param name="minutes"></param>
+			<returns></returns>
+		</member>
+		<member name="M:SDateTime.ToCompactString">
+			<summary>
+            November 2016
+            </summary>
+			<returns></returns>
+		</member>
+		<member name="M:SDateTime.ToExtraCompactString">
+			<summary>
+            NOV16
+            </summary>
+			<returns></returns>
+		</member>
+		<member name="M:SDateTime.ToCompactString2">
+			<summary>
+            Day 1/4 November 2016
+            </summary>
+			<returns></returns>
+		</member>
+		<member name="M:SDateTime.ToVeryCompactString">
+			<summary>
+            Nov 2016
+            </summary>
+			<returns></returns>
+		</member>
+		<member name="M:SDateTime.ToQuarterString">
+			<summary>
+            Q4 2016
+            </summary>
+			<returns></returns>
+		</member>
+		<member name="M:SDateTime.ToString">
+			<summary>
+            20:33 Day 1/4 November 2016
+            </summary>
+			<returns></returns>
+		</member>
+		<member name="M:SDateTime.Simplify">
+			<summary>
+            Zeroes minute and hour
+            </summary>
+		</member>
+		<member name="M:SDateTime.SimplifyMore">
+			<summary>
+            Zeroes minute, hour and day
+            </summary>
+		</member>
+		<member name="M:SDateTime.SimplifyLess">
+			<summary>
+            Zeroes minute
+            </summary>
+		</member>
+		<member name="M:SDateTime.DateDiff(SDateTime,SDateTime)">
+			<summary>
+            Writes "1 year, 2 months and 1 day" or "3 hours"
+            Only goes to hour mode if now is same day as end
+            </summary>
+		</member>
+		<member name="M:SDateTime.DateDiff2(SDateTime,SDateTime)">
+			<summary>
+            Writes either 1 year or 2 months or 3 days or 5 hours
+            </summary>
+		</member>
+		<member name="M:SoftwareWorkItem.#ctor(System.String,SoftwareType,SoftwareCategory,System.Collections.Generic.Dictionary{System.String,SoftwareProduct},SoftwareProduct[],System.Single,System.Single[],SDateTime,Company,SoftwareProduct,System.Boolean,System.Single,System.Collections.Generic.IList{FeatureBase},System.Collections.Generic.Dictionary{System.String,TechLevel},ContractWork,System.String,System.String,System.String,SoftwareFramework)">
+			<summary>
+            Design work
+            </summary>
+		</member>
+		<member name="M:SoftwareWorkItem.#ctor(SoftwareAlpha,ReviewWindow.ReviewData)">
+			<summary>
+            Design iteration
+            </summary>
+		</member>
+		<member name="M:SoftwareWorkItem.GetMaximumBugs(System.Single)">
+			<summary>
+            Only code devtime
+            </summary>
+		</member>
+		<member name="M:SoftwareWorkItem.#ctor(System.String,SoftwareType,SoftwareCategory,System.Collections.Generic.Dictionary{System.String,SoftwareProduct},SoftwareProduct[],System.Single,System.Single[],SDateTime,Company,SoftwareProduct,SoftwareWorkItem.FeatureProgress[],System.Collections.Generic.Dictionary{System.String,TechLevel},System.Boolean,System.Single,ContractWork,System.String,System.String,System.Int32,System.Single,System.UInt32,System.Single,System.Nullable{SDateTime},System.Int32,System.String,SoftwareFramework,System.Single)">
+			<summary>
+            Alpha work
+            </summary>
+		</member>
+		<member name="M:WorkItem.CompanyWork(System.Single)">
+			<summary>
+            Do company work
+            </summary>
+			<param name="delta">Delta scaled to in-game minutes</param>
+			<returns>Cost to subsidiary for work done</returns>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,System.Object},System.Func{`0,System.String},System.Boolean,System.Nullable{System.Single},System.Nullable{GUIListView.FilterType},System.Func{`0,System.Object},System.Nullable{GUIColumn.ColumnType},System.Action{`0,System.Object})">
+			<summary>
+            Custom column, with string comparison for sorting
+            </summary>
+			<param name="header">Non-localizated string to put in column header</param>
+			<param name="label">What to turn the input type into for display, usually a string</param>
+			<param name="comparison">What to turn input type into for comparison, as strings</param>
+			<param name="vola">Whether this value changes often and should be updated in realtime</param>
+			<param name="width">Optional default width of column</param>
+			<param name="filterType">What kind of dialog should show when filtering values</param>
+			<param name="filter">What to turn input type into for filtering</param>
+			<param name="typeOverride">What kind of column this is</param>
+			<param name="setValue">If slider column, what to change when slider is moved</param>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,System.Single},System.Boolean,System.Nullable{System.Single},System.Boolean)">
+			<summary>
+            Money or percent column
+            </summary>
+			<param name="currency">Money if true, otherwise percent</param>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,System.Int32},System.Boolean,System.Nullable{System.Single},System.Boolean)">
+			<summary>
+            Integer column, with optional thousand separator
+            </summary>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,System.UInt32},System.Boolean,System.Nullable{System.Single})">
+			<summary>
+            Unsigned integer column, always uses thousand separator
+            </summary>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,SDateTime},System.Boolean,System.Nullable{System.Single})">
+			<summary>
+            Date column, output as "November 2016"
+            </summary>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,System.Boolean},System.Boolean,System.Nullable{System.Single})">
+			<summary>
+            Yes/no bool column
+            </summary>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,System.String},System.Boolean,System.Nullable{System.Single},System.Boolean)">
+			<summary>
+            Standard string column, which will add a multi choice filter option, if toggled
+            </summary>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Func{`0,System.Object},System.Func{`0,System.Single},System.Boolean,System.Nullable{System.Single},System.Nullable{GUIListView.FilterType},System.Func{`0,System.Object},System.Nullable{GUIColumn.ColumnType},System.Action{`0,System.Object})">
+			<summary>
+            Custom column, with floating point number comparison for sorting
+            </summary>
+			<param name="header">Non-localizated string to put in column header</param>
+			<param name="label">What to turn the input type into for display, usually a string</param>
+			<param name="comparison">What to turn input type into for comparison, as floats</param>
+			<param name="vola">Whether this value changes often and should be updated in realtime</param>
+			<param name="width">Optional default width of column</param>
+			<param name="filterType">What kind of dialog should show when filtering values</param>
+			<param name="filter">What to turn input type into for filtering</param>
+			<param name="typeOverride">What kind of column this is</param>
+			<param name="setValue">If slider column, what to change when slider is moved</param>
+		</member>
+		<member name="M:GUIListView.ColumnDefinition`1.#ctor(System.String,System.Action{`0},System.Nullable{System.Single})">
+			<summary>
+            Action column, where something happens when the player clicks an element
+            </summary>
+		</member>
+		<member name="F:GUIWindow.OnlyHide">
+			<summary>
+            Whether to destroy window when closed or not
+            </summary>
+		</member>
+		<member name="F:GUIWindow.StartHidden">
+			<summary>
+            Whether the window should immediatly hide when created
+            </summary>
+		</member>
+		<member name="F:GUIWindow.Modal">
+			<summary>
+            Whether the window should disable everything else in the UI when open
+            </summary>
+		</member>
+		<member name="F:GUIWindow.AlwaysOnTop">
+			<summary>
+            Whether the window should be on top, even if not modal or active
+            </summary>
+		</member>
+		<member name="F:GUIWindow.ShowCentered">
+			<summary>
+            Whether to center the window on screen when it is opened
+            </summary>
+		</member>
+		<member name="F:GUIWindow.HasBeenShown">
+			<summary>
+            Whether the window has ever been shown
+            </summary>
+		</member>
+		<member name="F:GUIWindow.HideBlockPanel">
+			<summary>
+            Whether the dark overlay should be hidden when modal window is open
+            </summary>
+		</member>
+		<member name="F:GUIWindow.ContinuallyUpdateSize">
+			<summary>
+            Whether to call OnSizeChanged once at end or continually when player scales window
+            </summary>
+		</member>
+		<member name="F:GUIWindow.InitialTitle">
+			<summary>
+            Unless the window Title has been changed when the window is created, it will take this name localized
+            </summary>
+		</member>
+		<member name="F:GUIWindow.OnClose">
+			<summary>
+            Callback for when window is closed, even if only hidden
+            </summary>
+		</member>
+		<member name="F:GUIWindow.SizeButton">
+			<summary>
+            If size button is destroyed, window will no longer be sizable
+            </summary>
+		</member>
+		<member name="F:GUIWindow.HelpButton">
+			<summary>
+            Tutorial button, will be enabled if AssociatedTutorial is set
+            </summary>
+		</member>
+		<member name="F:GUIWindow.SpawnFrom">
+			<summary>
+            UI element to visually "zoom" into when closed
+            </summary>
+		</member>
+		<member name="F:GUIWindow.WindowSizeID">
+			<summary>
+            Unique ID to save the window's position and size
+            </summary>
+		</member>
+		<member name="F:GUIWindow.OnSizeChanged">
+			<summary>
+            Callback for when player scales window, see ContinuallyUpdateSize
+            </summary>
+		</member>
+		<member name="P:GUIWindow.Shown">
+			<summary>
+            Whether window is currently open
+            </summary>
+		</member>
+		<member name="P:GUIWindow.Title">
+			<summary>
+            Window title, setting this will localize value automatically
+            </summary>
+		</member>
+		<member name="P:GUIWindow.NonLocTitle">
+			<summary>
+            Window title, will not be localized when set
+            </summary>
+		</member>
+		<member name="M:GUIWindow.Focus">
+			<summary>
+            Same as WindowManager.Focus(this)
+            </summary>
+		</member>
+	</members>
+</doc>
