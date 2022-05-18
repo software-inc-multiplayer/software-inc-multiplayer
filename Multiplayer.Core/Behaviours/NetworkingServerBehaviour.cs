@@ -14,7 +14,7 @@ namespace Multiplayer.Core
 {
 
     [DisallowMultipleComponent]
-    public class NetworkingServerBehaviour : ModBehaviour
+    public class NetworkingServerBehaviour : ModBehaviour, IDisposable
     {
         private Shared.ILogger logger;
         //public GameServer_old Server { get; private set; }
@@ -26,7 +26,7 @@ namespace Multiplayer.Core
 
         public override void OnActivate()
         {
-            this.logger = Meta.Logging;
+            this.logger = Meta.Logger;
             this.logger.Debug("server behaviour booting");
 
             this.UserManager = new UserManager();
@@ -55,6 +55,7 @@ namespace Multiplayer.Core
         public override void OnDeactivate()
         {
             this.logger.Debug("destroying server behaviour");
+            Dispose();
         }
 
         public void Host(string name, string description, ushort port)
@@ -83,6 +84,11 @@ namespace Multiplayer.Core
         {
             // this is the games update loop
             //this.Server.HandleMessages();
+        }
+
+        public void Dispose()
+        {
+            Server?.Dispose();
         }
     }
 }

@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Multiplayer.Debugging\Multiplayer.Debugging.csproj" />
     <ProjectReference Include="..\Multiplayer.Shared\Multiplayer.Shared.csproj" />
   </ItemGroup>
 

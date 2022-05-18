@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 //using Multiplayer.Extensions;
 using Multiplayer.Shared;
 using System.Text;
+using LogType = Multiplayer.Shared.LogType;
 
 namespace Multiplayer.Debugging
 {
     public class UnityLogger : Shared.ILogger
     {
-        public static Queue<string> messageQueue = new Queue<string>();
         private static readonly object externalLogLock = new object();
+        private readonly string sourceFilePath;
 
         // TODO maybe we can trigger this from client main
         public static void Start()
@@ -22,7 +24,7 @@ namespace Multiplayer.Debugging
                 //File.Create(Path.Combine(Application.dataPath, "Multiplayer", DateTime.Now.ToString("HH:mm:ss:ffff").MakeSafe() + "-logging.log"));
             }
         }
-        
+
         // TODO maybe we can trigger this from client main
         public static void OnDisable()
         {
@@ -33,12 +35,13 @@ namespace Multiplayer.Debugging
             }
         }
 
-        public UnityLogger()
+        public UnityLogger([CallerFilePath] string sourceFilePath = "")
         {
+            this.sourceFilePath = sourceFilePath;
             Start();
         }
 
-        public void LogInternal(Shared.LogType logType, string message)
+        public void LogInternal(Shared.LogType logType, string message, Exception ex = null)
         {
             switch (logType)
             {
@@ -60,49 +63,25 @@ namespace Multiplayer.Debugging
             //messageQueue.Enqueue(message);
         }
 
-        public void Log(Shared.LogType logType, params object[] objs)
+
+        #region ILogger Implementation
+        public void Log(LogType logType, object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var sb = new StringBuilder();
+            sb.Append($"[{DateTime.Now:HH:mm:ss:ffff}] [MP] [{logType}] [{sourceFilePath}->{memberName}#{sourceLineNumber}] ");
 
-            switch (logType)
-            {
-                case Shared.LogType.Debug:
-                    sb.Append($"[{DateTime.Now:HH:mm:ss:ffff}] [MP] [Debug] ");
-                    break;
-                case Shared.LogType.Info:
-                    sb.Append($"[{DateTime.Now:HH:mm:ss:ffff}] [MP] [Info] ");
-                    break;
-                case Shared.LogType.Error:
-                    sb.Append($"[{DateTime.Now:HH:mm:ss:ffff}] [MP] [Warn] ");
-                    break;
-                case Shared.LogType.Warn:
-                    sb.Append($"[{DateTime.Now:HH:mm:ss:ffff}] [MP] [Error] ");
-                    break;
-            }
+            sb.Append(obj + Environment.NewLine);
+            if (ex != null) sb.AppendLine(ex.ToString());
+            LogInternal(logType, sb.ToString());
+        }
 
-            foreach (object obj in objs)
-            {
-                sb.Append(obj);
-                sb.Append(' ');
-            }
-            this.LogInternal(logType, sb.ToString());
-        }
-        
-        public void Debug(params object[] objs)
-        {
-            this.Log(Shared.LogType.Debug, objs);
-        }
-        public void Info(params object[] objs)
-        {
-            this.Log(Shared.LogType.Info, objs);
-        }
-        public void Warn(params object[] objs)
-        {
-            this.Log(Shared.LogType.Warn, objs);
-        }
-        public void Error(params object[] objs)
-        {
-            this.Log(Shared.LogType.Error, objs);
-        }
+        public void Debug(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0) => Log(LogType.Debug, obj, ex, memberName, sourceLineNumber);
+
+        public void Info(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0) => Log(LogType.Info, obj, ex, memberName, sourceLineNumber);
+
+        public void Warn(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0) => Log(LogType.Warn, obj, ex, memberName, sourceLineNumber);
+
+        public void Error(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0) => Log(LogType.Error, obj, ex, memberName, sourceLineNumber);
+        #endregion
     }
 }

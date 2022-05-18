@@ -68,7 +68,7 @@ namespace Multiplayer.Networking.Client
 
         private void HandleWelcomeUser(WelcomeUser welcomeUser)
         {
-            this.logger.Debug("[client] welcome client", welcomeUser.Sender, welcomeUser.UserName);
+            this.logger.Debug($"[client] welcome client {welcomeUser.Sender}, {welcomeUser.UserName}");
 
             var newUser = this.UserManager.GetOrAddUser(new GameUser()
             {
@@ -93,7 +93,7 @@ namespace Multiplayer.Networking.Client
             }
 
             this.UserManager.RemoveUser(user);
-            this.logger.Debug("[client] removing client", disconnectedUserId);
+            this.logger.Debug($"[client] removing client {disconnectedUserId}");
         }
 
         /*private void InternalHandleMessage(Message msg)
@@ -182,7 +182,7 @@ namespace Multiplayer.Networking.Client
         }
 
         public void Connect(string ip, ushort port)
-        {   
+        {
             this.RawClient = SteamNetworkingSockets.CreateNormalSocket(NetAddress.From(ip, port), this);
         }
 

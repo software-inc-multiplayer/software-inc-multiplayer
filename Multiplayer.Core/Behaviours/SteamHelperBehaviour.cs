@@ -3,22 +3,36 @@ using System.Diagnostics.CodeAnalysis;
 using Multiplayer.Debugging;
 using UnityEngine;
 using Facepunch.Steamworks;
+using ILogger = Multiplayer.Shared.ILogger;
 
 namespace Multiplayer.Core.Behaviours
 {
     [DisallowMultipleComponent]
-    public class SteamHelperBehaviour : ModBehaviour
+    public class SteamHelperBehaviour : ModBehaviour, IDisposable
     {
-        private UnityLogger logger;
+        private ILogger logger;
         public static bool Initialized { get; private set; } = false;
         private const int Appid = 362620;
+
+        public void OnDisable()
+        {
+            //Proper place to shutdown SteamClient in order to avoid hanging of the game when closing it
+            OnDeactivate();
+        }
+
+        public void OnEnable()
+        {
+            OnActivate();
+        }
+
+
 
         public override void OnActivate()
         {
             if (Initialized)
                 return;
 
-            this.logger = Meta.Logging;
+            this.logger = Meta.Logger;
             this.logger.Info("[STEAM] booting");
             try
             {
@@ -27,10 +41,10 @@ namespace Multiplayer.Core.Behaviours
 
                 this.logger.Info("[STEAM] booted");
 
-                this.logger.Debug("[STEAM] Name", SteamClient.Name);
-                this.logger.Debug("[STEAM] AccountId", SteamClient.SteamId.AccountId);
-                this.logger.Debug("[STEAM] IsValid", SteamClient.IsValid);
-                this.logger.Debug("[STEAM] IsLoggedOn", SteamClient.IsLoggedOn);
+                this.logger.Debug($"[STEAM] Name: {SteamClient.Name}");
+                this.logger.Debug($"[STEAM] AccountId: {SteamClient.SteamId.AccountId}");
+                this.logger.Debug($"[STEAM] IsValid: {SteamClient.IsValid}");
+                this.logger.Debug($"[STEAM] IsLoggedOn: {SteamClient.IsLoggedOn}");
             }
             catch (Exception ex)
             {
@@ -64,5 +78,7 @@ namespace Multiplayer.Core.Behaviours
                 return;
             SteamClient.RunCallbacks();
         }
+
+        public void Dispose() => OnDeactivate();
     }
 }

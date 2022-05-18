@@ -18,49 +18,59 @@
 
 
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\References\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\References\UnityEngine.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\References\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.Networking">
-      <HintPath>..\References\UnityEngine.Networking.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.Networking.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
-      <HintPath>..\References\UnityEngine.StandardEvents.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.StandardEvents.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\References\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\References\UnityEngine.UI.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>..\References\UnityEngine.UIElementsModule.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\References\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.UIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.UNETModule">
-      <HintPath>..\References\UnityEngine.UNETModule.dll</HintPath>
+      <HintPath>$(softwareincfolder)\Software Inc_Data\Managed\UnityEngine.UNETModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="AdditionalOutputArtifacts\steam_api64_new.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="XCOPY &quot;$(TargetDir)\Multiplayer.Core.dll&quot; &quot;$(softwareincfolder)\DLLMods\Multiplayer\&quot; /S /Y &#xD;&#xA;XCOPY &quot;$(TargetDir)\Multiplayer.Core.pdb&quot; &quot;$(softwareincfolder)\DLLMods\Multiplayer\&quot; /S /Y&#xD;&#xA;@echo Multiplayer.Core.dll&gt; toexclude.txt&#xD;&#xA;@echo Multiplayer.Core.pdb&gt; toexclude.txt&#xD;&#xA;@echo AdditionalOutputArtifacts&gt; toexclude.txt&#xD;&#xA;XCOPY /S /Y /exclude:toexclude.txt &quot;$(TargetDir)\&quot; &quot;$(softwareincfolder)\Software Inc_Data\Managed\&quot;&#xD;&#xA;XCOPY /S /Y &quot;$(TargetDir)\AdditionalOutputArtifacts\&quot; &quot;$(softwareincfolder)\Software Inc_Data\Managed\&quot;&#xD;&#xA;del toexclude.txt" />
+  </Target>
 
 </Project>
