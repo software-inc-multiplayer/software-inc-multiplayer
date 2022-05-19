@@ -14,8 +14,9 @@ namespace Multiplayer.Core
     {
         public static ILogger Logger { get; set; }
         public static ModController.DLLMod ThisMod { get; set; }
+        
         public static bool GiveMeFreedom = true;
-
+        
         public NetworkingClientBehaviour NetworkingClient { get; private set; }
         public NetworkingServerBehaviour NetworkingServer { get; private set; }
         public SteamHelperBehaviour SteamHelper { get; private set; }
@@ -61,23 +62,20 @@ namespace Multiplayer.Core
             MpWindow.MinSize = new Vector2(730, 500);
             MpWindow.SizeButton.SetActive(false);
 
-            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(3, 3, 240, 25),CreateServerClicked, MPWindow,"mp_tab_create");
-            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"),new Rect(245, 3, 240, 25),ConnectServerClicked,MPWindow,"mp_tab_connect");
-            Utils.Controls.Window.UIButton tabServerlist = new Utils.Controls.Window.UIButton("ServerListTab".LocDef("Server List"), new Rect(487, 3, 240, 25), ServerlistClicked, MPWindow, "mp_tab_serverlist");
+            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(3, 3, 240, 25),CreateServerClicked, MpWindow,"mp_tab_create");
+            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"),new Rect(245, 3, 240, 25),ConnectServerClicked,MpWindow,"mp_tab_connect");
+            Utils.Controls.Window.UIButton tabServerlist = new Utils.Controls.Window.UIButton("ServerListTab".LocDef("Server List"), new Rect(487, 3, 240, 25), ServerlistClicked, MpWindow, "mp_tab_serverlist");
 
             //Create the controls inside the tabs
-            hostport = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Port", "mp_hostport");
-            hostpassword = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MPWindow, "Password", "mp_hostpassword");
-            hostbutton = new Utils.Controls.Window.UIButton("Host Server", new Rect(25, 130, 150, 50), HostClicked, MPWindow, "mp_hostbutton");
-            connectremoteip = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MPWindow, "Remote IP", "mp_remoteip");
-            connectremoteport = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MPWindow, "Remote Port", "mp_remoteport");
-            connectremotepassword = new Utils.Controls.Window.UITextbox(new Rect(25, 130, 150, 30), MPWindow, "Password", "mp_remotepassword");
-            connectbutton = new Utils.Controls.Window.UIButton("Connect", new Rect(25, 170, 150, 50), ConnectClicked, MPWindow, "mp_remotebutton");
-            serverlistplaceholder = new Utils.Controls.Window.UILabel("Coming soon!", new Rect(25, 50, 150, 25), MPWindow, "mp_serverlistplaceholder",true);
-            Utils.Controls.Window.UIButton tabHost = new Utils.Controls.Window.UIButton("CreateServerTab".LocDef("Create Server"), new Rect(0, 0, 145, 25), CreateServerClicked, MpWindow, "mp_tab_create");
-            Utils.Controls.Window.UIButton tabConnect = new Utils.Controls.Window.UIButton("ConnectServerTab".LocDef("Connect to Server"), new Rect(150, 0, 145, 25), ConnectServerClicked, MpWindow, "mp_tab_connect");
-            Utils.Controls.Window.UIButton tabServerList = new Utils.Controls.Window.UIButton("ServerListTab".LocDef("Server List"), new Rect(300, 0, 145, 25), ServerlistClicked, MpWindow, "mp_tab_serverlist");
-
+            hostport = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MpWindow, "Port", "mp_hostport");
+            hostpassword = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MpWindow, "Password", "mp_hostpassword");
+            hostbutton = new Utils.Controls.Window.UIButton("Host Server", new Rect(25, 130, 150, 50), HostGameClicked, MpWindow, "mp_hostbutton");
+            connectremoteip = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MpWindow, "Remote IP", "mp_remoteip");
+            connectremoteport = new Utils.Controls.Window.UITextbox(new Rect(25, 90, 150, 30), MpWindow, "Remote Port", "mp_remoteport");
+            connectremotepassword = new Utils.Controls.Window.UITextbox(new Rect(25, 130, 150, 30), MpWindow, "Password", "mp_remotepassword");
+            connectbutton = new Utils.Controls.Window.UIButton("Connect", new Rect(25, 170, 150, 50), ConnectGameClicked, MpWindow, "mp_remotebutton");
+            serverlistplaceholder = new Utils.Controls.Window.UILabel("Coming soon!", new Rect(25, 50, 150, 25), MpWindow, "mp_serverlistplaceholder",true);
+            
             //Create the controls inside the tabs
             hostport = new Utils.Controls.Window.UITextbox(new Rect(25, 50, 150, 30), MpWindow, "Port", "mp_hostport")
             {

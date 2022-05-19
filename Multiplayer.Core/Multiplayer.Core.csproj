@@ -70,7 +70,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY &quot;$(TargetDir)\Multiplayer.Core.dll&quot; &quot;$(softwareincfolder)\DLLMods\Multiplayer\&quot; /S /Y &#xD;&#xA;XCOPY &quot;$(TargetDir)\Multiplayer.Core.pdb&quot; &quot;$(softwareincfolder)\DLLMods\Multiplayer\&quot; /S /Y&#xD;&#xA;@echo Multiplayer.Core.dll&gt; toexclude.txt&#xD;&#xA;@echo Multiplayer.Core.pdb&gt; toexclude.txt&#xD;&#xA;@echo AdditionalOutputArtifacts&gt; toexclude.txt&#xD;&#xA;XCOPY /S /Y /exclude:toexclude.txt &quot;$(TargetDir)\&quot; &quot;$(softwareincfolder)\Software Inc_Data\Managed\&quot;&#xD;&#xA;XCOPY /S /Y &quot;$(TargetDir)\AdditionalOutputArtifacts\&quot; &quot;$(softwareincfolder)\Software Inc_Data\Managed\&quot;&#xD;&#xA;del toexclude.txt" />
+    <Exec Command="XCOPY &quot;$(TargetDir)\Multiplayer.Core.dll&quot; &quot;$(softwareincfolder)\DLLMods\Multiplayer\&quot; /S /Y &#xA;XCOPY &quot;$(TargetDir)\Multiplayer.Core.pdb&quot; &quot;$(softwareincfolder)\DLLMods\Multiplayer\&quot; /S /Y&#xA;(@echo Multiplayer.Core.dll &amp; @echo Multiplayer.Core.pdb &amp; @echo AdditionalOutputArtifacts) &gt; toexclude.txt&#xA;XCOPY /S /Y /exclude:toexclude.txt &quot;$(TargetDir)\&quot; &quot;$(softwareincfolder)\Software Inc_Data\Managed\&quot;&#xA;XCOPY /S /Y &quot;$(TargetDir)\AdditionalOutputArtifacts\&quot; &quot;$(softwareincfolder)\Software Inc_Data\Managed\&quot;&#xA;del toexclude.txt" />
   </Target>
 
 </Project>
