@@ -19,9 +19,13 @@
 
 ## Installation
 
+<!-- 
+
 <a href="https://github.com/cal3432/software-inc-multiplayer/releases/tag/2.0.0-launcher"> Download the latest manager here.</a>
 
 The manager is a desktop app you can use to install different versions of the mod, at a fast speed with no hassle. If you are having trouble using the installer, keep reading.
+
+-->
 
 ###### Manual Installation (Windows/Contributors/Developers only)
 
