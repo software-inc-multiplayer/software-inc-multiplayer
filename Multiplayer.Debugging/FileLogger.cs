@@ -40,7 +40,6 @@ namespace Multiplayer.Debugging
             this.logFileName = logFileName;
             this.sourceFilePath = sourceFilePath;
             _logLocksByFileName.AddOrUpdate(logFileName, new object(), (s, o) => new object());
-
         }
 
         public void Log(LogType logType, object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0)
@@ -50,7 +49,7 @@ namespace Multiplayer.Debugging
 
             sb.Append(obj + Environment.NewLine);
             if (ex != null) sb.AppendLine(ex.ToString());
-            LogInternal(logType, sb.ToString());
+            LogInternal(sb.ToString());
         }
 
         public void Debug(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0) => Log(LogType.Debug, obj, ex, memberName, sourceLineNumber);
@@ -61,7 +60,7 @@ namespace Multiplayer.Debugging
 
         public void Error(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0) => Log(LogType.Error, obj, ex, memberName, sourceLineNumber);
 
-        private void LogInternal(LogType logType, string message)
+        private void LogInternal(string message)
         {
             lock (_logLocksByFileName[logFileName])
             {

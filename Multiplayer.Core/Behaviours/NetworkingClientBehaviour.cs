@@ -26,7 +26,7 @@ namespace Multiplayer.Core
 
         public override void OnActivate()
         {
-            this.log = Meta.Logger;
+            this.log = new UnityLogger();
             this.log.Debug("client behavior booting");
 
             //if (!SteamManager.Initialized)

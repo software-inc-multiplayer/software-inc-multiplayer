@@ -33,8 +33,6 @@ namespace Multiplayer.Networking.Client
             this.Send(handshake);
         }
 
-
-
         public void Disconnect()
         {
             //TODO improve disconnection, this is pretty rude

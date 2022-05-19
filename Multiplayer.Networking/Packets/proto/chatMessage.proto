@@ -1,0 +1,9 @@
+syntax = "proto3";
+package Multiplayer.Packets;
+
+message ChatMessage {
+
+	string UserName = 1;
+	string Contents = 2;
+
+}

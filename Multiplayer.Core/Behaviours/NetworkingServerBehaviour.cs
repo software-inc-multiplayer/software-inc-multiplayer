@@ -26,7 +26,7 @@ namespace Multiplayer.Core
 
         public override void OnActivate()
         {
-            this.logger = Meta.Logger;
+            this.logger = new UnityLogger();
             this.logger.Debug("server behaviour booting");
 
             this.UserManager = new UserManager();
@@ -89,6 +89,7 @@ namespace Multiplayer.Core
         public void Dispose()
         {
             Server?.Dispose();
+            Server = null;
         }
     }
 }

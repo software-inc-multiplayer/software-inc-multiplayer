@@ -10,8 +10,9 @@ namespace Multiplayer.Core.Behaviours
     [DisallowMultipleComponent]
     public class SteamHelperBehaviour : ModBehaviour, IDisposable
     {
-        private ILogger logger;
+        private ILogger Logger;
         public static bool Initialized { get; private set; } = false;
+        
         private const int Appid = 362620;
 
         public void OnDisable()
@@ -22,33 +23,31 @@ namespace Multiplayer.Core.Behaviours
 
         public void OnEnable()
         {
+            Logger = new UnityLogger();
             OnActivate();
         }
-
-
 
         public override void OnActivate()
         {
             if (Initialized)
                 return;
-
-            this.logger = Meta.Logger;
-            this.logger.Info("[STEAM] booting");
+            
+            this.Logger.Info("[STEAM] booting");
             try
             {
                 SteamClient.Init(Appid);
                 Initialized = true;
 
-                this.logger.Info("[STEAM] booted");
+                this.Logger.Info("[STEAM] booted");
 
-                this.logger.Debug($"[STEAM] Name: {SteamClient.Name}");
-                this.logger.Debug($"[STEAM] AccountId: {SteamClient.SteamId.AccountId}");
-                this.logger.Debug($"[STEAM] IsValid: {SteamClient.IsValid}");
-                this.logger.Debug($"[STEAM] IsLoggedOn: {SteamClient.IsLoggedOn}");
+                this.Logger.Debug($"[STEAM] Name: {SteamClient.Name}");
+                this.Logger.Debug($"[STEAM] AccountId: {SteamClient.SteamId.AccountId}");
+                this.Logger.Debug($"[STEAM] IsValid: {SteamClient.IsValid}");
+                this.Logger.Debug($"[STEAM] IsLoggedOn: {SteamClient.IsLoggedOn}");
             }
             catch (Exception ex)
             {
-                this.logger.Error("[STEAM] boot failed", ex);
+                this.Logger.Error("[STEAM] boot failed", ex);
             }
         }
 
@@ -57,17 +56,17 @@ namespace Multiplayer.Core.Behaviours
             if (!Initialized)
                 return;
 
-            this.logger.Info("[STEAM] shutdown");
+            this.Logger.Info("[STEAM] shutdown");
             try
             {
                 SteamClient.Shutdown();
                 Initialized = false;
 
-                this.logger.Info("[STEAM] closed");
+                this.Logger.Info("[STEAM] closed");
             }
             catch (Exception ex)
             {
-                this.logger.Error("[STEAM] shutdown failed", ex);
+                this.Logger.Error("[STEAM] shutdown failed", ex);
             }
         }
 
