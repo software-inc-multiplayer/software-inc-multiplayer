@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,11 +12,11 @@ namespace Multiplayer.Shared
     /// </summary>
     public interface ILogger
     {
-        void Log(LogType logType, params object[] objs);
-        void Debug(params object[] objs);
-        void Info(params object[] objs);
-        void Warn(params object[] objs);
-        void Error(params object[] objs);
+        void Log(LogType logType, object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0);
+        void Debug(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0);
+        void Info(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0);
+        void Warn(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0);
+        void Error(object obj, Exception ex = null, [CallerMemberName] string memberName = "", [CallerLineNumber] int sourceLineNumber = 0);
     }
 
     public enum LogType

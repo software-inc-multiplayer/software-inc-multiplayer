@@ -1,4 +1,5 @@
 ﻿using System;
+using Multiplayer.Networking.Shared;
 using Packets;
 
 namespace Multiplayer.Networking
@@ -6,8 +7,8 @@ namespace Multiplayer.Networking
 
     public class ClientConnectedEventArgs : EventArgs
     {
-        public int ConnectionId { get; }
-        public ClientConnectedEventArgs(int connectionId)
+        public uint ConnectionId { get; }
+        public ClientConnectedEventArgs(uint connectionId)
         {
             this.ConnectionId = connectionId;
         }
@@ -15,10 +16,28 @@ namespace Multiplayer.Networking
 
     public class ClientDisconnectedEventArgs : EventArgs
     {
-        public int ConnectionId { get; }
-        public ClientDisconnectedEventArgs(int connectionId)
+        public uint ConnectionId { get; }
+        public ClientDisconnectedEventArgs(uint connectionId)
         {
             this.ConnectionId = connectionId;
+        }
+    }
+
+    public class UserConnectedEventArgs : EventArgs
+    {
+        public GameUser User { get; }
+        public UserConnectedEventArgs(GameUser user)
+        {
+            this.User = user;
+        }
+    }
+
+    public class UserDisconnectedEventArgs : EventArgs
+    {
+        public GameUser User { get; }
+        public UserDisconnectedEventArgs(GameUser user)
+        {
+            this.User = user;
         }
     }
 

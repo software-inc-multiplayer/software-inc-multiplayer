@@ -11,9 +11,9 @@ namespace Multiplayer.Networking.Client
 
         public abstract void HandlePacket(GameUser sender, IPacket packet);
 
-        protected readonly GameClient client;
+        protected readonly GameClient_old client;
 
-        public ClientPacketHandler(GameClient client)
+        public ClientPacketHandler(GameClient_old client)
         {
             this.client = client;
         }

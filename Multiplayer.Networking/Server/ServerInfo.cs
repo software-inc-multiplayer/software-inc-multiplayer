@@ -7,8 +7,8 @@ namespace Multiplayer.Networking
         public string Name { get; set; }
         public string Description { get; set; }
         public string Password { get; set; }
-        public bool HasPassword { get => string.IsNullOrEmpty(this.Password); }
+        public bool HasPassword => string.IsNullOrEmpty(this.Password);
         public UserRole DefaultRole { get; set; }
-        public int Port { get; set; }
+        public ushort Port { get; set; }
     }
 }

@@ -76,6 +76,7 @@ namespace Multiplayer.Networking.Utility
             return serializedPacket;
 #else
             formatter.Serialize(packetStream, packet);
+            //TODO this is evil! dont do it this way! use an array pool or something like that <.<
             var bytes = packetStream.ToArray();
             packetStream.SetLength(0);
 

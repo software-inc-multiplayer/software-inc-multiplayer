@@ -5,31 +5,38 @@ using Multiplayer.Debugging;
 using Multiplayer.Networking.Client;
 using Multiplayer.Networking.Shared;
 using Multiplayer.Networking.Utility;
+using Multiplayer.Networking.Client.Handlers;
+using System;
 
 namespace Multiplayer.Core
 {
 
     [DisallowMultipleComponent]
-    public class NetworkingClientBehaviour : ModBehaviour
-    {
-        private Shared.ILogger logger;
-        private GameClient client;
+    public class NetworkingClientBehaviour : ModBehaviour, IDisposable
 
+    {
+        private Shared.ILogger log;
+
+        //public GameClient_old Client { get; private set; }
+        public GameClient Client { get; private set; }
+        public ChatHandler ChatHandler { get; private set; }
         public IUserManager UserManager { get; private set; }
+        public bool IsConnected => Client.Socket.Connected;
+
 
         public override void OnActivate()
         {
-            this.logger = new UnityLogger();
-            this.logger.Debug("booting client behavior");
+            this.log = Meta.Logger;
+            this.log.Debug("client behavior booting");
 
-            if (!SteamManager.Initialized)
-                return;
+            //if (!SteamManager.Initialized)
+            //    return;
 
-            var currentUserId = Steamworks.SteamUser.GetSteamID().m_SteamID;
-            var currentUserName = Steamworks.SteamFriends.GetPersonaName();
-            this.logger.Debug("Got steam info", currentUserId, currentUserName);
+            //var currentUserId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+            //var currentUserName = Steamworks.SteamFriends.GetPersonaName();
+            //this.log.Debug("got steam info", currentUserId, currentUserName);
 
-            var currentUser = new GameUser()
+            /*var currentUser = new GameUser()
             {
                 Id = currentUserId,
                 Name = currentUserName,
@@ -37,27 +44,82 @@ namespace Multiplayer.Core
             };
 
             this.UserManager = new UserManager();
-            
-            this.client = new GameClient(
-                this.logger,
+
+            this.Client = new GameClient_old(
+                this.log,
                 currentUser,
                 new PacketSerializer(),
                 this.UserManager
             );
 
-            this.logger.Debug("client booted");
+            this.RegisterPacketHandler();*/
+
+            this.Client = new GameClient(log);
+            this.log.Debug("client behaviour booted");
+        }
+
+        private void RegisterPacketHandler()
+        {
+            //this.ChatHandler = new ChatHandler(this.Client);
+            //this.Client.RegisterPacketHandler(this.ChatHandler);
         }
 
         public override void OnDeactivate()
         {
-            this.logger.Debug("destroying client");
+            this.log.Debug("destroying client behaviour");
+            Dispose();
         }
 
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity")]
         private void Update()
         {
+
             // this is the games update loop
-            this.client.HandleMessages();
+            //this.Client.HandleMessages();
         }
+
+        public void Connect(string host, int port)
+        {
+            this.log.Debug($"[client] connecting to {host}:{port}");
+            try
+            {
+
+                this.Client.Connect(host, (ushort)port);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error("[client] not connected", ex);
+            }
+
+            this.log.Debug("[client] connected");
+        }
+
+        public void Disconnect()
+        {
+            log.Debug("[client] disconnecting..");
+
+            try
+            {
+                Client.Disconnect();
+            }
+            catch (Exception e)
+            {
+                this.log.Error("[client] not connected", e);
+            }
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                Client?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+
     }
 }

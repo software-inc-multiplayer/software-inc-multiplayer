@@ -8,7 +8,7 @@ namespace Multiplayer.Networking.Client.Handlers
     {
         public override Type[] PacketsFilter => new Type[] { typeof(ChatMessage), typeof(PrivateChatMessage) };
 
-        public ChatHandler(GameClient client) : base(client) { }
+        public ChatHandler(GameClient_old client) : base(client) { }
 
         public override void HandlePacket(GameUser sender, IPacket packet)
         {

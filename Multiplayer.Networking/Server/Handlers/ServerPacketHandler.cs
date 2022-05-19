@@ -11,9 +11,9 @@ namespace Multiplayer.Networking.Server
 
         public abstract void HandlePacket(GameUser sender, IPacket packet);
 
-        protected readonly GameServer server;
+        protected readonly GameServer_old server;
 
-        public ServerPacketHandler(GameServer server)
+        public ServerPacketHandler(GameServer_old server)
         {
             this.server = server;
         }

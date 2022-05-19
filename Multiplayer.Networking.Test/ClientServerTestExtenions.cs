@@ -25,13 +25,13 @@ namespace Multiplayer.Networking.Test
         }
 
         [DebuggerStepThrough]
-        public static void SafeHandleMessages(this GameClient client)
+        public static void SafeHandleMessages(this GameClient_old client)
         {
             SafeTimeout(() => client.HandleMessages());
         }
 
         [DebuggerStepThrough]
-        public static void SafeHandleMessages(this GameServer server)
+        public static void SafeHandleMessages(this GameServer_old server)
         {
             SafeTimeout(() => server.HandleMessages());
         }
