@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Multiplayer.Debugging;
+using Multiplayer.Networking.Utility;
 using Multiplayer.Shared;
+using Packets;
 
 namespace Multiplayer.Networking.Client
 {
@@ -12,7 +16,7 @@ namespace Multiplayer.Networking.Client
 
         public GameClientSocket()
         {
-            log = new FileLogger();
+            log = new UnityLogger();
         }
 
         public override void OnConnected(ConnectionInfo info)
@@ -41,10 +45,15 @@ namespace Multiplayer.Networking.Client
 
         public override void OnMessage(IntPtr data, int size, long messageNum, long recvTime, int channel)
         {
-
-            //TODO deserialize message and enqueue it
-            //TODO catch exceptions and store them somewhere else, as this gets executed on another thread
-
+            using (var packetSerializer = new PacketSerializer())
+            {
+                byte[] buffer = new byte[size];
+                Marshal.Copy(data, buffer, 0, size);
+                IPacket packet = packetSerializer.DeserializePacket(buffer);
+                log.Debug(packet);
+                packetSerializer.Dispose();
+            }
+            
         }
 
         public void Dispose()

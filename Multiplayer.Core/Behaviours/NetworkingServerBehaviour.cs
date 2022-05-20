@@ -82,8 +82,8 @@ namespace Multiplayer.Core
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity")]
         private void Update()
         {
-            // this is the games update loop
-            //this.Server.HandleMessages();
+             // this is the games update loop
+            // this.Server.HandleMessages();
         }
 
         public void Dispose()
