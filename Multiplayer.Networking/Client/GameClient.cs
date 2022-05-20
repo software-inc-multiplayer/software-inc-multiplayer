@@ -8,14 +8,15 @@ using Multiplayer.Packets;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using System.Buffers;
 
 namespace Multiplayer.Networking.Client
 {
     public class GameClient : IDisposable
     {
         public GameClientSocket Socket { get; private set; }
-
-        private MemoryStream serializationStream = new MemoryStream();
+        private readonly ArrayPool<byte> bufferPool = ArrayPool<byte>.Create();
 
         public GameClient()
         {
@@ -34,24 +35,22 @@ namespace Multiplayer.Networking.Client
 
         public unsafe void Send<T>(T message) where T : IMessage<T>
         {
-            //maybe we should avoid this lock
-            lock (serializationStream)
+            var anyMessage = Any.Pack(message);
+            var messageSize = anyMessage.CalculateSize();
+
+            var buffer = bufferPool.Rent(messageSize);
+
+            anyMessage.WriteTo(buffer);
+            fixed (byte *p = buffer)
             {
-                message.WriteTo(serializationStream);
-                var buffer = serializationStream.GetBuffer();
-                var messageSize = message.CalculateSize();
-                fixed (byte *p = buffer)
-                {
-                    this.Socket.Connection.SendMessage((IntPtr)p, messageSize);
-                }
-                serializationStream.Position = 0;
+                this.Socket.Connection.SendMessage((IntPtr)p, messageSize);
             }
+
+            bufferPool.Return(buffer);
         }
 
         public void Dispose()
         {
-            this.serializationStream?.Dispose();
-            this.serializationStream = null;
         }
     }
 }
