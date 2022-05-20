@@ -24,12 +24,13 @@ namespace Multiplayer.Packets {
     static HandshakeReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg9oYW5kc2hha2UucHJvdG8SE011bHRpcGxheWVyLlBhY2tldHMiHQoJSGFu",
-            "ZHNoYWtlEhAKCFVzZXJOYW1lGAEgASgJYgZwcm90bzM="));
+            "Cg9oYW5kc2hha2UucHJvdG8SE011bHRpcGxheWVyLlBhY2tldHMiSwoJSGFu",
+            "ZHNoYWtlEhAKCHVzZXJuYW1lGAEgASgJEg4KBnNlcnZlchgCIAEoCBIKCgJp",
+            "ZBgDIAEoBBIQCghwYXNzd29yZBgEIAEoCWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.Handshake), global::Multiplayer.Packets.Handshake.Parser, new[]{ "UserName" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.Handshake), global::Multiplayer.Packets.Handshake.Parser, new[]{ "Username", "Server", "Id", "Password" }, null, null, null, null)
           }));
     }
     #endregion
@@ -70,7 +71,10 @@ namespace Multiplayer.Packets {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Handshake(Handshake other) : this() {
-      userName_ = other.userName_;
+      username_ = other.username_;
+      server_ = other.server_;
+      id_ = other.id_;
+      password_ = other.password_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -80,15 +84,51 @@ namespace Multiplayer.Packets {
       return new Handshake(this);
     }
 
-    /// <summary>Field number for the "UserName" field.</summary>
-    public const int UserNameFieldNumber = 1;
-    private string userName_ = "";
+    /// <summary>Field number for the "username" field.</summary>
+    public const int UsernameFieldNumber = 1;
+    private string username_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string UserName {
-      get { return userName_; }
+    public string Username {
+      get { return username_; }
       set {
-        userName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        username_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "server" field.</summary>
+    public const int ServerFieldNumber = 2;
+    private bool server_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Server {
+      get { return server_; }
+      set {
+        server_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 3;
+    private ulong id_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong Id {
+      get { return id_; }
+      set {
+        id_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "password" field.</summary>
+    public const int PasswordFieldNumber = 4;
+    private string password_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Password {
+      get { return password_; }
+      set {
+        password_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -107,7 +147,10 @@ namespace Multiplayer.Packets {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (UserName != other.UserName) return false;
+      if (Username != other.Username) return false;
+      if (Server != other.Server) return false;
+      if (Id != other.Id) return false;
+      if (Password != other.Password) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -115,7 +158,10 @@ namespace Multiplayer.Packets {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (UserName.Length != 0) hash ^= UserName.GetHashCode();
+      if (Username.Length != 0) hash ^= Username.GetHashCode();
+      if (Server != false) hash ^= Server.GetHashCode();
+      if (Id != 0UL) hash ^= Id.GetHashCode();
+      if (Password.Length != 0) hash ^= Password.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -134,9 +180,21 @@ namespace Multiplayer.Packets {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (UserName.Length != 0) {
+      if (Username.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(UserName);
+        output.WriteString(Username);
+      }
+      if (Server != false) {
+        output.WriteRawTag(16);
+        output.WriteBool(Server);
+      }
+      if (Id != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(Id);
+      }
+      if (Password.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Password);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -148,9 +206,21 @@ namespace Multiplayer.Packets {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (UserName.Length != 0) {
+      if (Username.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(UserName);
+        output.WriteString(Username);
+      }
+      if (Server != false) {
+        output.WriteRawTag(16);
+        output.WriteBool(Server);
+      }
+      if (Id != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(Id);
+      }
+      if (Password.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Password);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -162,8 +232,17 @@ namespace Multiplayer.Packets {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (UserName.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(UserName);
+      if (Username.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Username);
+      }
+      if (Server != false) {
+        size += 1 + 1;
+      }
+      if (Id != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Id);
+      }
+      if (Password.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Password);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -177,8 +256,17 @@ namespace Multiplayer.Packets {
       if (other == null) {
         return;
       }
-      if (other.UserName.Length != 0) {
-        UserName = other.UserName;
+      if (other.Username.Length != 0) {
+        Username = other.Username;
+      }
+      if (other.Server != false) {
+        Server = other.Server;
+      }
+      if (other.Id != 0UL) {
+        Id = other.Id;
+      }
+      if (other.Password.Length != 0) {
+        Password = other.Password;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -196,7 +284,19 @@ namespace Multiplayer.Packets {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            UserName = input.ReadString();
+            Username = input.ReadString();
+            break;
+          }
+          case 16: {
+            Server = input.ReadBool();
+            break;
+          }
+          case 24: {
+            Id = input.ReadUInt64();
+            break;
+          }
+          case 34: {
+            Password = input.ReadString();
             break;
           }
         }
@@ -215,7 +315,19 @@ namespace Multiplayer.Packets {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            UserName = input.ReadString();
+            Username = input.ReadString();
+            break;
+          }
+          case 16: {
+            Server = input.ReadBool();
+            break;
+          }
+          case 24: {
+            Id = input.ReadUInt64();
+            break;
+          }
+          case 34: {
+            Password = input.ReadString();
             break;
           }
         }

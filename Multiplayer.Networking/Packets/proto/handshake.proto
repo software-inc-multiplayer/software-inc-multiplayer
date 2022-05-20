@@ -3,6 +3,8 @@ package Multiplayer.Packets;
 
 message Handshake {
 
-	string UserName = 1;
-
+	string username = 1;
+	bool server = 2;
+	uint64 id = 3;
+	string password = 4;
 }

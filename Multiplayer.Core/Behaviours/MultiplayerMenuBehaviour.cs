@@ -230,7 +230,7 @@ namespace Multiplayer.Core.Behaviours
                             diag.Show("AlreadyServer".LocDef("You already have a server started, would you like to stop it?"), !true, DialogWindow.DialogType.Warning, actions);
                             return;
                         }
-                        Meta.NetworkingServer.Host("", "", ushort.Parse(PortTextBox.obj.text));
+                        Meta.NetworkingServer.Host("Test", "Test Server", ushort.Parse(PortTextBox.obj.text));
                         dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
                     }
                     connectWindow.gameObject.SetActive(false);

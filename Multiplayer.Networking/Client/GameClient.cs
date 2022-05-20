@@ -22,13 +22,15 @@ namespace Multiplayer.Networking.Client
             this.log = log;
         }
 
-        public void Connect(string ip, ushort port)
+        public void Connect(string ip, ushort port, string password = "")
         {
             this.Socket = SteamNetworkingSockets.ConnectNormal<GameClientSocket>(NetAddress.From(ip, port));
 
             var handshake = new Handshake
             {
-                UserName = SteamClient.Name
+                Username = SteamClient.Name,
+                Password = password,
+                Id = SteamClient.SteamId.Value
             };
             this.Send(handshake);
         }
