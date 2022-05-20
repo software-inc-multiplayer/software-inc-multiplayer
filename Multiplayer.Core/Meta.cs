@@ -20,7 +20,7 @@ namespace Multiplayer.Core
         public static NetworkingClientBehaviour NetworkingClient { get; private set; }
         public static NetworkingServerBehaviour NetworkingServer { get; private set; }
         public static SteamHelperBehaviour SteamHelper { get; private set; }
-        public static MultiplayerMenuBehaviour MpWindow { get; set; }
+        // public static MultiplayerMenuBehaviour MpWindow { get; set; }
 
         public override string Name => "Software Inc Multiplayer";
         public override void ConstructOptionsScreen(RectTransform parent, bool inGame)

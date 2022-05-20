@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !REWRITE_UI
+using System;
 using System.Collections.Generic;
 using Facepunch.Steamworks;
 using Multiplayer.Extensions;
@@ -65,8 +66,8 @@ namespace Multiplayer.Core.Behaviours
                 MpWindow.gameObject.SetActive(false);
 
                 /**
-                 * Box 200, 200, 750, 200 "Multiplayer - Connect"
-                 * Button 230, 275, 159, 25 "Go Back"
+                  Box 200, 200, 750, 200 "Multiplayer - Connect"
+                  Button 230, 275, 159, 25 "Go Back"
                   Label 230, 230, 700, 45 "Connect to a multiplayer server via IP and Port, specify a password if the server has a password set."
                   Input 230, 310, 159, 25 "IP Address"
                   Input 399, 310, 159, 25 "Port"
@@ -274,3 +275,4 @@ namespace Multiplayer.Core.Behaviours
         }
     }
 }
+#endif

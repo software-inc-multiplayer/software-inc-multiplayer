@@ -7,6 +7,11 @@ namespace Multiplayer.Extensions
 {
     public static class UI
     {
+        public static void FlipActive(this GameObject gameObject)
+        {
+            gameObject.SetActive(!gameObject.activeInHierarchy);
+        }
+        
         public static void SetTitle(this GUIWindow Window, string title)
         {
             Window.InitialTitle = Window.TitleText.text = Window.NonLocTitle = title;
