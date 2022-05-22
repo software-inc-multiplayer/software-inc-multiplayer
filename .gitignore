@@ -357,3 +357,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /swinc.multiplayer/Assets/mainMenuButton.png
+.vscode/launch.json
+.vscode/tasks.json
