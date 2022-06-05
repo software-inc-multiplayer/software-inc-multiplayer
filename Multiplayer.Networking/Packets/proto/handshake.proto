@@ -2,7 +2,6 @@ syntax = "proto3";
 package Multiplayer.Packets;
 
 message Handshake {
-
 	string username = 1;
 	bool server = 2;
 	uint64 id = 3;
