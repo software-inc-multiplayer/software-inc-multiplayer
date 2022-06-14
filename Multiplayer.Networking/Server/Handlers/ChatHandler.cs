@@ -5,6 +5,7 @@ using Multiplayer.Packets;
 
 namespace Multiplayer.Networking.Server.Handlers
 {
+    [RegisterManager(RegisterType.SERVER)]
     public class ChatHandler : ServerPacketHandler<ChatMessage>
     {
         public override Type[] PacketsFilter => new Type[] { typeof(ChatMessage) };

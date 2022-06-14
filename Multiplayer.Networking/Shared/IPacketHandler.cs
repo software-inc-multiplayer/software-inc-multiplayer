@@ -4,10 +4,10 @@ using Multiplayer.Packets;
 
 namespace Multiplayer.Networking.Shared
 {
-    public interface IPacketHandler<T>
+    public interface IPacketHandler
     {
         int Priority { get; }
         Type[] PacketsFilter { get; }
-        void HandlePacket(GameUser sender, T packet);
+        void HandlePacket(GameUser sender, GamePacket packet);
     }
 }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Multiplayer.Packets;
 
+// TODO: Rewrite
+
 namespace Multiplayer.Networking.Shared
 {
     public enum UserRole

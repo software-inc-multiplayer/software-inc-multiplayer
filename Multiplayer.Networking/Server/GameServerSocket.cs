@@ -10,6 +10,7 @@ using Multiplayer.Networking.Utility;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
 using System.Buffers;
+using System.Collections.Generic;
 using AuthResponse = Multiplayer.Packets.AuthResponse;
 
 namespace Multiplayer.Networking.Server
@@ -22,8 +23,12 @@ namespace Multiplayer.Networking.Server
         private ILogger log;
 
         private readonly ArrayPool<byte> bufferPool = ArrayPool<byte>.Create();
+
+        private readonly Dictionary<GamePacket.PacketOneofCase, IPacketHandler> PacketHandlers = new Dictionary<GamePacket.PacketOneofCase, IPacketHandler>();
+
         public GameServerSocket()
         {
+            PacketHandlers.Add(RegisterManager.GetTypesWithAttribute().);
             this.log = new FileLogger();
         }
 
@@ -69,56 +74,70 @@ namespace Multiplayer.Networking.Server
             Marshal.Copy(data, buffer, 0, size);
 
             var gamePacket = GamePacket.Parser.ParseFrom(buffer, 0, size);
-            switch (gamePacket.PacketCase)
+
+            var types = Enum.GetValues(typeof(GamePacket.PacketOneofCase));
+            
+            foreach (GamePacket.PacketOneofCase type in types)
             {
-                case GamePacket.PacketOneofCase.None: // error
-                    break;
-                case GamePacket.PacketOneofCase.Handshake:
-                    var handshakePacket = gamePacket.Handshake;
-                    if (Parent.ServerInfo.HasPassword)
-                    {
-                        if (Parent.ServerInfo.Password != handshakePacket.Password)
-                        {
-                            // Invalid Password
-                            Send(new AuthResponse()
-                            {
-                                Type = ResponseType.Bad
-                            }, connection);
-                            return;
-                        }
-
-                        // Password correct.
-                        GameUser user = new GameUser()
-                        {
-                            Name = handshakePacket.Username,
-                            Role = UserRole.Guest,
-                            Id = handshakePacket.Id
-                        };
-
-                        Parent.UserManager.GetOrAddUser(user);
-
-                        BanInformation? banned = Parent.UserManager.CheckBanned(user);
-
-                        if (banned != null)
-                        {
-                            Send(new AuthResponse()
-                            {
-                                Type = ResponseType.Banned,
-                                BanInfo = banned
-                            }, connection);
-                            return;
-                        }
-
-                        Send(new Handshake()
-                        {
-                            Server = true
-                        }, connection);
-                    }
-
-                    break;
-                case GamePacket.PacketOneofCase.ChatMessage:
-                    break;
+                if (PacketHandlers.TryGetValue(type, out IPacketHandler handler))
+                {
+                    // using connection.Id probably wont work for now, we need a way to assign GameUsers connection IDs
+                    handler.HandlePacket(Parent.UserManager.GetUser(connection.Id), gamePacket);
+                }
             }
+            
+            // TODO: Move this switch into packet handlers.
+            
+            // switch (gamePacket.PacketCase)
+            // {
+            //     case GamePacket.PacketOneofCase.None: // error
+            //         break;
+            //     case GamePacket.PacketOneofCase.Handshake:
+            //         var handshakePacket = gamePacket.Handshake;
+            //         if (Parent.ServerInfo.HasPassword)
+            //         {
+            //             if (Parent.ServerInfo.Password != handshakePacket.Password)
+            //             {
+            //                 // Invalid Password
+            //                 Send(new AuthResponse()
+            //                 {
+            //                     Type = ResponseType.Bad
+            //                 }, connection);
+            //                 return;
+            //             }
+            //
+            //             // Password correct.
+            //             GameUser user = new GameUser()
+            //             {
+            //                 Name = handshakePacket.Username,
+            //                 Role = UserRole.Guest,
+            //                 Id = handshakePacket.Id
+            //             };
+            //
+            //             Parent.UserManager.GetOrAddUser(user);
+            //
+            //             BanInformation? banned = Parent.UserManager.CheckBanned(user);
+            //
+            //             if (banned != null)
+            //             {
+            //                 Send(new AuthResponse()
+            //                 {
+            //                     Type = ResponseType.Banned,
+            //                     BanInfo = banned
+            //                 }, connection);
+            //                 return;
+            //             }
+            //
+            //             Send(new Handshake()
+            //             {
+            //                 Server = true
+            //             }, connection);
+            //         }
+            //
+            //         break;
+            //     case GamePacket.PacketOneofCase.ChatMessage:
+            //         break;
+            // }
         }
 
         public unsafe void Send<T>(T message, Connection connection) where T : IMessage<T>
