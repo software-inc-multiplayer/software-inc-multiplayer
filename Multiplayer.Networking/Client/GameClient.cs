@@ -3,6 +3,7 @@ using System.IO;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Google.Protobuf;
+using Multiplayer.Networking.Shared;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
 
@@ -10,12 +11,14 @@ namespace Multiplayer.Networking.Client
 {
     public class GameClient : IDisposable
     {
+        private readonly GameUser? virtualUser;
         public GameClientSocket Socket { get; private set; }
         private ILogger log { get; set; }
 
-        public GameClient(ILogger log)
+        public GameClient(ILogger log, GameUser? virtualUser)
         {
             this.log = log;
+            this.virtualUser = virtualUser;
         }
 
         public void Connect(string ip, ushort port, string password = "")
@@ -24,6 +27,17 @@ namespace Multiplayer.Networking.Client
 
             this.Socket.Parent = this;
 
+            if (virtualUser != null)
+            {
+                Send(new Handshake
+                {
+                    Username = virtualUser.Name,
+                    Password = password,
+                    Id = virtualUser.Id
+                });
+                return;
+            }
+            
             var handshake = new Handshake
             {
                 Username = SteamClient.Name,
@@ -35,7 +49,6 @@ namespace Multiplayer.Networking.Client
 
         public void Disconnect()
         {
-            //TODO improve disconnection, this is pretty rude
             Socket.Connection.Close();
         }
 

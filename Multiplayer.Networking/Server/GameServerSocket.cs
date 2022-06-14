@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Google.Protobuf;
-using Multiplayer.Debugging;
 using Multiplayer.Networking.Shared;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
@@ -19,7 +18,7 @@ namespace Multiplayer.Networking.Server
 
         public GameServer Parent { get; set; }
 
-        private ILogger log;
+        public ILogger Logger;
 
         private readonly ArrayPool<byte> bufferPool = ArrayPool<byte>.Create();
 
@@ -27,7 +26,6 @@ namespace Multiplayer.Networking.Server
 
         public GameServerSocket()
         {
-            this.log = new FileLogger();
             packetHandlers = RegisterManager.FetchInstancesWithAttribute(RegisterType.SERVER, this);
         }
 
@@ -39,33 +37,33 @@ namespace Multiplayer.Networking.Server
 
         public override void OnConnected(Connection connection, ConnectionInfo info)
         {
-            log.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
-            log.Debug($"Connected!");
+            Logger.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
+            Logger.Debug($"Connected!");
         }
 
         public override void OnConnecting(Connection connection, ConnectionInfo info)
         {
-            log.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
+            Logger.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
             var result = connection.Accept();
-            log.Debug($"Accepted");
+            Logger.Debug($"Accepted");
         }
 
         public override void OnDisconnected(Connection connection, ConnectionInfo info)
         {
-            log.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
+            Logger.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
             var result = connection.Close();
-            log.Debug($"Disconnected and Closed");
+            Logger.Debug($"Disconnected and Closed");
         }
 
         public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
         {
-            log.Debug($"Connection: {connection}, identity: {identity.Address}");
-            log.Debug($"On Message, size: {size}, messageNum: {messageNum}");
+            Logger.Debug($"Connection: {connection}, identity: {identity.Address}");
+            Logger.Debug($"On Message, size: {size}, messageNum: {messageNum}");
 
             // TODO this should have a reasonable size
             if (size > 10 * 1024 * 1024) // 10kb
             {
-                log.Warn("Discarding large packet");
+                Logger.Warn("Discarding large packet");
                 return;
             }
 
@@ -145,7 +143,7 @@ namespace Multiplayer.Networking.Server
         public unsafe void Send<T>(T message, Connection connection) where T : IMessage<T>
         {
             //TODO implement a sending queue and a background task/thread
-            log.Debug($"Sending message of type {typeof(T)}: {message}");
+            Logger.Debug($"Sending message of type {typeof(T)}: {message}");
             using (var serializationStream = new MemoryStream())
             {
                 message.WriteTo(serializationStream);
@@ -158,14 +156,14 @@ namespace Multiplayer.Networking.Server
                 serializationStream.Position = 0;
             }
 
-            log.Debug($"Message sent");
+            Logger.Debug($"Message sent");
 
         }
 
         public unsafe void SendAll<T>(T message) where T : IMessage<T>
         {
             //TODO implement a sending queue and a background task/thread
-            log.Debug($"Sending message of type {typeof(T)}: {message}");
+            Logger.Debug($"Sending message of type {typeof(T)}: {message}");
             using (var serializationStream = new MemoryStream())
             {
                 message.WriteTo(serializationStream);
@@ -181,7 +179,7 @@ namespace Multiplayer.Networking.Server
                 serializationStream.Position = 0;
             }
 
-            log.Debug($"Message sent");
+            Logger.Debug($"Message sent");
 
         }
 
@@ -197,7 +195,7 @@ namespace Multiplayer.Networking.Server
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Logger.Error(ex);
             }
         }
     }

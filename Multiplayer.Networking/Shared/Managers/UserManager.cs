@@ -27,6 +27,8 @@ namespace Multiplayer.Networking.Shared
         void RemoveUser(ulong userId);
         void RemoveUser(GameUser user);
 
+        int Count();
+
         void Clear();
     }
 
@@ -123,6 +125,11 @@ namespace Multiplayer.Networking.Shared
         public void RemoveUser(GameUser user)
         {
             this.RemoveUser(user.Id);
+        }
+
+        public int Count()
+        {
+            return userIdToUser.Count;
         }
 
         public void Clear()
