@@ -1,31 +1,28 @@
 ﻿using System;
+using System.Numerics;
 using Multiplayer.Networking.Shared;
-using Packets;
+using Multiplayer.Packets;
 
 namespace Multiplayer.Networking.Server.Handlers
 {
-    public class ChatHandler : ServerPacketHandler
+    public class ChatHandler : ServerPacketHandler<ChatMessage>
     {
-        public override Type[] PacketsFilter => new Type[] { typeof(ChatMessage), typeof(PrivateChatMessage) };
+        public override Type[] PacketsFilter => new Type[] { typeof(ChatMessage) };
 
-        public ChatHandler(GameServer_old server) : base(server) { }
+        public ChatHandler(GameServer server) : base(server) { }
 
-        public override void HandlePacket(GameUser sender, IPacket packet)
+        public override void HandlePacket(GameUser sender, ChatMessage packet)
         {
-            if (packet is ChatMessage chatMessage)
+            if (BigInteger.Compare(packet.Target, BigInteger.Zero) < 0)
             {
-                this.server.Broadcast(chatMessage);
+                // For everyone.
+                server.SocketManager.SendAll(packet);
             }
-            else if (packet is PrivateChatMessage privateChatMessage)
+            else
             {
-                var receiverUser = this.server.UserManager.GetUser(privateChatMessage.Receiver);
-                if (receiverUser == null)
-                {
-                    this.server.Send(sender, new PrivateChatMessage(0, sender.Id, "Invalid target player for pm"));
-                    return;
-                }
-
-                this.server.Send(receiverUser, privateChatMessage);
+                // For specific user.
+                //TODO: send to specific user
+                // server.SocketManager.Send();
             }
         }
     }

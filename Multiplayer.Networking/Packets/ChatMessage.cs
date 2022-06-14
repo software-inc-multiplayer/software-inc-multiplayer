@@ -24,13 +24,13 @@ namespace Multiplayer.Packets {
     static ChatMessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChFjaGF0TWVzc2FnZS5wcm90bxITTXVsdGlwbGF5ZXIuUGFja2V0cyIxCgtD",
+            "ChFjaGF0TWVzc2FnZS5wcm90bxITTXVsdGlwbGF5ZXIuUGFja2V0cyJBCgtD",
             "aGF0TWVzc2FnZRIQCghVc2VybmFtZRgBIAEoCRIQCghDb250ZW50cxgCIAEo",
-            "CWIGcHJvdG8z"));
+            "CRIOCgZUYXJnZXQYAyABKARiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.ChatMessage), global::Multiplayer.Packets.ChatMessage.Parser, new[]{ "Username", "Contents" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.ChatMessage), global::Multiplayer.Packets.ChatMessage.Parser, new[]{ "Username", "Contents", "Target" }, null, null, null, null)
           }));
     }
     #endregion
@@ -73,6 +73,7 @@ namespace Multiplayer.Packets {
     public ChatMessage(ChatMessage other) : this() {
       username_ = other.username_;
       contents_ = other.contents_;
+      target_ = other.target_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -106,6 +107,21 @@ namespace Multiplayer.Packets {
       }
     }
 
+    /// <summary>Field number for the "Target" field.</summary>
+    public const int TargetFieldNumber = 3;
+    private ulong target_;
+    /// <summary>
+    /// -1 if everyone, else use user ID
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong Target {
+      get { return target_; }
+      set {
+        target_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -123,6 +139,7 @@ namespace Multiplayer.Packets {
       }
       if (Username != other.Username) return false;
       if (Contents != other.Contents) return false;
+      if (Target != other.Target) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -132,6 +149,7 @@ namespace Multiplayer.Packets {
       int hash = 1;
       if (Username.Length != 0) hash ^= Username.GetHashCode();
       if (Contents.Length != 0) hash ^= Contents.GetHashCode();
+      if (Target != 0UL) hash ^= Target.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -158,6 +176,10 @@ namespace Multiplayer.Packets {
         output.WriteRawTag(18);
         output.WriteString(Contents);
       }
+      if (Target != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(Target);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -176,6 +198,10 @@ namespace Multiplayer.Packets {
         output.WriteRawTag(18);
         output.WriteString(Contents);
       }
+      if (Target != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(Target);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -191,6 +217,9 @@ namespace Multiplayer.Packets {
       }
       if (Contents.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Contents);
+      }
+      if (Target != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Target);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -209,6 +238,9 @@ namespace Multiplayer.Packets {
       }
       if (other.Contents.Length != 0) {
         Contents = other.Contents;
+      }
+      if (other.Target != 0UL) {
+        Target = other.Target;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -233,6 +265,10 @@ namespace Multiplayer.Packets {
             Contents = input.ReadString();
             break;
           }
+          case 24: {
+            Target = input.ReadUInt64();
+            break;
+          }
         }
       }
     #endif
@@ -254,6 +290,10 @@ namespace Multiplayer.Packets {
           }
           case 18: {
             Contents = input.ReadString();
+            break;
+          }
+          case 24: {
+            Target = input.ReadUInt64();
             break;
           }
         }

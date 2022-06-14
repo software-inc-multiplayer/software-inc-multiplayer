@@ -2,7 +2,8 @@ syntax = "proto3";
 package Multiplayer.Packets;
 
 message ChatMessage {
-
 	string Username = 1;
 	string Contents = 2;
+	// -1 if everyone, else use user ID
+	uint64 Target = 3;
 }

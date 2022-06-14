@@ -1,6 +1,5 @@
 ﻿using System;
 using Multiplayer.Networking.Shared;
-using Packets;
 
 namespace Multiplayer.Networking
 {
