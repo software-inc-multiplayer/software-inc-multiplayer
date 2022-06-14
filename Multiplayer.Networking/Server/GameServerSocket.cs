@@ -9,18 +9,18 @@ using Multiplayer.Networking.Shared;
 using Multiplayer.Networking.Utility;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
-using Multiplayer.Packets;
+using System.Buffers;
 
 namespace Multiplayer.Networking.Server
 {
     public class GameServerSocket : SocketManager, IDisposable
     {
-        
+
         public GameServer Parent { get; set; }
-        
+
         private ILogger log;
 
-
+        private readonly ArrayPool<byte> bufferPool = ArrayPool<byte>.Create();
         public GameServerSocket()
         {
             this.log = new FileLogger();
@@ -54,46 +54,61 @@ namespace Multiplayer.Networking.Server
 
         public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
         {
-            log.Debug($"Connection: {connection.ToString()}, identity: {identity.Address}");
+            log.Debug($"Connection: {connection}, identity: {identity.Address}");
             log.Debug($"On Message, size: {size}, messageNum: {messageNum}");
-            
-            byte[] managedArray = new byte[size];
-            Marshal.Copy(data, managedArray, 0, size);
 
-            Handshake handshakePacket = Handshake.Parser.ParseFrom(managedArray);
-            if(handshakePacket != null)
+            // TODO this should have a reasonable size
+            if (size > 10 * 1024 * 1024) // 10kb
             {
-                if (Parent.ServerInfo.HasPassword)
-                {
-                    if (Parent.ServerInfo.Password != handshakePacket.Password)
-                    {
-                        // Invalid Password
-                        Send(new BadPassword(), connection);
-                        return;
-                    }
-                    
-                    // Password correct.
-                    GameUser user = new GameUser()
-                    {
-                        Name = handshakePacket.Username,
-                        Role = UserRole.Guest,
-                        Id = handshakePacket.Id
-                    };
+                log.Warn("Discarding large packet");
+                return;
+            }
 
-                    Parent.UserManager.GetOrAddUser(user);
-                    
-                    Send(new Handshake()
+            var buffer = this.bufferPool.Rent(size);
+            Marshal.Copy(data, buffer, 0, size);
+
+            var gamePacket = GamePacket.Parser.ParseFrom(buffer, 0, size);
+            switch (gamePacket.PacketCase)
+            {
+                case GamePacket.PacketOneofCase.None: // error
+                    break;
+                case GamePacket.PacketOneofCase.Handshake:
+                    var handshakePacket = gamePacket.Handshake;
+                    if (Parent.ServerInfo.HasPassword)
                     {
-                        Server = true
-                    }, connection);
-                }
+                        if (Parent.ServerInfo.Password != handshakePacket.Password)
+                        {
+                            // Invalid Password
+                            Send(new BadPassword(), connection);
+                            return;
+                        }
+
+                        // Password correct.
+                        GameUser user = new GameUser()
+                        {
+                            Name = handshakePacket.Username,
+                            Role = UserRole.Guest,
+                            Id = handshakePacket.Id
+                        };
+
+                        Parent.UserManager.GetOrAddUser(user);
+
+                        Send(new Handshake()
+                        {
+                            Server = true
+                        }, connection);
+                    }
+
+                    break;
+                case GamePacket.PacketOneofCase.ChatMessage:
+                    break;
             }
         }
-        
+
         public unsafe void Send<T>(T message, Connection connection) where T : IMessage<T>
         {
-            //maybe we should avoid this lock
-            log.Debug($"Sending message of type {typeof(T)}: {message.ToString()}");
+            //TODO implement a sending queue and a background task/thread
+            log.Debug($"Sending message of type {typeof(T)}: {message}");
             using (var serializationStream = new MemoryStream())
             {
                 message.WriteTo(serializationStream);
@@ -109,11 +124,11 @@ namespace Multiplayer.Networking.Server
             log.Debug($"Message sent");
 
         }
-        
+
         public unsafe void SendAll<T>(T message) where T : IMessage<T>
         {
-            //maybe we should avoid this lock
-            log.Debug($"Sending message of type {typeof(T)}: {message.ToString()}");
+            //TODO implement a sending queue and a background task/thread
+            log.Debug($"Sending message of type {typeof(T)}: {message}");
             using (var serializationStream = new MemoryStream())
             {
                 message.WriteTo(serializationStream);

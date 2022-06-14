@@ -1,0 +1,18 @@
+﻿
+syntax = "proto3";
+package Multiplayer.Packets;
+
+import "chatMessage.proto";
+import "handshake.proto";
+
+message GamePacket {
+	
+	//variant 1) any packet = 1;
+	//variant 2)
+	uint64 reciever = 1;
+
+	oneof packet {
+		Handshake handshake = 2;
+		ChatMessage chatMessage = 3;
+	}
+}
