@@ -3,7 +3,7 @@
   <a href="https://github.com/cal3432/software-inc-multiplayer/issues"><img  src="https://img.shields.io/github/issues/cal3432/software-inc-multiplayer?style=for-the-badge" /></a>
   <a href="https://github.com/cal3432/software-inc-multiplayer/stargazers"><img  src="https://img.shields.io/github/stars/cal3432/software-inc-multiplayer?style=for-the-badge" /></a>
   <a href="https://github.com/cal3432/software-inc-multiplayer/releases"><img  src="https://img.shields.io/github/downloads/cal3432/software-inc-multiplayer/total?style=for-the-badge" /></a>
-  <a href="https://sincmultiplayer.net/discord"><img width="156" height="28" src="https://i.imgur.com/RokeTxs.png" /></a>
+  <a href="https://discord.gg/DKRcMabAKk"><img width="156" height="28" src="https://i.imgur.com/RokeTxs.png" /></a>
   <hr>
   <h3>Software Inc Multiplayer Mod</h3>
   <p>A multiplayer mod for the game "Software Inc"</p>
