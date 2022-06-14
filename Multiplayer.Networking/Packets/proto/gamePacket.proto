@@ -1,9 +1,10 @@
-﻿
-syntax = "proto3";
+﻿syntax = "proto3";
 package Multiplayer.Packets;
 
 import "chatMessage.proto";
 import "handshake.proto";
+import "authResponse.proto";
+import "moderation.proto";
 
 message GamePacket {
 	
@@ -14,5 +15,8 @@ message GamePacket {
 	oneof packet {
 		Handshake handshake = 2;
 		ChatMessage chatMessage = 3;
+		AuthResponse authResponse = 4;
+		BanInformation banInformation = 5;
+		KickInformation kickInformation = 6;
 	}
 }

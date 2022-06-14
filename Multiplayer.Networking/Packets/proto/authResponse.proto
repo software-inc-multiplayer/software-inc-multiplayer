@@ -1,0 +1,15 @@
+syntax = "proto3";
+package Multiplayer.Packets;
+
+import "moderation.proto";
+
+enum ResponseType {
+  GOOD = 0;
+  BAD = 1;
+  BANNED = 2;
+}
+
+message AuthResponse {
+   ResponseType Type = 1;
+   optional BanInformation BanInfo = 2;
+}

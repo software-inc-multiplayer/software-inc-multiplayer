@@ -25,12 +25,12 @@ namespace Multiplayer.Packets {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChFjaGF0TWVzc2FnZS5wcm90bxITTXVsdGlwbGF5ZXIuUGFja2V0cyIxCgtD",
-            "aGF0TWVzc2FnZRIQCghVc2VyTmFtZRgBIAEoCRIQCghDb250ZW50cxgCIAEo",
+            "aGF0TWVzc2FnZRIQCghVc2VybmFtZRgBIAEoCRIQCghDb250ZW50cxgCIAEo",
             "CWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.ChatMessage), global::Multiplayer.Packets.ChatMessage.Parser, new[]{ "UserName", "Contents" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.ChatMessage), global::Multiplayer.Packets.ChatMessage.Parser, new[]{ "Username", "Contents" }, null, null, null, null)
           }));
     }
     #endregion
@@ -45,19 +45,23 @@ namespace Multiplayer.Packets {
     private static readonly pb::MessageParser<ChatMessage> _parser = new pb::MessageParser<ChatMessage>(() => new ChatMessage());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<ChatMessage> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Multiplayer.Packets.ChatMessageReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ChatMessage() {
       OnConstruction();
     }
@@ -65,25 +69,28 @@ namespace Multiplayer.Packets {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ChatMessage(ChatMessage other) : this() {
-      userName_ = other.userName_;
+      username_ = other.username_;
       contents_ = other.contents_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ChatMessage Clone() {
       return new ChatMessage(this);
     }
 
-    /// <summary>Field number for the "UserName" field.</summary>
-    public const int UserNameFieldNumber = 1;
-    private string userName_ = "";
+    /// <summary>Field number for the "Username" field.</summary>
+    public const int UsernameFieldNumber = 1;
+    private string username_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string UserName {
-      get { return userName_; }
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Username {
+      get { return username_; }
       set {
-        userName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        username_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -91,6 +98,7 @@ namespace Multiplayer.Packets {
     public const int ContentsFieldNumber = 2;
     private string contents_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Contents {
       get { return contents_; }
       set {
@@ -99,11 +107,13 @@ namespace Multiplayer.Packets {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as ChatMessage);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(ChatMessage other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -111,15 +121,16 @@ namespace Multiplayer.Packets {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (UserName != other.UserName) return false;
+      if (Username != other.Username) return false;
       if (Contents != other.Contents) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (UserName.Length != 0) hash ^= UserName.GetHashCode();
+      if (Username.Length != 0) hash ^= Username.GetHashCode();
       if (Contents.Length != 0) hash ^= Contents.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -128,18 +139,20 @@ namespace Multiplayer.Packets {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (UserName.Length != 0) {
+      if (Username.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(UserName);
+        output.WriteString(Username);
       }
       if (Contents.Length != 0) {
         output.WriteRawTag(18);
@@ -153,10 +166,11 @@ namespace Multiplayer.Packets {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (UserName.Length != 0) {
+      if (Username.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(UserName);
+        output.WriteString(Username);
       }
       if (Contents.Length != 0) {
         output.WriteRawTag(18);
@@ -169,10 +183,11 @@ namespace Multiplayer.Packets {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (UserName.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(UserName);
+      if (Username.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Username);
       }
       if (Contents.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Contents);
@@ -184,12 +199,13 @@ namespace Multiplayer.Packets {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(ChatMessage other) {
       if (other == null) {
         return;
       }
-      if (other.UserName.Length != 0) {
-        UserName = other.UserName;
+      if (other.Username.Length != 0) {
+        Username = other.Username;
       }
       if (other.Contents.Length != 0) {
         Contents = other.Contents;
@@ -198,6 +214,7 @@ namespace Multiplayer.Packets {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -209,7 +226,7 @@ namespace Multiplayer.Packets {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            UserName = input.ReadString();
+            Username = input.ReadString();
             break;
           }
           case 18: {
@@ -223,6 +240,7 @@ namespace Multiplayer.Packets {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -231,7 +249,7 @@ namespace Multiplayer.Packets {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            UserName = input.ReadString();
+            Username = input.ReadString();
             break;
           }
           case 18: {

@@ -25,15 +25,20 @@ namespace Multiplayer.Packets {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChBnYW1lUGFja2V0LnByb3RvEhNNdWx0aXBsYXllci5QYWNrZXRzGhFjaGF0",
-            "TWVzc2FnZS5wcm90bxoPaGFuZHNoYWtlLnByb3RvIpYBCgpHYW1lUGFja2V0",
-            "EhAKCHJlY2lldmVyGAEgASgEEjMKCWhhbmRzaGFrZRgCIAEoCzIeLk11bHRp",
-            "cGxheWVyLlBhY2tldHMuSGFuZHNoYWtlSAASNwoLY2hhdE1lc3NhZ2UYAyAB",
-            "KAsyIC5NdWx0aXBsYXllci5QYWNrZXRzLkNoYXRNZXNzYWdlSABCCAoGcGFj",
+            "TWVzc2FnZS5wcm90bxoPaGFuZHNoYWtlLnByb3RvGhJhdXRoUmVzcG9uc2Uu",
+            "cHJvdG8aEG1vZGVyYXRpb24ucHJvdG8i0QIKCkdhbWVQYWNrZXQSEAoIcmVj",
+            "aWV2ZXIYASABKAQSMwoJaGFuZHNoYWtlGAIgASgLMh4uTXVsdGlwbGF5ZXIu",
+            "UGFja2V0cy5IYW5kc2hha2VIABI3CgtjaGF0TWVzc2FnZRgDIAEoCzIgLk11",
+            "bHRpcGxheWVyLlBhY2tldHMuQ2hhdE1lc3NhZ2VIABI5CgxhdXRoUmVzcG9u",
+            "c2UYBCABKAsyIS5NdWx0aXBsYXllci5QYWNrZXRzLkF1dGhSZXNwb25zZUgA",
+            "Ej0KDmJhbkluZm9ybWF0aW9uGAUgASgLMiMuTXVsdGlwbGF5ZXIuUGFja2V0",
+            "cy5CYW5JbmZvcm1hdGlvbkgAEj8KD2tpY2tJbmZvcm1hdGlvbhgGIAEoCzIk",
+            "Lk11bHRpcGxheWVyLlBhY2tldHMuS2lja0luZm9ybWF0aW9uSABCCAoGcGFj",
             "a2V0YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Multiplayer.Packets.ChatMessageReflection.Descriptor, global::Multiplayer.Packets.HandshakeReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Multiplayer.Packets.ChatMessageReflection.Descriptor, global::Multiplayer.Packets.HandshakeReflection.Descriptor, global::Multiplayer.Packets.AuthResponseReflection.Descriptor, global::Multiplayer.Packets.ModerationReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.GamePacket), global::Multiplayer.Packets.GamePacket.Parser, new[]{ "Reciever", "Handshake", "ChatMessage" }, new[]{ "Packet" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Multiplayer.Packets.GamePacket), global::Multiplayer.Packets.GamePacket.Parser, new[]{ "Reciever", "Handshake", "ChatMessage", "AuthResponse", "BanInformation", "KickInformation" }, new[]{ "Packet" }, null, null, null)
           }));
     }
     #endregion
@@ -48,19 +53,23 @@ namespace Multiplayer.Packets {
     private static readonly pb::MessageParser<GamePacket> _parser = new pb::MessageParser<GamePacket>(() => new GamePacket());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<GamePacket> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::Multiplayer.Packets.GamePacketReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GamePacket() {
       OnConstruction();
     }
@@ -68,6 +77,7 @@ namespace Multiplayer.Packets {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GamePacket(GamePacket other) : this() {
       reciever_ = other.reciever_;
       switch (other.PacketCase) {
@@ -77,12 +87,22 @@ namespace Multiplayer.Packets {
         case PacketOneofCase.ChatMessage:
           ChatMessage = other.ChatMessage.Clone();
           break;
+        case PacketOneofCase.AuthResponse:
+          AuthResponse = other.AuthResponse.Clone();
+          break;
+        case PacketOneofCase.BanInformation:
+          BanInformation = other.BanInformation.Clone();
+          break;
+        case PacketOneofCase.KickInformation:
+          KickInformation = other.KickInformation.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GamePacket Clone() {
       return new GamePacket(this);
     }
@@ -95,6 +115,7 @@ namespace Multiplayer.Packets {
     ///variant 2)
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public ulong Reciever {
       get { return reciever_; }
       set {
@@ -105,6 +126,7 @@ namespace Multiplayer.Packets {
     /// <summary>Field number for the "handshake" field.</summary>
     public const int HandshakeFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Multiplayer.Packets.Handshake Handshake {
       get { return packetCase_ == PacketOneofCase.Handshake ? (global::Multiplayer.Packets.Handshake) packet_ : null; }
       set {
@@ -116,11 +138,48 @@ namespace Multiplayer.Packets {
     /// <summary>Field number for the "chatMessage" field.</summary>
     public const int ChatMessageFieldNumber = 3;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public global::Multiplayer.Packets.ChatMessage ChatMessage {
       get { return packetCase_ == PacketOneofCase.ChatMessage ? (global::Multiplayer.Packets.ChatMessage) packet_ : null; }
       set {
         packet_ = value;
         packetCase_ = value == null ? PacketOneofCase.None : PacketOneofCase.ChatMessage;
+      }
+    }
+
+    /// <summary>Field number for the "authResponse" field.</summary>
+    public const int AuthResponseFieldNumber = 4;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Multiplayer.Packets.AuthResponse AuthResponse {
+      get { return packetCase_ == PacketOneofCase.AuthResponse ? (global::Multiplayer.Packets.AuthResponse) packet_ : null; }
+      set {
+        packet_ = value;
+        packetCase_ = value == null ? PacketOneofCase.None : PacketOneofCase.AuthResponse;
+      }
+    }
+
+    /// <summary>Field number for the "banInformation" field.</summary>
+    public const int BanInformationFieldNumber = 5;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Multiplayer.Packets.BanInformation BanInformation {
+      get { return packetCase_ == PacketOneofCase.BanInformation ? (global::Multiplayer.Packets.BanInformation) packet_ : null; }
+      set {
+        packet_ = value;
+        packetCase_ = value == null ? PacketOneofCase.None : PacketOneofCase.BanInformation;
+      }
+    }
+
+    /// <summary>Field number for the "kickInformation" field.</summary>
+    public const int KickInformationFieldNumber = 6;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Multiplayer.Packets.KickInformation KickInformation {
+      get { return packetCase_ == PacketOneofCase.KickInformation ? (global::Multiplayer.Packets.KickInformation) packet_ : null; }
+      set {
+        packet_ = value;
+        packetCase_ = value == null ? PacketOneofCase.None : PacketOneofCase.KickInformation;
       }
     }
 
@@ -130,25 +189,32 @@ namespace Multiplayer.Packets {
       None = 0,
       Handshake = 2,
       ChatMessage = 3,
+      AuthResponse = 4,
+      BanInformation = 5,
+      KickInformation = 6,
     }
     private PacketOneofCase packetCase_ = PacketOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PacketOneofCase PacketCase {
       get { return packetCase_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void ClearPacket() {
       packetCase_ = PacketOneofCase.None;
       packet_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as GamePacket);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(GamePacket other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -159,16 +225,23 @@ namespace Multiplayer.Packets {
       if (Reciever != other.Reciever) return false;
       if (!object.Equals(Handshake, other.Handshake)) return false;
       if (!object.Equals(ChatMessage, other.ChatMessage)) return false;
+      if (!object.Equals(AuthResponse, other.AuthResponse)) return false;
+      if (!object.Equals(BanInformation, other.BanInformation)) return false;
+      if (!object.Equals(KickInformation, other.KickInformation)) return false;
       if (PacketCase != other.PacketCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (Reciever != 0UL) hash ^= Reciever.GetHashCode();
       if (packetCase_ == PacketOneofCase.Handshake) hash ^= Handshake.GetHashCode();
       if (packetCase_ == PacketOneofCase.ChatMessage) hash ^= ChatMessage.GetHashCode();
+      if (packetCase_ == PacketOneofCase.AuthResponse) hash ^= AuthResponse.GetHashCode();
+      if (packetCase_ == PacketOneofCase.BanInformation) hash ^= BanInformation.GetHashCode();
+      if (packetCase_ == PacketOneofCase.KickInformation) hash ^= KickInformation.GetHashCode();
       hash ^= (int) packetCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -177,11 +250,13 @@ namespace Multiplayer.Packets {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
@@ -198,6 +273,18 @@ namespace Multiplayer.Packets {
         output.WriteRawTag(26);
         output.WriteMessage(ChatMessage);
       }
+      if (packetCase_ == PacketOneofCase.AuthResponse) {
+        output.WriteRawTag(34);
+        output.WriteMessage(AuthResponse);
+      }
+      if (packetCase_ == PacketOneofCase.BanInformation) {
+        output.WriteRawTag(42);
+        output.WriteMessage(BanInformation);
+      }
+      if (packetCase_ == PacketOneofCase.KickInformation) {
+        output.WriteRawTag(50);
+        output.WriteMessage(KickInformation);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -206,6 +293,7 @@ namespace Multiplayer.Packets {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (Reciever != 0UL) {
         output.WriteRawTag(8);
@@ -219,6 +307,18 @@ namespace Multiplayer.Packets {
         output.WriteRawTag(26);
         output.WriteMessage(ChatMessage);
       }
+      if (packetCase_ == PacketOneofCase.AuthResponse) {
+        output.WriteRawTag(34);
+        output.WriteMessage(AuthResponse);
+      }
+      if (packetCase_ == PacketOneofCase.BanInformation) {
+        output.WriteRawTag(42);
+        output.WriteMessage(BanInformation);
+      }
+      if (packetCase_ == PacketOneofCase.KickInformation) {
+        output.WriteRawTag(50);
+        output.WriteMessage(KickInformation);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -226,6 +326,7 @@ namespace Multiplayer.Packets {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (Reciever != 0UL) {
@@ -237,6 +338,15 @@ namespace Multiplayer.Packets {
       if (packetCase_ == PacketOneofCase.ChatMessage) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(ChatMessage);
       }
+      if (packetCase_ == PacketOneofCase.AuthResponse) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(AuthResponse);
+      }
+      if (packetCase_ == PacketOneofCase.BanInformation) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(BanInformation);
+      }
+      if (packetCase_ == PacketOneofCase.KickInformation) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(KickInformation);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -244,6 +354,7 @@ namespace Multiplayer.Packets {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(GamePacket other) {
       if (other == null) {
         return;
@@ -264,12 +375,31 @@ namespace Multiplayer.Packets {
           }
           ChatMessage.MergeFrom(other.ChatMessage);
           break;
+        case PacketOneofCase.AuthResponse:
+          if (AuthResponse == null) {
+            AuthResponse = new global::Multiplayer.Packets.AuthResponse();
+          }
+          AuthResponse.MergeFrom(other.AuthResponse);
+          break;
+        case PacketOneofCase.BanInformation:
+          if (BanInformation == null) {
+            BanInformation = new global::Multiplayer.Packets.BanInformation();
+          }
+          BanInformation.MergeFrom(other.BanInformation);
+          break;
+        case PacketOneofCase.KickInformation:
+          if (KickInformation == null) {
+            KickInformation = new global::Multiplayer.Packets.KickInformation();
+          }
+          KickInformation.MergeFrom(other.KickInformation);
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -302,6 +432,33 @@ namespace Multiplayer.Packets {
             ChatMessage = subBuilder;
             break;
           }
+          case 34: {
+            global::Multiplayer.Packets.AuthResponse subBuilder = new global::Multiplayer.Packets.AuthResponse();
+            if (packetCase_ == PacketOneofCase.AuthResponse) {
+              subBuilder.MergeFrom(AuthResponse);
+            }
+            input.ReadMessage(subBuilder);
+            AuthResponse = subBuilder;
+            break;
+          }
+          case 42: {
+            global::Multiplayer.Packets.BanInformation subBuilder = new global::Multiplayer.Packets.BanInformation();
+            if (packetCase_ == PacketOneofCase.BanInformation) {
+              subBuilder.MergeFrom(BanInformation);
+            }
+            input.ReadMessage(subBuilder);
+            BanInformation = subBuilder;
+            break;
+          }
+          case 50: {
+            global::Multiplayer.Packets.KickInformation subBuilder = new global::Multiplayer.Packets.KickInformation();
+            if (packetCase_ == PacketOneofCase.KickInformation) {
+              subBuilder.MergeFrom(KickInformation);
+            }
+            input.ReadMessage(subBuilder);
+            KickInformation = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -309,6 +466,7 @@ namespace Multiplayer.Packets {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -336,6 +494,33 @@ namespace Multiplayer.Packets {
             }
             input.ReadMessage(subBuilder);
             ChatMessage = subBuilder;
+            break;
+          }
+          case 34: {
+            global::Multiplayer.Packets.AuthResponse subBuilder = new global::Multiplayer.Packets.AuthResponse();
+            if (packetCase_ == PacketOneofCase.AuthResponse) {
+              subBuilder.MergeFrom(AuthResponse);
+            }
+            input.ReadMessage(subBuilder);
+            AuthResponse = subBuilder;
+            break;
+          }
+          case 42: {
+            global::Multiplayer.Packets.BanInformation subBuilder = new global::Multiplayer.Packets.BanInformation();
+            if (packetCase_ == PacketOneofCase.BanInformation) {
+              subBuilder.MergeFrom(BanInformation);
+            }
+            input.ReadMessage(subBuilder);
+            BanInformation = subBuilder;
+            break;
+          }
+          case 50: {
+            global::Multiplayer.Packets.KickInformation subBuilder = new global::Multiplayer.Packets.KickInformation();
+            if (packetCase_ == PacketOneofCase.KickInformation) {
+              subBuilder.MergeFrom(KickInformation);
+            }
+            input.ReadMessage(subBuilder);
+            KickInformation = subBuilder;
             break;
           }
         }

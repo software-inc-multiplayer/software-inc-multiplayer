@@ -1,0 +1,11 @@
+﻿syntax = "proto3";
+package Multiplayer.Packets;
+
+message BanInformation {
+  string Reason = 1;
+  int64 ExpiryDate = 2;
+}
+
+message KickInformation {
+  string Reason = 1;
+}
