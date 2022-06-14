@@ -1,6 +1,8 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Multiplayer.Packets;
 
 namespace Multiplayer.Networking.Shared
 {
@@ -68,6 +70,7 @@ namespace Multiplayer.Networking.Shared
         #endregion
 
         private readonly Dictionary<ulong, GameUser> userIdToUser = new Dictionary<ulong, GameUser>();
+        private readonly Dictionary<ulong, BanInformation> bannedUsers = new Dictionary<ulong, BanInformation>();
 
         public UserManager()
         {
@@ -97,6 +100,12 @@ namespace Multiplayer.Networking.Shared
             }
 
             return oldUser;
+        }
+
+        
+        public BanInformation? CheckBanned(GameUser user)
+        {
+            return this.bannedUsers.TryGetValue(user.Id, out var banInfo) ? banInfo : null;
         }
 
         public void RemoveUser(ulong userId)

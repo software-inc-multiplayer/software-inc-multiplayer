@@ -10,6 +10,7 @@ using Multiplayer.Networking.Utility;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
 using System.Buffers;
+using AuthResponse = Multiplayer.Packets.AuthResponse;
 
 namespace Multiplayer.Networking.Server
 {
@@ -79,7 +80,10 @@ namespace Multiplayer.Networking.Server
                         if (Parent.ServerInfo.Password != handshakePacket.Password)
                         {
                             // Invalid Password
-                            Send(new BadPassword(), connection);
+                            Send(new AuthResponse()
+                            {
+                                Type = ResponseType.Bad
+                            }, connection);
                             return;
                         }
 
@@ -92,6 +96,18 @@ namespace Multiplayer.Networking.Server
                         };
 
                         Parent.UserManager.GetOrAddUser(user);
+
+                        BanInformation? banned = Parent.UserManager.CheckBanned(user);
+
+                        if (banned != null)
+                        {
+                            Send(new AuthResponse()
+                            {
+                                Type = ResponseType.Banned,
+                                BanInfo = banned
+                            }, connection);
+                            return;
+                        }
 
                         Send(new Handshake()
                         {
