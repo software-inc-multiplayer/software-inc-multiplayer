@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Facepunch.Steamworks;
 using Multiplayer.Extensions;
-using Multiplayer.Networking.Shared;
 using Multiplayer.Packets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -256,7 +255,7 @@ namespace Multiplayer.Core.Behaviours
                 }
                 ChatMessage chatClass = new ChatMessage()
                 {
-                    UserName = SteamClient.Name,
+                    Username = SteamClient.Name,
                     Contents = chatBox.obj.text
                 };
                 chatBox.obj.text = "";

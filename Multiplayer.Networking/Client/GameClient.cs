@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Multiplayer.Packets;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Google.Protobuf;
+using Multiplayer.Packets;
 using Multiplayer.Shared;
 
 namespace Multiplayer.Networking.Client
@@ -25,6 +21,8 @@ namespace Multiplayer.Networking.Client
         public void Connect(string ip, ushort port, string password = "")
         {
             this.Socket = SteamNetworkingSockets.ConnectNormal<GameClientSocket>(NetAddress.From(ip, port));
+
+            this.Socket.Parent = this;
 
             var handshake = new Handshake
             {
