@@ -243,7 +243,7 @@ namespace Multiplayer.Core.Behaviours
             }, MpWindow.MainPanel);
 
             ChatWindow = WindowManager.SpawnLabel();
-            ChatWindow.text = "NoMessages".LocDef("Its pretty quiet in here, seems to be no sign of chat messages anywhere!");
+            ChatWindow.text = "NoMessages".LocDef("No messages... yet.");
             MpWindow.AddElement(ChatWindow.gameObject, new Rect(30, 75, 670, 255), Rect.zero);
             Utils.Controls.Element.UITextbox chatBox = new Utils.Controls.Element.UITextbox(new Rect(30, 390, 471, 45), MpWindow.MainPanel, "TypeToChat".LocDef("Type here to chat..."), "chatBox", null, 15, false);
             Utils.Controls.Element.UIButton sendButton = new Utils.Controls.Element.UIButton("Send", new Rect(541, 390, 159, 45), () =>
@@ -253,7 +253,7 @@ namespace Multiplayer.Core.Behaviours
                     WindowManager.SpawnDialog("NotConnectedToServer".LocDef("You aren't connected to a server!"), true, DialogWindow.DialogType.Error);
                     return;
                 }
-                ChatMessage chatClass = new ChatMessage()
+                var chatClass = new ChatMessage()
                 {
                     Username = SteamClient.Name,
                     Contents = chatBox.obj.text
