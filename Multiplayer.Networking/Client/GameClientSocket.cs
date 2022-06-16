@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Multiplayer.Debugging;
-using Multiplayer.Networking.Server;
-using Multiplayer.Networking.Shared;
+using Multiplayer.Networking.Shared.Managers;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
 
@@ -18,15 +15,12 @@ namespace Multiplayer.Networking.Client
         private readonly ILogger log;
 
         public GameClient Parent;
-        
-        private readonly List<IPacketHandler> packetHandlers;
-        
+
         private readonly ArrayPool<byte> bufferPool = ArrayPool<byte>.Create();
 
         public GameClientSocket()
         {
             log = new UnityLogger();
-            packetHandlers = RegisterManager.FetchInstancesWithAttribute(RegisterType.CLIENT, this);
         }
 
         public override void OnConnected(ConnectionInfo info)
@@ -38,7 +32,6 @@ namespace Multiplayer.Networking.Client
         {
             base.OnConnecting(info);
         }
-
 
 
         //base implementation is good enaugh
@@ -69,18 +62,10 @@ namespace Multiplayer.Networking.Client
 
             var gamePacket = GamePacket.Parser.ParseFrom(buffer, 0, size);
 
-            var types = Enum.GetValues(typeof(GamePacket.PacketOneofCase));
-
-            var assembly = typeof(GameServerSocket).Assembly;
-            
-            foreach (GamePacket.PacketOneofCase type in types)
+            if (gamePacket.PacketCase == GamePacket.PacketOneofCase.None) return;
+            if (RegisterManager.ClientPacketHandlersCache.TryGetValue(gamePacket.PacketCase, out var handler))
             {
-                if (type == GamePacket.PacketOneofCase.None) continue;
-                foreach (var packetHandler in packetHandlers.Where(packetHandler => packetHandler.GetType().GetGenericArguments()[0] == assembly.GetType("Multiplayer.Packets." + type)))
-                {
-                    // using connection.Id probably wont work for now, we need a way to assign GameUsers connection IDs
-                    packetHandler.HandlePacket(null, gamePacket);
-                }
+                handler.HandlePacket(null, gamePacket);
             }
         }
 

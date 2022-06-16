@@ -1,16 +1,14 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using Multiplayer.Debugging;
+using Multiplayer.Networking;
+using Multiplayer.Networking.Server;
+using Multiplayer.Networking.Server.Handlers;
+using Multiplayer.Networking.Server.Managers;
+using Multiplayer.Networking.Shared;
 using UnityEngine;
 
-using Multiplayer.Debugging;
-using Multiplayer.Networking.Server;
-using Multiplayer.Networking.Shared;
-using Multiplayer.Networking.Utility;
-using Multiplayer.Networking.Server.Managers;
-using Multiplayer.Networking;
-using Multiplayer.Networking.Server.Handlers;
-using System;
-
-namespace Multiplayer.Core
+namespace Multiplayer.Core.Behaviours
 {
 
     [DisallowMultipleComponent]
@@ -31,8 +29,8 @@ namespace Multiplayer.Core
 
             this.UserManager = new UserManager();
             this.BanManager = new BanManager();
-
-            this.Server = new GameServer();
+            
+            this.Server = new GameServer(logger);
 
             /*this.Server = new GameServer_old(
                 this.logger,

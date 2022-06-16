@@ -1,15 +1,13 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Multiplayer.Networking.Shared;
+using Multiplayer.Networking.Shared.Managers;
 using Multiplayer.Packets;
 
 namespace Multiplayer.Networking.Server.Handlers
 {
-    [RegisterManager(RegisterType.SERVER)]
+    [RegisterManager(RegisterType.Server, GamePacket.PacketOneofCase.ChatMessage)]
     public class ChatHandler : ServerPacketHandler<ChatMessage>
     {
-        public override Type[] PacketsFilter => new Type[] { typeof(ChatMessage) };
-
         public ChatHandler(GameServer server) : base(server) { }
 
         public override void HandlePacket(GameUser sender, ChatMessage packet)

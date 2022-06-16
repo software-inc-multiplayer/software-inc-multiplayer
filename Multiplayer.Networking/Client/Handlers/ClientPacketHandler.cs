@@ -1,5 +1,4 @@
-﻿using System;
-using Google.Protobuf;
+﻿using Google.Protobuf;
 using Multiplayer.Networking.Shared;
 using Multiplayer.Packets;
 
@@ -8,7 +7,6 @@ namespace Multiplayer.Networking.Client
     public abstract class ClientPacketHandler<T> : IPacketHandler where T : IMessage
     {
         public virtual int Priority => 0;
-        public abstract Type[] PacketsFilter { get; }
         public void HandlePacket(GameUser sender, GamePacket packet)
         {
             var fields = packet.GetType().GetFields();

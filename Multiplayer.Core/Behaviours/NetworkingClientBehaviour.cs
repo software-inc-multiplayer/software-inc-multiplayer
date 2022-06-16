@@ -1,14 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using UnityEngine;
-
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Multiplayer.Debugging;
 using Multiplayer.Networking.Client;
-using Multiplayer.Networking.Shared;
-using Multiplayer.Networking.Utility;
 using Multiplayer.Networking.Client.Handlers;
-using System;
+using Multiplayer.Networking.Shared;
+using UnityEngine;
 
-namespace Multiplayer.Core
+namespace Multiplayer.Core.Behaviours
 {
 
     [DisallowMultipleComponent]
@@ -54,7 +52,7 @@ namespace Multiplayer.Core
 
             this.RegisterPacketHandler();*/
 
-            this.Client = new GameClient(log);
+            this.Client = new GameClient(log, null);
             this.log.Debug("client behaviour booted");
         }
 

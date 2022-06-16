@@ -4,6 +4,7 @@ using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Google.Protobuf;
 using Multiplayer.Networking.Shared;
+using Multiplayer.Networking.Shared.Managers;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
 
@@ -19,6 +20,7 @@ namespace Multiplayer.Networking.Client
         {
             this.log = log;
             this.virtualUser = virtualUser;
+            RegisterManager.LoadInstances(this, null);
         }
 
         public void Connect(string ip, ushort port, string password = "")

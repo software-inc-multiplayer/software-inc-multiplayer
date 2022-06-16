@@ -2,6 +2,7 @@
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Multiplayer.Networking.Shared;
+using Multiplayer.Networking.Shared.Managers;
 using Multiplayer.Shared;
 
 namespace Multiplayer.Networking.Server
@@ -34,7 +35,11 @@ namespace Multiplayer.Networking.Server
         }
 
 
-        public GameServer(ILogger logger) => this.Logger = logger;
+        public GameServer(ILogger logger)
+        {
+            this.Logger = logger;
+            RegisterManager.LoadInstances(null, this);
+        }
         
 
 

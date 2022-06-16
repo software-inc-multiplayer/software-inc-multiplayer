@@ -2,12 +2,12 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Google.Protobuf;
 using Multiplayer.Networking.Shared;
+using Multiplayer.Networking.Shared.Managers;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
 
@@ -24,10 +24,7 @@ namespace Multiplayer.Networking.Server
 
         private readonly List<IPacketHandler> packetHandlers;
 
-        public GameServerSocket()
-        {
-            packetHandlers = RegisterManager.FetchInstancesWithAttribute(RegisterType.SERVER, this);
-        }
+        public GameServerSocket() {}
 
         public override void OnConnectionChanged(Connection connection, ConnectionInfo info)
         {
@@ -72,18 +69,10 @@ namespace Multiplayer.Networking.Server
 
             var gamePacket = GamePacket.Parser.ParseFrom(buffer, 0, size);
 
-            var types = Enum.GetValues(typeof(GamePacket.PacketOneofCase));
-
-            var assembly = typeof(GameServerSocket).Assembly;
-            
-            foreach (GamePacket.PacketOneofCase type in types)
+            if (gamePacket.PacketCase == GamePacket.PacketOneofCase.None) return;
+            if (RegisterManager.ServerPacketHandlersCache.TryGetValue(gamePacket.PacketCase, out var handler))
             {
-                if (type == GamePacket.PacketOneofCase.None) continue;
-                foreach (var packetHandler in packetHandlers.Where(packetHandler => packetHandler.GetType().GetGenericArguments()[0] == assembly.GetType("Multiplayer.Packets." + type)))
-                {
-                    // using connection.Id probably wont work for now, we need a way to assign GameUsers connection IDs
-                    packetHandler.HandlePacket(Parent.UserManager.GetUser(connection.Id), gamePacket);
-                }
+                handler.HandlePacket(null, gamePacket);
             }
             
             // TODO: Move this switch into packet handlers.

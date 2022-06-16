@@ -3,38 +3,58 @@ using System.Collections.Generic;
 using System.Reflection;
 using Multiplayer.Networking.Client;
 using Multiplayer.Networking.Server;
+using Multiplayer.Packets;
 
-namespace Multiplayer.Networking.Shared
+namespace Multiplayer.Networking.Shared.Managers
 {
     public enum RegisterType
     {
-        CLIENT,
-        SERVER
+        Client,
+        Server
     }
-    
+
     public class RegisterManager : Attribute
     {
+        public static readonly Dictionary<GamePacket.PacketOneofCase, IPacketHandler> ClientPacketHandlersCache = new Dictionary<GamePacket.PacketOneofCase, IPacketHandler>();
+        public static readonly Dictionary<GamePacket.PacketOneofCase, IPacketHandler> ServerPacketHandlersCache = new Dictionary<GamePacket.PacketOneofCase, IPacketHandler>();
+        
         private RegisterType type;
+        private GamePacket.PacketOneofCase[] catchers;
         
         public virtual RegisterType Type { get => this.type; set => type = value; }
+        public virtual GamePacket.PacketOneofCase[] Catchers { get => this.catchers; set => catchers = value; }
 
-        public RegisterManager(RegisterType type)
+        public RegisterManager(RegisterType type, params GamePacket.PacketOneofCase[] catcher)
         {
             this.type = type;
+            this.catchers = catcher;
         }
         
-        public static List<IPacketHandler> FetchInstancesWithAttribute(RegisterType type, object networkInstance)
+        public static void LoadInstances(GameClient? client, GameServer? server)
         {
-            var e = new List<IPacketHandler>();
             foreach(var t in Assembly.GetCallingAssembly().GetTypes())
             {
                 var f = t.GetCustomAttributes(typeof(RegisterManager), true);
-                if (f.Length <= 0 || ((RegisterManager)f[0]).type != type) 
+                if (f.Length <= 0 && f[0].GetType() == typeof(RegisterManager)) 
                     continue;
-                var ctor = t.GetConstructor(new[] { type == RegisterType.CLIENT ? typeof(GameClient) : typeof(GameServer) });
-                if (ctor != null) e.Add((IPacketHandler) ctor.Invoke(new[] { networkInstance }));
+                var manager = (RegisterManager)f[0];
+                var ctor = t.GetConstructor(new[] { manager.type == RegisterType.Client ? typeof(GameClient) : typeof(GameServer) });
+                
+                foreach (var catcher in manager.catchers )
+                {
+                    if (manager.type == RegisterType.Client && ctor != null && client != null)
+                    {
+                        ClientPacketHandlersCache.Add(catcher, (IPacketHandler) ctor.Invoke(new object[] { client }));
+                    }
+                    else if (ctor != null && server != null)
+                    {
+                        ServerPacketHandlersCache.Add(catcher, (IPacketHandler) ctor.Invoke(new object[] { server }));
+                    }
+                    
+                }
+                
+                
             }
-            return e;
         }
     }
 }
