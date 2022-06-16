@@ -12,6 +12,9 @@ namespace Multiplayer.Networking.Client
 {
     public class GameClient : IDisposable
     {
+
+        public event EventHandler<bool> ConnectionStateChange;
+        
         private readonly GameUser? virtualUser;
         public GameClientSocket Socket { get; private set; }
         private ILogger log { get; set; }
@@ -47,10 +50,12 @@ namespace Multiplayer.Networking.Client
                 Id = SteamClient.SteamId.Value
             };
             this.Send(handshake);
+            ConnectionStateChange(this, true);
         }
 
         public void Disconnect()
         {
+            ConnectionStateChange(this, false);
             Socket.Connection.Close();
         }
 

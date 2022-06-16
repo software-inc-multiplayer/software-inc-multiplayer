@@ -1,12 +1,9 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using Multiplayer.Core.Behaviours;
 using Multiplayer.Debugging;
-//using Multiplayer.Extensions;
 using UnityEngine;
-using UnityEngine.UI;
 using ILogger = Multiplayer.Shared.ILogger;
+//using Multiplayer.Extensions;
 
 namespace Multiplayer.Core
 {
@@ -16,11 +13,11 @@ namespace Multiplayer.Core
         public static ModController.DLLMod ThisMod { get; set; }
         
         public static bool GiveMeFreedom = true;
-        
-        public static NetworkingClientBehaviour NetworkingClient { get; private set; }
-        public static NetworkingServerBehaviour NetworkingServer { get; private set; }
-        public static SteamHelperBehaviour SteamHelper { get; private set; }
-        public static MultiplayerMenuBehaviour MpWindow { get; set; }
+
+        public static NetworkingClientBehaviour NetworkingClient;
+        public static NetworkingServerBehaviour NetworkingServer;
+        public static SteamHelperBehaviour SteamHelper;
+        public static MultiplayerMenuBehaviour MpWindow;
 
         public override string Name => "Software Inc Multiplayer";
         public override void ConstructOptionsScreen(RectTransform parent, bool inGame)
@@ -41,10 +38,11 @@ namespace Multiplayer.Core
             ThisMod = parentMod;
             
             Application.runInBackground = true;
-            
-            NetworkingClient = parentMod.Behaviors.Single(x => x is NetworkingClientBehaviour) as NetworkingClientBehaviour;
-            NetworkingServer = parentMod.Behaviors.Single(x => x is NetworkingServerBehaviour) as NetworkingServerBehaviour;
-            SteamHelper = parentMod.Behaviors.Single(x => x is SteamHelperBehaviour) as SteamHelperBehaviour;
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                Logger.Error("Error!" + ((Exception)args.ExceptionObject).StackTrace + "\n\n" + ((Exception)args.ExceptionObject).Message);
+            };
             
             base.Initialize(parentMod);
         }

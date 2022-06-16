@@ -24,13 +24,12 @@ namespace Multiplayer.Core.Behaviours
 
         public override void OnActivate()
         {
+            Meta.NetworkingServer = this;
             this.logger = new UnityLogger();
             this.logger.Debug("server behaviour booting");
 
             this.UserManager = new UserManager();
             this.BanManager = new BanManager();
-            
-            this.Server = new GameServer(logger);
 
             /*this.Server = new GameServer_old(
                 this.logger,
@@ -68,12 +67,19 @@ namespace Multiplayer.Core.Behaviours
             this.logger.Debug("[server] starting");
             try
             {
+                this.Server = new GameServer(logger);
                 this.Server.Start(serverInfo);
             }
             catch (Exception ex)
             {
                 this.logger.Error("[server] not started", ex);
             }
+
+            Server.ClientConnected += (sender, args) => this.logger.Info("Client connected");
+            Server.ClientDisconnected += (sender, args) => this.logger.Info("Client disconnected");
+            Server.ServerStarted  += (sender, args) => this.logger.Info("Server started");
+            Server.ServerStopped  += (sender, args) => this.logger.Info("Server stopped");
+            
             this.logger.Debug("[server] started");
         }
 

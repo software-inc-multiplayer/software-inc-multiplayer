@@ -36,11 +36,11 @@ namespace Multiplayer.Core.Behaviours
 
         private void CreateButton()
         {
-            GameObject FanPanel = WindowManager.FindElementPath("MainPanel/Holder/FanPanel").gameObject;
+            GameObject fanPanel = WindowManager.FindElementPath("MainPanel/Holder/FanPanel").gameObject;
             MpButton = WindowManager.SpawnButton();
             MpButton.onClick.AddListener(CreateBaseMultiplayerWindow);
             MpButton.SetText("MultiplayerButton".LocDef("Multiplayer"));
-            WindowManager.AddElementToElement(MpButton.gameObject, FanPanel, new Rect(274, 0, 100, 32), Rect.zero);
+            WindowManager.AddElementToElement(MpButton.gameObject, fanPanel, new Rect(274, 0, 100, 32), Rect.zero);
             Meta.Logger.Info("Initalized multiplayer button in MainScene");
         }
 
@@ -58,7 +58,7 @@ namespace Multiplayer.Core.Behaviours
             MpWindow.MinSize = new Vector2(730, 500);
             MpWindow.SizeButton.SetActive(false);
 
-            new Utils.Controls.Element.UIButton("ConnectButtonText".LocDef("Connect"), new Rect(30, 30, 159, 25), () =>
+            var uiButton = new Utils.Controls.Element.UIButton("ConnectButtonText".LocDef("Connect"), new Rect(30, 30, 159, 25), () =>
             {
                 #region Connect Window
                 MpWindow.gameObject.SetActive(false);
@@ -100,41 +100,38 @@ namespace Multiplayer.Core.Behaviours
                         WindowManager.SpawnDialog("NoIPText".LocDef("Please enter a IP into the text box labeled \"Server IP\""), true, DialogWindow.DialogType.Error);
                         return;
                     }
-                    else if (String.IsNullOrWhiteSpace(PortTextBox.obj.text))
+                    if (String.IsNullOrWhiteSpace(PortTextBox.obj.text))
                     {
                         WindowManager.SpawnDialog("NoPortText".LocDef("Please enter a Port into the text box labeled \"Server Port\""), true, DialogWindow.DialogType.Error);
                         return;
                     }
-                    else
+                    if (Meta.NetworkingClient.IsConnected)
                     {
-                        if (Meta.NetworkingClient.IsConnected)
+                        // If user is already connected to a server.
+                        GameObject diagObj = UnityEngine.Object.Instantiate(WindowManager.Instance.DialogPrefab, WindowManager.Instance.Canvas.transform, false);
+                        DialogWindow diag = gameObject.GetComponent<DialogWindow>();
+                        KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
                         {
-                            // If user is already connected to a server.
-                            GameObject diagObj = UnityEngine.Object.Instantiate(WindowManager.Instance.DialogPrefab, WindowManager.Instance.Canvas.transform, false);
-                            DialogWindow diag = gameObject.GetComponent<DialogWindow>();
-                            KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
-                            {
-                                new KeyValuePair<string, Action>("DisconnnectButton".LocDef("Disconnect"), delegate {
-                                    Meta.NetworkingClient.Disconnect();
-                                }),
-                                new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
-                                    diag.Window.Close();
-                                    return;
-                                }),
-                            };
-                            diag.Show("AlreadyConnectedToServer".LocDef("You are already connected to a server, would you like to disconnect?"), !true, DialogWindow.DialogType.Warning, actions);
-                        }
-                        try
-                        {
-                            Meta.NetworkingClient.Connect(IpTextBox.obj.text, ushort.Parse(PortTextBox.obj.text));
-                            WindowManager.SpawnDialog("SuccessfullyConnected".LocDef("Successfully connected to the server!"), true, DialogWindow.DialogType.Error);
-                        }
-                        catch (Exception e)
-                        {
-                            WindowManager.SpawnDialog($"There was an error trying to connect to {IpTextBox.obj.text}:{PortTextBox.obj.text}, see console for error.", true, DialogWindow.DialogType.Error);
-                            Meta.Logger.Error(e);
-                            return;
-                        }
+                            new KeyValuePair<string, Action>("DisconnnectButton".LocDef("Disconnect"), delegate {
+                                Meta.NetworkingClient.Disconnect();
+                            }),
+                            new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
+                                diag.Window.Close();
+                                return;
+                            }),
+                        };
+                        diag.Show("AlreadyConnectedToServer".LocDef("You are already connected to a server, would you like to disconnect?"), !true, DialogWindow.DialogType.Warning, actions);
+                    }
+                    try
+                    {
+                        Meta.NetworkingClient.Connect(IpTextBox.obj.text, ushort.Parse(PortTextBox.obj.text));
+                        WindowManager.SpawnDialog("SuccessfullyConnected".LocDef("Successfully connected to the server!"), true, DialogWindow.DialogType.Error);
+                    }
+                    catch (Exception e)
+                    {
+                        WindowManager.SpawnDialog($"There was an error trying to connect to {IpTextBox.obj.text}:{PortTextBox.obj.text}, see console for error.", true, DialogWindow.DialogType.Error);
+                        Meta.Logger.Error(e);
+                        return;
                     }
                 }, connectWindow.MainPanel);
                 #region Window Show management.
@@ -174,70 +171,67 @@ namespace Multiplayer.Core.Behaviours
                         WindowManager.SpawnDialog("NoPortText".LocDef("Please enter a valid Port into the text box labeled \"Port\""), true, DialogWindow.DialogType.Error);
                         return;
                     }
-                    else
+                    KeyValuePair<string, Action>[] action2s = new KeyValuePair<string, Action>[]
                     {
-                        KeyValuePair<string, Action>[] action2s = new KeyValuePair<string, Action>[]
-                        {
-                                new KeyValuePair<string, Action>("Yes".LocDef("Yes"), delegate {
-                                    if(Meta.NetworkingClient.IsConnected) Meta.NetworkingClient.Disconnect();
-                                    dia2g.Window.Close();
-                                    try
-                                    {
-                                        Meta.NetworkingClient.Connect("127.0.0.1", ushort.Parse(PortTextBox.obj.text));
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        WindowManager.SpawnDialog($"There was an error trying to connect to the server. See console for error.", true, DialogWindow.DialogType.Error);
-                                        Meta.Logger.Error(e);
-                                        return;
-                                    }
-                                    WindowManager.SpawnDialog("SuccessfullyCreated".LocDef("Successfully created server!"), true, DialogWindow.DialogType.Information);
-                                }),
-                                new KeyValuePair<string, Action>("No".LocDef("No"), delegate {
-                                    dia2g.Window.Close();
-                                }),
-                        };
-                        if (Meta.NetworkingClient.IsConnected)
-                        {
-                            Meta.NetworkingClient.Disconnect();
-                        }
-                        if (Meta.NetworkingServer.Server != null)
-                        {
-                            // If user is already connected to a server.
-                            DialogWindow diag = WindowManager.SpawnDialog();
-                            KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
+                        new KeyValuePair<string, Action>("Yes".LocDef("Yes"), delegate {
+                            if(Meta.NetworkingClient.IsConnected) Meta.NetworkingClient.Disconnect();
+                            dia2g.Window.Close();
+                            try
                             {
-                                new KeyValuePair<string, Action>("StopButtonText".LocDef("Stop Server"), delegate {
-                                    Meta.NetworkingServer.Dispose();
-                                    diag.Window.Close();
-                                    try
-                                    {
-                                        Meta.NetworkingServer.Host("", "", ushort.Parse(PortTextBox.obj.text));
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        WindowManager.SpawnDialog($"There was an error trying to create a server at port {PortTextBox.obj.text}, see console for error.", true, DialogWindow.DialogType.Error);
-                                        Meta.Logger.Error(e);
-                                        return;
-                                    }
-                                    dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
-                                }),
-                                new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
-                                    diag.Window.Close();
-                                }),
-                            };
-                            diag.Show("AlreadyServer".LocDef("You already have a server started, would you like to stop it?"), !true, DialogWindow.DialogType.Warning, actions);
-                            return;
-                        }
-                        Meta.NetworkingServer.Host("Test", "Test Server", ushort.Parse(PortTextBox.obj.text));
-                        dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
+                                Meta.NetworkingClient.Connect("127.0.0.1", ushort.Parse(PortTextBox.obj.text));
+                            }
+                            catch (Exception e)
+                            {
+                                WindowManager.SpawnDialog($"There was an error trying to connect to the server. See console for error.", true, DialogWindow.DialogType.Error);
+                                Meta.Logger.Error(e);
+                                return;
+                            }
+                            WindowManager.SpawnDialog("SuccessfullyCreated".LocDef("Successfully created server!"), true, DialogWindow.DialogType.Information);
+                        }),
+                        new KeyValuePair<string, Action>("No".LocDef("No"), delegate {
+                            dia2g.Window.Close();
+                        }),
+                    };
+                    if (Meta.NetworkingClient.IsConnected)
+                    {
+                        Meta.NetworkingClient.Disconnect();
                     }
+                    if (Meta.NetworkingServer.Server != null)
+                    {
+                        // If user is already connected to a server.
+                        DialogWindow diag = WindowManager.SpawnDialog();
+                        KeyValuePair<string, Action>[] actions = new KeyValuePair<string, Action>[]
+                        {
+                            new KeyValuePair<string, Action>("StopButtonText".LocDef("Stop Server"), delegate {
+                                Meta.NetworkingServer.Dispose();
+                                diag.Window.Close();
+                                try
+                                {
+                                    Meta.NetworkingServer.Host("", "", ushort.Parse(PortTextBox.obj.text));
+                                }
+                                catch (Exception e)
+                                {
+                                    WindowManager.SpawnDialog($"There was an error trying to create a server at port {PortTextBox.obj.text}, see console for error.", true, DialogWindow.DialogType.Error);
+                                    Meta.Logger.Error(e);
+                                    return;
+                                }
+                                dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
+                            }),
+                            new KeyValuePair<string, Action>("CancelButton".LocDef("Cancel"), delegate {
+                                diag.Window.Close();
+                            }),
+                        };
+                        diag.Show("AlreadyServer".LocDef("You already have a server started, would you like to stop it?"), !true, DialogWindow.DialogType.Warning, actions);
+                        return;
+                    }
+                    Meta.NetworkingServer.Host("Test", "Test Server", ushort.Parse(PortTextBox.obj.text));
+                    dia2g.Show("LikeToConnect".LocDef("Would you like to connect to the server you have created?"), !true, DialogWindow.DialogType.Question, action2s);
                     connectWindow.gameObject.SetActive(false);
                 }, connectWindow.MainPanel);
                 connectWindow.Show();
                 #endregion
             }, MpWindow.MainPanel);
-            new Utils.Controls.Element.UIButton("GameplayButtonText".LocDef("Gameplay"), new Rect(369, 30, 159, 25), () =>
+            var button = new Utils.Controls.Element.UIButton("GameplayButtonText".LocDef("Gameplay"), new Rect(369, 30, 159, 25), () =>
             {
                 WindowManager.SpawnDialog("ComingSoon".LocDef("Coming soon!"), true, DialogWindow.DialogType.Error);
             }, MpWindow.MainPanel);

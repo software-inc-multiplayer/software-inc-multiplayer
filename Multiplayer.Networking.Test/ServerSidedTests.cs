@@ -11,7 +11,7 @@ namespace Multiplayer.Networking.Test
     {
         private static int _serverPort = 1400;
         private readonly int serverPort;
-        private readonly ServerInfo serverInfo;
+        private readonly ServerInfo serverInfo = new() { Port = (ushort)_serverPort, Name = "testserver", DefaultRole = UserRole.Host };
 
         private readonly TestLogger logger;
         private readonly GameServer server;
@@ -25,7 +25,6 @@ namespace Multiplayer.Networking.Test
         public ServerSidedTests()
         {
             this.serverPort = Interlocked.Increment(ref _serverPort);
-            this.serverInfo = new ServerInfo() { Port = (ushort)this.serverPort, Name = "testserver", DefaultRole = UserRole.Host };
             this.logger = new TestLogger();
             this.server = new GameServer(this.logger);
         }
@@ -45,7 +44,6 @@ namespace Multiplayer.Networking.Test
         [Fact]
         public void Bootup()
         {
-            // maybe we can create these upfront?
             Assert.NotNull(server.SocketManager);
             Assert.Null(server.ServerInfo);
         }

@@ -5,6 +5,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

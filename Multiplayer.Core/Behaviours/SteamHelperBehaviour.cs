@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using Facepunch.Steamworks;
 using Multiplayer.Debugging;
 using UnityEngine;
-using Facepunch.Steamworks;
 using ILogger = Multiplayer.Shared.ILogger;
 
 namespace Multiplayer.Core.Behaviours
@@ -31,7 +31,8 @@ namespace Multiplayer.Core.Behaviours
         {
             if (Initialized)
                 return;
-            
+
+            Meta.SteamHelper = this;
             this.Logger.Info("[STEAM] booting");
             try
             {

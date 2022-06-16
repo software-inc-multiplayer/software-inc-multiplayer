@@ -19,11 +19,12 @@ namespace Multiplayer.Core.Behaviours
         public GameClient Client { get; private set; }
         public ChatHandler ChatHandler { get; private set; }
         public IUserManager UserManager { get; private set; }
-        public bool IsConnected => Client.Socket.Connected;
+        public bool IsConnected = false;
 
 
         public override void OnActivate()
         {
+            Meta.NetworkingClient = this;
             this.log = new UnityLogger();
             this.log.Debug("client behavior booting");
 
@@ -53,6 +54,7 @@ namespace Multiplayer.Core.Behaviours
             this.RegisterPacketHandler();*/
 
             this.Client = new GameClient(log, null);
+            Client.ConnectionStateChange += (sender, b) => this.IsConnected = b;
             this.log.Debug("client behaviour booted");
         }
 

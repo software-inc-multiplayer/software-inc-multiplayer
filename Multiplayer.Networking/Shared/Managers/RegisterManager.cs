@@ -46,7 +46,7 @@ namespace Multiplayer.Networking.Shared.Managers
                 
                 var manager = (RegisterManager)f[0];
                 
-                logger.Info("RegisterManager at " + t.Name + " catches: " + string.Join(" - ", manager.catchers.Select(s => s.ToString()).ToArray()));
+                logger.Info("RegisterManager at " + t.Name + " for " + manager.type + " catches: " + string.Join(" - ", manager.catchers.Select(s => s.ToString()).ToArray()));
                 
                 var ctor = t.GetConstructor(new[] { manager.type == RegisterType.Client ? typeof(GameClient) : typeof(GameServer) });
                 
@@ -57,28 +57,30 @@ namespace Multiplayer.Networking.Shared.Managers
 
                     if (manager.type == RegisterType.Client && client != null) 
                     {
-                        logger.Info("Registered Catcher - " + catcher );
-                        if (ClientPacketHandlersCache[catcher] != null)
+                        
+                        if (ClientPacketHandlersCache.TryGetValue(catcher, out var arr))
                         {
-                            ClientPacketHandlersCache[catcher].Add((IPacketHandler) ctor.Invoke(new object[] { client }));
+                            arr.Add((IPacketHandler) ctor.Invoke(new object[] { client }));
                         }
                         else
                         {
-                            ClientPacketHandlersCache[catcher] = new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { client }) };
+                            ClientPacketHandlersCache.Add(catcher, new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { client }) });
                         }
                         
                     }
-                    if (manager.type != RegisterType.Server && server != null)
+                    if (manager.type == RegisterType.Server && server != null)
                     {
-                        if (ServerPacketHandlersCache[catcher] != null)
+                        if (ServerPacketHandlersCache.TryGetValue(catcher, out var arr))
                         {
-                            ServerPacketHandlersCache[catcher].Add((IPacketHandler) ctor.Invoke(new object[] { server }));
+                            arr.Add((IPacketHandler) ctor.Invoke(new object[] { server }));
                         }
                         else
                         {
-                            ServerPacketHandlersCache[catcher] = new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { server }) };
+                            ServerPacketHandlersCache.Add(catcher, new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { server }) });
                         }
                     }
+                    
+                    logger.Info("Registered Catcher - " + catcher );
                 }
                 
                 
