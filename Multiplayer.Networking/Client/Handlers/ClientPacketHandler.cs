@@ -14,7 +14,7 @@ namespace Multiplayer.Networking.Client
             {
                 if (field.FieldType == typeof(T))
                 {
-                    HandlePacket(sender, (T)field.GetValue(packet));
+                    HandlePacket(sender, (T)field.GetValue(packet)!);
                 }
             }
         }

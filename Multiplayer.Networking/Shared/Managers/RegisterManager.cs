@@ -44,13 +44,12 @@ namespace Multiplayer.Networking.Shared.Managers
                 {
                     if (manager.type == RegisterType.Client && ctor != null && client != null)
                     {
-                        ClientPacketHandlersCache.Add(catcher, (IPacketHandler) ctor.Invoke(new object[] { client }));
+                        ClientPacketHandlersCache[catcher] = (IPacketHandler) ctor.Invoke(new object[] { client });
                     }
                     else if (ctor != null && server != null)
                     {
-                        ServerPacketHandlersCache.Add(catcher, (IPacketHandler) ctor.Invoke(new object[] { server }));
+                        ServerPacketHandlersCache[catcher] =(IPacketHandler) ctor.Invoke(new object[] { server });
                     }
-                    
                 }
                 
                 
