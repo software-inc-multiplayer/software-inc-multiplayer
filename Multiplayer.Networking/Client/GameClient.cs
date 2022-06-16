@@ -20,7 +20,7 @@ namespace Multiplayer.Networking.Client
         {
             this.log = log;
             this.virtualUser = virtualUser;
-            RegisterManager.LoadInstances(this, null);
+            RegisterManager.LoadInstances(log, this, null);
         }
 
         public void Connect(string ip, ushort port, string password = "")

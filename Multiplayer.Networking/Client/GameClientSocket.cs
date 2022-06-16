@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
 using Multiplayer.Debugging;
+using Multiplayer.Networking.Shared;
 using Multiplayer.Networking.Shared.Managers;
 using Multiplayer.Packets;
 using Multiplayer.Shared;
@@ -63,9 +64,12 @@ namespace Multiplayer.Networking.Client
             var gamePacket = GamePacket.Parser.ParseFrom(buffer, 0, size);
 
             if (gamePacket.PacketCase == GamePacket.PacketOneofCase.None) return;
-            if (RegisterManager.ClientPacketHandlersCache.TryGetValue(gamePacket.PacketCase, out var handler))
+            if (RegisterManager.ClientPacketHandlersCache.TryGetValue(gamePacket.PacketCase, out var handlers))
             {
-                handler.HandlePacket(null, gamePacket);
+                foreach (IPacketHandler handler in handlers)
+                {
+                    handler.HandlePacket(null, gamePacket);
+                }
             }
         }
 

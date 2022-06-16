@@ -70,9 +70,12 @@ namespace Multiplayer.Networking.Server
             var gamePacket = GamePacket.Parser.ParseFrom(buffer, 0, size);
 
             if (gamePacket.PacketCase == GamePacket.PacketOneofCase.None) return;
-            if (RegisterManager.ServerPacketHandlersCache.TryGetValue(gamePacket.PacketCase, out var handler))
+            if (RegisterManager.ServerPacketHandlersCache.TryGetValue(gamePacket.PacketCase, out var handlers))
             {
-                handler.HandlePacket(null, gamePacket);
+                foreach (IPacketHandler handler in handlers)
+                {
+                    handler.HandlePacket(null, gamePacket);
+                }
             }
             
             // TODO: Move this switch into packet handlers.

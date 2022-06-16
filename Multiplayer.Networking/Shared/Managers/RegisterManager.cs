@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Multiplayer.Networking.Client;
 using Multiplayer.Networking.Server;
 using Multiplayer.Packets;
+using Multiplayer.Shared;
 
 namespace Multiplayer.Networking.Shared.Managers
 {
@@ -15,8 +17,8 @@ namespace Multiplayer.Networking.Shared.Managers
 
     public class RegisterManager : Attribute
     {
-        public static readonly Dictionary<GamePacket.PacketOneofCase, IPacketHandler> ClientPacketHandlersCache = new Dictionary<GamePacket.PacketOneofCase, IPacketHandler>();
-        public static readonly Dictionary<GamePacket.PacketOneofCase, IPacketHandler> ServerPacketHandlersCache = new Dictionary<GamePacket.PacketOneofCase, IPacketHandler>();
+        public static readonly Dictionary<GamePacket.PacketOneofCase, List<IPacketHandler>> ClientPacketHandlersCache = new Dictionary<GamePacket.PacketOneofCase, List<IPacketHandler>>();
+        public static readonly Dictionary<GamePacket.PacketOneofCase, List<IPacketHandler>> ServerPacketHandlersCache = new Dictionary<GamePacket.PacketOneofCase, List<IPacketHandler>>();
         
         private RegisterType type;
         private GamePacket.PacketOneofCase[] catchers;
@@ -30,25 +32,52 @@ namespace Multiplayer.Networking.Shared.Managers
             this.catchers = catcher;
         }
         
-        public static void LoadInstances(GameClient? client, GameServer? server)
+        public static void LoadInstances(ILogger logger, GameClient? client, GameServer? server)
         {
+            logger.Info("Loading Handlers @ " + (client != null ? "Client" : "Server"));
             foreach(var t in Assembly.GetCallingAssembly().GetTypes())
             {
                 var f = t.GetCustomAttributes(typeof(RegisterManager), true);
-                if (f.Length <= 0 && f[0].GetType() == typeof(RegisterManager)) 
+                
+                if (f.Length <= 0) 
                     continue;
+                
+                logger.Info("Found class with RegisterManager: " + t.Name);
+                
                 var manager = (RegisterManager)f[0];
+                
+                logger.Info("RegisterManager at " + t.Name + " catches: " + string.Join(" - ", manager.catchers.Select(s => s.ToString()).ToArray()));
+                
                 var ctor = t.GetConstructor(new[] { manager.type == RegisterType.Client ? typeof(GameClient) : typeof(GameServer) });
                 
                 foreach (var catcher in manager.catchers )
                 {
-                    if (manager.type == RegisterType.Client && ctor != null && client != null)
+                    if (ctor == null)
+                        break;
+
+                    if (manager.type == RegisterType.Client && client != null) 
                     {
-                        ClientPacketHandlersCache[catcher] = (IPacketHandler) ctor.Invoke(new object[] { client });
+                        logger.Info("Registered Catcher - " + catcher );
+                        if (ClientPacketHandlersCache[catcher] != null)
+                        {
+                            ClientPacketHandlersCache[catcher].Add((IPacketHandler) ctor.Invoke(new object[] { client }));
+                        }
+                        else
+                        {
+                            ClientPacketHandlersCache[catcher] = new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { client }) };
+                        }
+                        
                     }
-                    else if (ctor != null && server != null)
+                    if (manager.type != RegisterType.Server && server != null)
                     {
-                        ServerPacketHandlersCache[catcher] =(IPacketHandler) ctor.Invoke(new object[] { server });
+                        if (ServerPacketHandlersCache[catcher] != null)
+                        {
+                            ServerPacketHandlersCache[catcher].Add((IPacketHandler) ctor.Invoke(new object[] { server }));
+                        }
+                        else
+                        {
+                            ServerPacketHandlersCache[catcher] = new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { server }) };
+                        }
                     }
                 }
                 

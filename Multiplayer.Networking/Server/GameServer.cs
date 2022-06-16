@@ -38,7 +38,7 @@ namespace Multiplayer.Networking.Server
         public GameServer(ILogger logger)
         {
             this.Logger = logger;
-            RegisterManager.LoadInstances(null, this);
+            RegisterManager.LoadInstances(logger, null, this);
         }
         
 
