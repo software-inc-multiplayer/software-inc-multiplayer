@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using Facepunch.Steamworks;
 using Facepunch.Steamworks.Data;
+using Multiplayer.Networking.Client;
+using Multiplayer.Networking.Server;
+using Multiplayer.Networking.Shared.Managers;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -63,6 +64,18 @@ namespace Multiplayer.Networking.Test
             Assert.True(gameServerSocket.DisconnectedEvent.WaitOne(NetworkTimeout));
             Assert.True(gameClientSocket.DisconnectedEvent.WaitOne(NetworkTimeout));
         }
+
+        [Fact]
+        public void TestPacketManager()
+        {
+            var log = new TestLogger();
+            var gs = new GameServer(log);
+            var gc = new GameClient(log, null);
+            RegisterManager.LoadInstances(log, gc, gs);
+            log.Info(RegisterManager.ClientPacketHandlersCache);
+            log.Info(RegisterManager.ServerPacketHandlersCache);
+        }
+        
 
         [Fact]
         public void Test()

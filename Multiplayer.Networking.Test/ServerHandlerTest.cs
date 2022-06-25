@@ -16,13 +16,13 @@ namespace Multiplayer.Networking.Test
         private readonly ServerInfo serverInfo;
 
         private readonly TestLogger logger;
-        private readonly GameServer server;
+        private GameServer server;
 
         private static readonly ulong userId1 = 0123456789;
         private static readonly ulong userId2 = 9876543210;
 
-        private readonly GameClient client1;
-        private readonly GameClient client2;
+        private GameClient client1;
+        private GameClient client2;
         
         private readonly GameUser testUser1 = new GameUser() {
             Id = userId1,
@@ -49,6 +49,7 @@ namespace Multiplayer.Networking.Test
         [DebuggerStepThrough]
         private void SetupServerAndClient()
         {
+            this.server = new GameServer(logger);
             this.server.Start(this.serverInfo);
 
             this.client1.Connect("localhost", (ushort)serverPort);

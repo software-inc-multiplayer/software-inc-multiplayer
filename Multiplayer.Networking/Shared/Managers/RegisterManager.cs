@@ -78,7 +78,7 @@ namespace Multiplayer.Networking.Shared.Managers
                         break;
                     }
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        break;
                 }
 
                 logger.Info("Registered Catcher - " + manager.Catcher );
