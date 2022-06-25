@@ -24,7 +24,8 @@ namespace Multiplayer.Networking.Server
 
         private readonly List<IPacketHandler> packetHandlers;
 
-        public GameServerSocket() {}
+        public GameServerSocket()
+        {}
 
         public override void OnConnectionChanged(Connection connection, ConnectionInfo info)
         {
@@ -36,6 +37,7 @@ namespace Multiplayer.Networking.Server
         {
             Logger.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
             Logger.Debug($"Connected!");
+            Parent.OnClientConnected();
         }
 
         public override void OnConnecting(Connection connection, ConnectionInfo info)
@@ -50,6 +52,7 @@ namespace Multiplayer.Networking.Server
             Logger.Debug($"Connection: {connection.ToString()}, connectionInfo: {info.Address}");
             var result = connection.Close();
             Logger.Debug($"Disconnected and Closed");
+            Parent.OnClientDisconnected();
         }
 
         public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
@@ -189,6 +192,7 @@ namespace Multiplayer.Networking.Server
             {
                 Logger.Error(ex);
             }
+            Parent.OnServerStopped();
         }
     }
 }

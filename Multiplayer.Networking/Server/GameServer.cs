@@ -31,7 +31,7 @@ namespace Multiplayer.Networking.Server
             this.SocketManager = SteamNetworkingSockets.CreateNormalSocket<GameServerSocket>(NetAddress.AnyIp(serverInfo.Port));
             this.SocketManager.Logger = Logger;
             Logger.Info("Server Started!");
-            // ServerStarted(this, EventArgs.Empty);
+            OnServerStarted();
         }
 
 
@@ -53,6 +53,26 @@ namespace Multiplayer.Networking.Server
             this.SocketManager.Close();
             Logger.Info("Server Stopped!");
             // ServerStopped.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnServerStarted()
+        {
+            ServerStarted?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnServerStopped()
+        {
+            ServerStopped?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnClientConnected()
+        {
+            ClientConnected?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnClientDisconnected()
+        {
+            ClientDisconnected?.Invoke(this, EventArgs.Empty);
         }
     }
 }
