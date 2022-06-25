@@ -50,12 +50,12 @@ namespace Multiplayer.Networking.Client
                 Id = SteamClient.SteamId.Value
             };
             this.Send(handshake);
-            ConnectionStateChange(this, true);
+            this?.ConnectionStateChange(this, true);
         }
 
         public void Disconnect()
         {
-            ConnectionStateChange(this, false);
+            this?.ConnectionStateChange(this, false);
             Socket.Connection.Close();
         }
 
