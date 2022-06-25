@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Multiplayer.Networking.Client;
 using Multiplayer.Networking.Server;
@@ -21,15 +20,15 @@ namespace Multiplayer.Networking.Shared.Managers
         public static readonly Dictionary<GamePacket.PacketOneofCase, List<IPacketHandler>> ServerPacketHandlersCache = new Dictionary<GamePacket.PacketOneofCase, List<IPacketHandler>>();
         
         private RegisterType type;
-        private GamePacket.PacketOneofCase[] catchers;
+        private GamePacket.PacketOneofCase catcher;
         
         public virtual RegisterType Type { get => this.type; set => type = value; }
-        public virtual GamePacket.PacketOneofCase[] Catchers { get => this.catchers; set => catchers = value; }
+        public virtual GamePacket.PacketOneofCase Catcher { get => this.catcher; set => catcher = value; }
 
-        public RegisterManager(RegisterType type, params GamePacket.PacketOneofCase[] catcher)
+        public RegisterManager(RegisterType type, GamePacket.PacketOneofCase catcher)
         {
             this.type = type;
-            this.catchers = catcher;
+            this.catcher = catcher;
         }
         
         public static void LoadInstances(ILogger logger, GameClient? client, GameServer? server)
@@ -46,44 +45,43 @@ namespace Multiplayer.Networking.Shared.Managers
                 
                 var manager = (RegisterManager)f[0];
                 
-                logger.Info("RegisterManager at " + t.Name + " for " + manager.type + " catches: " + string.Join(" - ", manager.catchers.Select(s => s.ToString()).ToArray()));
+                logger.Info("RegisterManager at " + t.Name + " for " + manager.type + " catches " + manager.Catcher);
                 
                 var ctor = t.GetConstructor(new[] { manager.type == RegisterType.Client ? typeof(GameClient) : typeof(GameServer) });
-                
-                foreach (var catcher in manager.catchers )
-                {
-                    if (ctor == null)
+                if (ctor == null)
                         break;
 
-                    if (manager.type == RegisterType.Client && client != null) 
+                switch (manager.type)
+                {
+                    case RegisterType.Client when client != null:
                     {
-                        
-                        if (ClientPacketHandlersCache.TryGetValue(catcher, out var arr))
+                        if (ClientPacketHandlersCache.TryGetValue(manager.Catcher, out var arr))
                         {
                             arr.Add((IPacketHandler) ctor.Invoke(new object[] { client }));
                         }
                         else
                         {
-                            ClientPacketHandlersCache.Add(catcher, new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { client }) });
+                            ClientPacketHandlersCache.Add(manager.Catcher, new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { client }) });
                         }
-                        
+                        break;
                     }
-                    if (manager.type == RegisterType.Server && server != null)
+                    case RegisterType.Server when server != null:
                     {
-                        if (ServerPacketHandlersCache.TryGetValue(catcher, out var arr))
+                        if (ServerPacketHandlersCache.TryGetValue(manager.Catcher, out var arr))
                         {
                             arr.Add((IPacketHandler) ctor.Invoke(new object[] { server }));
                         }
                         else
                         {
-                            ServerPacketHandlersCache.Add(catcher, new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { server }) });
+                            ServerPacketHandlersCache.Add(manager.Catcher, new List<IPacketHandler> { (IPacketHandler)ctor.Invoke(new object[] { server }) });
                         }
+                        break;
                     }
-                    
-                    logger.Info("Registered Catcher - " + catcher );
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                
-                
+
+                logger.Info("Registered Catcher - " + manager.Catcher );
             }
         }
     }
