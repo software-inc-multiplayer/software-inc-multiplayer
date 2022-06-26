@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Multiplayer.Networking.Shared;
+using Facepunch.Steamworks.Data;
 using Multiplayer.Networking.Shared.Managers;
 using Multiplayer.Packets;
 
@@ -10,7 +10,7 @@ namespace Multiplayer.Networking.Server.Handlers
     {
         public ChatHandler(GameServer server) : base(server) { }
 
-        public override void HandlePacket(GameUser sender, ChatMessage packet)
+        public override void HandlePacket(Connection sender, ChatMessage packet)
         {
             if (BigInteger.Compare(packet.Target, BigInteger.Zero) < 0)
             {

@@ -1,4 +1,5 @@
-﻿using Google.Protobuf;
+﻿using Facepunch.Steamworks.Data;
+using Google.Protobuf;
 using Multiplayer.Networking.Shared;
 using Multiplayer.Packets;
 
@@ -7,19 +8,19 @@ namespace Multiplayer.Networking.Server
     public abstract class ServerPacketHandler<T> : IPacketHandler where T : IMessage
     {
         public virtual int Priority => 0;
-        public void HandlePacket(GameUser sender, GamePacket packet)
+        public void HandlePacket(IPacketHandler.PacketSender sender, GamePacket packet)
         {
             var fields = packet.GetType().GetFields();
             foreach (var field in fields)
             {
                 if (field.FieldType == typeof(T))
                 {
-                    HandlePacket(sender, (T)field.GetValue(packet));
+                    HandlePacket(sender.Connection.Value, (T)field.GetValue(packet));
                 }
             }
         }
 
-        public abstract void HandlePacket(GameUser sender, T packet);
+        public abstract void HandlePacket(Connection sender, T packet);
 
         protected readonly GameServer server;
 

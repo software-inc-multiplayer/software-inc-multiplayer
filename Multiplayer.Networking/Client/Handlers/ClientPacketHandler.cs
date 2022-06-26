@@ -7,14 +7,14 @@ namespace Multiplayer.Networking.Client
     public abstract class ClientPacketHandler<T> : IPacketHandler where T : IMessage
     {
         public virtual int Priority => 0;
-        public void HandlePacket(GameUser sender, GamePacket packet)
+        public void HandlePacket(IPacketHandler.PacketSender sender, GamePacket packet)
         {
             var fields = packet.GetType().GetFields();
             foreach (var field in fields)
             {
                 if (field.FieldType == typeof(T))
                 {
-                    HandlePacket(sender, (T)field.GetValue(packet)!);
+                    HandlePacket(sender.User, (T)field.GetValue(packet)!);
                 }
             }
         }
