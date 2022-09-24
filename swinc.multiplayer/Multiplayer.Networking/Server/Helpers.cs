@@ -9,68 +9,12 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Policy;
 using System.Xml;
 using System.Xml.Serialization;
+using ProtoBuf;
 
 namespace Multiplayer.Networking
 {
 	public static class Helpers
 	{
-		/// <summary>
-		/// Serialize an object to a byte array
-		/// </summary>
-		/// <param name="obj">The object you want to serialize</param>
-		/// <returns>A byte array representation of the object</returns>
-		public static byte[] Serialize(this object obj)
-		{
-			if (obj == null)
-			{
-				return null;
-			}
-			var bf = new BinaryFormatter();
-			using (var ms = new MemoryStream())
-			{
-				bf.Serialize(ms, obj);
-				return ms.ToArray();
-			}
-		}
-
-		/// <summary>
-		/// Deserialize a byte array back to an object
-		/// </summary>
-		/// <typeparam name="T">The type of the object</typeparam>
-		/// <param name="byteArray">The byte array you want to deserialize</param>
-		/// <returns>The object</returns>
-		public static T Deserialize<T>(this byte[] byteArray) where T : class
-		{
-			try
-			{
-				if (byteArray == null)
-				{
-					return null;
-				}
-				using (var memStream = new MemoryStream())
-				{
-					var binForm = new BinaryFormatter();
-					memStream.Write(byteArray, 0, byteArray.Length);
-					memStream.Seek(0, SeekOrigin.Begin);
-					var obj = (T)binForm.Deserialize(memStream);
-					return obj;
-				}
-			}
-			catch (SerializationException ex)
-			{
-				Logging.Warn("[Helpers] SerializationException thrown while deserializing, probably harmless... => " + ex.Message);
-				return null;
-			}
-			catch (Exception ex)
-			{
-				//Workaround, will maybe break the whole thing ^^
-				if(ex.HResult != -2147467262)
-					Logging.Error("[Helpers] Unknown exception while deserializing the array! => " + ex.Message);
-				return null;
-			}
-
-		}
-
 		/// <summary>
 		/// returns the unique user id, if it doesn't exist it will create one and return it
 		/// </summary>
@@ -93,29 +37,34 @@ namespace Multiplayer.Networking
 			return uid;
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public class User
 		{
 			/// <summary>
 			/// The ID of the User inside the server
 			/// </summary>
+			[ProtoMember(1)]
 			public int ID { get; set; }
 			/// <summary>
 			/// The (Steam) username of the User
 			/// </summary>
+			[ProtoMember(2)]
 			public string Username { get; set; }
 			/// <summary>
 			/// The UserRole of the user (Host or Client)
 			/// </summary>
+			[ProtoMember(3)]
 			public UserRole Role { get; set; }
 			/// <summary>
 			/// The Unique User ID
 			/// </summary>
+			[ProtoMember(4)]
 			public string UniqueID { get; set; }
 
 			/// <summary>
 			/// The UserCompany of the User, will be set with the User() function
 			/// </summary>
+			[ProtoMember(5)]
 			public UserCompany Usercompany { get; set; }
 
 			public User()
@@ -124,12 +73,13 @@ namespace Multiplayer.Networking
 			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public class UserCompany : Company
 		{
 			/// <summary>
 			/// The player who owns the company
 			/// </summary>
+			[ProtoMember(1)]
 			public User Owner { get; private set; }
 			
 			public UserCompany() { }
@@ -150,31 +100,33 @@ namespace Multiplayer.Networking
 			}
 		}
 		
-		[Serializable]
+		[ProtoContract]
 		/// <summary>
 		/// Base message to send over the network. DO NOT USE!
 		/// </summary>
 		public class TcpMessage
 		{
+			[ProtoMember(1)]
 			public string Header = "";
-			[XmlElement]
+
+			[ProtoMember(2)]
 			public XML.XMLDictionary Data = new XML.XMLDictionary();
 
 			public virtual byte[] Serialize()
 			{
-				return Helpers.Serialize(this);
+				MemoryStream memoryStream = new MemoryStream();
+				Serializer.Serialize(memoryStream, this);
+				return memoryStream.GetBuffer();
 			}
 
-			public static TcpMessage Deserialize(byte[] array)
+			public static T Deserialize<T>(byte[] array)
 			{
-				return Helpers.Deserialize<TcpMessage>(array);
+
+				return Serializer.Deserialize<T>(new MemoryStream(array));
 			}
 		}
-
-		[Serializable]
-		/// <summary>
-		/// [Client Only] Login message used to send a login request from the client to the server
-		/// </summary>
+		
+		[ProtoContract]
 		public class TcpLogin : TcpMessage
 		{
 			public TcpLogin()
@@ -194,19 +146,9 @@ namespace Multiplayer.Networking
 				Data.Add("password", password);
 				Data.Add("uniqueid", GetUniqueID());
 			}
-
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpLogin Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpLogin>(array);
-			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		/// <summary>
 		/// [Client/Server] GameWorld message used to update the GameWorld. Can be used by the Server and the Client!
 		/// </summary>
@@ -227,19 +169,9 @@ namespace Multiplayer.Networking
 				Data.Add("addition", isAddition);
 				Data.Add("changes", worldchanges);
 			}
-
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpGameWorld Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpGameWorld>(array);
-			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		/// <summary>
 		/// [Server Only] A response from the server (For example a response to a TcpLogin message from the client)
 		/// </summary>
@@ -258,16 +190,6 @@ namespace Multiplayer.Networking
 				Data.Add("type", type);
 				Data.Add("data", response);
 			}
-
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpResponse Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpResponse>(array);
-			}
 		}
 
 		public enum TcpServerChatType
@@ -277,7 +199,7 @@ namespace Multiplayer.Networking
 			Warn,
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public class TcpServerChat : TcpMessage
 		{
 			public TcpServerChat() { }
@@ -287,18 +209,9 @@ namespace Multiplayer.Networking
 				Data.Add("message", message);
 				Data.Add("type", type);
 			}
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpServerChat Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpServerChat>(array);
-			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public class TcpChat : TcpMessage
 		{
 			public TcpChat() { }
@@ -338,19 +251,9 @@ namespace Multiplayer.Networking
 				Data.Add("receiver", receiverid);
 				Data.Add("message", message);
 			}
-
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpChat Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpChat>(array);
-			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public class TcpRequest : TcpMessage
 		{
 			public TcpRequest() { }
@@ -360,19 +263,9 @@ namespace Multiplayer.Networking
 				Header = "request";
 				Data.Add("request", request);
 			}
-
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpRequest Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpRequest>(array);
-			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public class TcpData : TcpMessage
 		{
 			public TcpData() { }
@@ -400,19 +293,9 @@ namespace Multiplayer.Networking
 				Header = "data";
 				Data.Add(key, value);
 			}
-
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpData Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpData>(array);
-			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public class TcpGamespeed : TcpMessage
 		{
 			public TcpGamespeed() {}
@@ -427,19 +310,9 @@ namespace Multiplayer.Networking
 				Data.Add("type", type);
 				Data.Add("speed", speed);
 			}
-
-			public override byte[] Serialize()
-			{
-				return Helpers.Serialize(this);
-			}
-
-			new public static TcpGamespeed Deserialize(byte[] array)
-			{
-				return Helpers.Deserialize<TcpGamespeed>(array);
-			}
 		}
 
-		[Serializable]
+		[ProtoContract]
 		public enum UserRole
 		{
 			Host,

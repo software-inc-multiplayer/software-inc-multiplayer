@@ -2,20 +2,30 @@
 using System.Collections.Generic;
 using System.IO;
 using Multiplayer.Debugging;
+using ProtoBuf;
 
 namespace Multiplayer.Networking
 {
-    [Serializable]
+    [ProtoContract]
     public class ServerData
     {
+        [ProtoMember(1)]
         public string ServerID;
+        [ProtoMember(2)]
         public List<Helpers.User> Clients = new List<Helpers.User>();
+        [ProtoMember(3)]
         public string ServerName;
+        [ProtoMember(4)]
         public string Password;
+        [ProtoMember(5)]
         public ushort MaxPlayers;
+        [ProtoMember(6)]
         public int Difficulty;
+        [ProtoMember(7)]
         public GameWorld.Server Gameworld;
+        [ProtoMember(8)]
         public GameTime Gametime;
+        [ProtoMember(9)]
         string serverpath;
 
         /// <summary>
@@ -38,7 +48,7 @@ namespace Multiplayer.Networking
             else
             {
                 Logging.Info($"[ServerHandler] Trying to load ServerData from '{fname}'");
-                ServerData data = Helpers.Deserialize<ServerData>(File.ReadAllBytes(Path.Combine(serverpath, fname + ".server")));
+                ServerData data = Serializer.Deserialize<ServerData>(File.OpenRead(Path.Combine(serverpath, fname + ".server")));
                 data.Gametime.Speed = 0; //Pause the game at startup
                 ServerID = data.ServerID;
                 Clients = data.Clients;
@@ -85,7 +95,9 @@ namespace Multiplayer.Networking
         {
             string fname = ServerName;
             string floca = Path.Combine(serverpath, fname + ".server");
-            File.WriteAllBytes(floca, this.Serialize());
+            FileStream fileStream = new FileStream(fname, FileMode.OpenOrCreate);
+            Serializer.Serialize(fileStream, this);
+            fileStream.Close();
             Logging.Info($"[ServerHandler] Saving ServerData to '{floca}'");
         }
     }

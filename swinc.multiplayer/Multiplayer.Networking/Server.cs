@@ -181,19 +181,19 @@ namespace Multiplayer.Networking
 
             //Handle TCPLogin
             //Helpers.TcpLogin tcplogin = XML.From<Helpers.TcpLogin>(datastr);
-            Helpers.TcpLogin tcplogin = Helpers.TcpLogin.Deserialize(msg.data);
+            Helpers.TcpLogin tcplogin = Helpers.TcpLogin.Deserialize<Helpers.TcpLogin>(msg.data);
             if (tcplogin != null && tcplogin.Header == "login")
                 OnUserLogin(msg.connectionId, tcplogin);
 
             //Handle TCPChat
             //Helpers.TcpChat tcpchat = XML.From<Helpers.TcpChat>(datastr);
-            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(msg.data);
+            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize<Helpers.TcpChat>(msg.data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnUserChat(msg.connectionId, tcpchat);
 
             //Handle TCPRequests
             //Helpers.TcpRequest tcprequest = XML.From<Helpers.TcpRequest>(datastr);
-            Helpers.TcpRequest tcprequest = Helpers.TcpRequest.Deserialize(msg.data);
+            Helpers.TcpRequest tcprequest = Helpers.TcpRequest.Deserialize<Helpers.TcpRequest>(msg.data);
             if (tcprequest != null && tcprequest.Header == "request")
 			{
                 string req = (string)tcprequest.Data.GetValue("request");
@@ -203,7 +203,7 @@ namespace Multiplayer.Networking
                     OnRequestUserList(msg.connectionId);
 			}
 
-            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(msg.data);
+            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize<Helpers.TcpGamespeed>(msg.data);
             if (tcpspeed != null && tcpspeed.Header == "gamespeed")
                 OnGamespeedChange(msg.connectionId, tcpspeed);
         }

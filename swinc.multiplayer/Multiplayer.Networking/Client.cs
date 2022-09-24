@@ -90,27 +90,27 @@ namespace Multiplayer.Networking
             Logging.Info("[Client] Data from Server: " + data.Length + " bytes");
 
             //Handle TcpResponse
-            Helpers.TcpResponse tcpresponse = Helpers.TcpResponse.Deserialize(data);
+            Helpers.TcpResponse tcpresponse = Helpers.TcpResponse.Deserialize<Helpers.TcpResponse>(data);
             if (tcpresponse != null && tcpresponse.Header == "response")
                 OnServerResponse(tcpresponse);
 
             //Handle TcpServerChat
-            Helpers.TcpServerChat tcpServerChat = Helpers.TcpServerChat.Deserialize(data);
+            Helpers.TcpServerChat tcpServerChat = Helpers.TcpServerChat.Deserialize<Helpers.TcpServerChat>(data);
             if (tcpServerChat != null && tcpServerChat.Header == "serverchat")
                 OnServerChatRecieved(tcpServerChat);
 
             //Handle TcpChat
-            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize(data);
+            Helpers.TcpChat tcpchat = Helpers.TcpChat.Deserialize<Helpers.TcpChat>(data);
             if (tcpchat != null && tcpchat.Header == "chat")
                 OnChatReceived(tcpchat);
             
             //Handle GameWorld
-            Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize(data);
+            Helpers.TcpGameWorld tcpworld = Helpers.TcpGameWorld.Deserialize<Helpers.TcpGameWorld>(data);
             if (tcpworld != null && tcpworld.Header == "gameworld")
                 OnGameWorldReceived(tcpworld);
 
             //Handle Gamespeed
-            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize(data);
+            Helpers.TcpGamespeed tcpspeed = Helpers.TcpGamespeed.Deserialize<Helpers.TcpGamespeed>(data);
             if (tcpspeed != null && tcpspeed.Header == "gamespeed")
                 OnGamespeedChange(tcpspeed);
         }        
